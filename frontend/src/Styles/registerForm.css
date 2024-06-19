@@ -5,7 +5,6 @@
     min-height: 100vh;
     background-color: #f5f5f5;
   }
-  
   .form {
     background-color: #ffffff;
     padding: 2rem;
@@ -14,26 +13,22 @@
     width: 100%;
     max-width: 350px;
   }
-  
   .form-title {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 1.5rem;
     text-align: center;
   }
-  
   .form-group {
     margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
   }
-  
   .form-label {
     margin-bottom: 0.5rem;
     color: #333333;
     text-align: left;
   }
-  
   .form-input {
     padding: 0.5rem;
     border: 1px solid #cccccc;
@@ -42,11 +37,9 @@
     outline: none;
     transition: border-color 0.3s;
   }
-  
   .form-input:focus {
     border-color: #007bff;
   }
-  
   .submit-button {
     width: 100%;
     padding: 0.75rem;
@@ -58,23 +51,19 @@
     cursor: pointer;
     transition: background-color 0.3s;
   }
-  
   .submit-button:hover {
     background-color: #0056b3;
   }
-  
   .link-text {
     margin-top: 1rem;
     text-align: center;
     color: #666666;
   }
-  
   .link {
     color: #007bff;
     text-decoration: none;
     transition: color 0.3s;
   }
-  
   .link:hover {
     color: #0056b3;
     text-decoration: underline;
