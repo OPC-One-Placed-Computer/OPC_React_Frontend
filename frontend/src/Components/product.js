@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BiSolidCartAdd } from "react-icons/bi";
 import '../Styles/product.css';
 
 const Product = ({ image, brand, productName, price }) => {
@@ -22,8 +23,8 @@ const Product = ({ image, brand, productName, price }) => {
       <div className="product-image" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         <img src={image} alt={productName} />
         {isHovered && (
-          <div className="add-to-cart">
-            <button onClick={addToCart}>Add to Cart</button>
+          <div className="add-to-cart" onClick={addToCart}>
+            <BiSolidCartAdd size={30} color="#ff6600" />
           </div>
         )}
       </div>

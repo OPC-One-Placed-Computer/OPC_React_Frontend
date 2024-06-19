@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import Product from '../Components/product'; 
 import '../Styles/product.css';
 
+import Image1 from '../assets/bc_image.jpg';
+
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
   const products = [
     {
       id: 1,
-      image: 'https://via.placeholder.com/200',
+      image: Image1,
       brand: 'Example Brand 1',
       productName: 'Product 1',
       price: '19.99',

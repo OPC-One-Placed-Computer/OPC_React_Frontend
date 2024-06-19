@@ -50,15 +50,16 @@
     margin-bottom: 30px;
   }
   .btn {
-    background-color: #ff6600;
-    color: white;
+    background-color: #ffffff;
+    color: #13072E;
     padding: 10px 20px;
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 25px;
     transition: background-color 0.3s ease;
   }
   .btn:hover {
-    background-color: #cc5200;
+    background-color: #ff6600;
+    color: #ffffff;
   }
   .hero-image {
     max-width: 100%;
@@ -67,15 +68,18 @@
     border-radius: 25px;
   }
   .animated-span {
+    font-size: 55px;
+    color: #ff6600;
     display: inline-block;
-    white-space: nowrap;
     overflow: hidden;
-    animation: type 5s steps(20, end) infinite;
+    white-space: nowrap;
+    animation: type 5s steps(30, end) infinite;
+    border-right: 2px solid white;
   }
-  
+
   @keyframes type {
-    0% { width: 0; }
-    100% { width: 100%; }
+    from { width: 0; }
+    to { width: 100%; }
   }
   
   

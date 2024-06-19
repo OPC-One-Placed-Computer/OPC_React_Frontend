@@ -10,13 +10,13 @@
 .login-form {
   background-color: #ffffff;
   padding: 2rem;
-  border-radius: 25px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 350px;
 }
 .login-title {
   font-size: 2rem;
+  color: #13072E;
   font-weight: bold;
   margin-bottom: 1.5rem;
   text-align: center;
