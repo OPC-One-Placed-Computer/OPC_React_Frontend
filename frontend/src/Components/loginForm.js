@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-//import '../Styles/loginForm.css'; 
 import styled from 'styled-components'
+
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,62 +14,29 @@ const LoginForm = () => {
 
   return (
     <div>
-    <loginContainer>
+    <LoginContainer>
       <form onSubmit={handleSubmit}>
         <h2>Login</h2>
-        <formGroup>
-          <label className="form-label" htmlFor="email">Email</label>
-          <input 
-            id="email"
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-            className="form-input"
-          />
-        </formGroup>
-        <div className="form-group">
-          <label className="form-label" htmlFor="password">Password</label>
-          <input 
-            id="password"
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-            className="form-input"
-          />
-        </div>
-        <button 
-          type="submit" 
-          className="login-button"
-        >
-          Sign In
-        </button>
-        <p className="register-link">
-          New customer? <Link to="/registerForm" className="register-link-text">Create your account</Link>
-        </p>
-      </form>
-      
-      </loginContainer>
-    <sampleDiv>
-        <p>HII</p>
-      </sampleDiv>
+        <FormGroup>
+          <label htmlFor="email">Email</label> 
+          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="form-input"/>
+        </FormGroup>
+        <FormGroup>
+          <label htmlFor="password">Password</label>
+          <input id="password"type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </FormGroup>
+        <button type="submit">Sign In</button>
+        <NewCustomer>New customer? <Link to="/registerForm" className='link'>Create your account</Link></NewCustomer>
+      </form>   
+      </LoginContainer>
     </div>
   );
 };
 
 export default LoginForm;
 
-const sampleDiv = styled.div`
-display: flex;
-margin: 0 auto; 
-p {
-  font-color: #ffffff;
-  font-size: 100px;
-}
-`
 
-const loginContainer = styled.div `
+const LoginContainer = styled.div `
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,10 +57,58 @@ const loginContainer = styled.div `
   margin-bottom: 1.5rem;
   text-align: center;
   }
+  button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #0a1827;
+  }
 `
-const formGroup = styled.div `
-margin-bottom: 1rem;
+const FormGroup = styled.div `
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
 
+  label {
+  margin-bottom: 0.5rem;
+  color: #333333;
+  text-align: left; 
+  }
+
+  input {
+  padding: 0.5rem;
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+  }
+
+  input:focus {
+    border-color: #007bff;
+  }
+
+`
+const NewCustomer = styled.p `
+  margin-top: 1rem;
+  text-align: center;
+  color: #666666;
+.link {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.link: hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+  
 `

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 import Product from '../Components/product'; 
-import '../Styles/product.css';
+import styled from 'styled-components';
 
 import Image1 from '../assets/bc_image.jpg';
 
@@ -82,8 +82,8 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="products-page">
-      <div className="search-bar">
+    <ProductPage>
+      <Search>
         <input
           type="text"
           placeholder="Search products..."
@@ -91,21 +91,55 @@ const ProductsPage = () => {
           onChange={handleSearchChange}
           className="search-input"
         />
-      </div>
-      <div className="products-list">
+      </Search>
+      <ProductList>
         {filteredProducts.map(product => (
-          <div key={product.id} className="product-card" onClick={() => handleProductClick(product)}>
+          <ProductCard key={product.id} onClick={() => handleProductClick(product)}>
             <Product
               image={product.image}
               brand={product.brand}
               productName={product.productName}
               price={product.price}
             />
-          </div>
+          </ProductCard>
         ))}
-      </div>
-    </div>
+      </ProductList>
+    </ProductPage>
   );
 };
 
 export default ProductsPage;
+
+const ProductPage = styled.div `
+  padding: 30px;
+`
+const Search = styled.div `
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  
+  .search-input {
+  width: 70%;
+  padding: 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  }
+`
+const ProductList = styled.div `
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+`
+const ProductCard = styled.div `
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+
+  ProductCard:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+`
