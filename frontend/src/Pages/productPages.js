@@ -54,9 +54,9 @@ const ProductsPage = () => {
         {filteredProducts.map(product => (
           <ProductCard key={product.id} onClick={() => handleProductClick(product)}>
             <Product
-              image={product.image_name}
+              image={product.image_path}
               brand={product.brand}
-              productName={product.product_name}
+              product_name={product.product_name}
               price={product.price}
             />
           </ProductCard>

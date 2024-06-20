@@ -2,6 +2,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import getImageUrl from '../tools/media';
 
 const ProductDetailPage = () => {
   const location = useLocation();
@@ -15,12 +16,12 @@ const ProductDetailPage = () => {
     <ProductDetail>
       <ProductContent>
         <ProductImage>
-          <img src={product.image} alt={product.productName} />
+          <img src={getImageUrl(product.image_path)} alt={product.product_name} />
         </ProductImage>
         <ProductInfo>
-          <h1>{product.productName}</h1>
+          <h1>{product.product_name}</h1>
           <h2>{product.brand}</h2>
-          <p className="product-description">Description:{product.description}</p>
+          <p className="product-description">{product.description}</p>
           <p className="product-price">Price: ${product.price}</p>
           <p className="product-quantity">Quantity: {product.quantity}</p>
         </ProductInfo>

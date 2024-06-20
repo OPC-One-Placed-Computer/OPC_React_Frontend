@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { BiSolidCartAdd } from "react-icons/bi";
+import getImageUrl from '../tools/media';
 
 import styled from 'styled-components';
-const Product = ({ image_name, brand, product_name, price }) => {
+const Product = ({ image, brand, product_name, price }) => {
   const [isHovered, setIsHovered] = useState(false);
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -22,7 +23,7 @@ const Product = ({ image_name, brand, product_name, price }) => {
             <BiSolidCartAdd size={30} color="#FF6600" />
           </AddCart>
         )}
-        <img src={image_name} alt={product_name} />
+        <img src={getImageUrl(image)} alt={product_name} />
       </ProdImg>
       <ProdDetails>
         <h3>{brand}</h3>
@@ -60,6 +61,7 @@ const AddCart = styled.div`
   justify-content: center;
 `
 const ProdDetails = styled.div`
+padding: 10px;
 h3 {
   font-size: 18px;
   margin-bottom: 8px;
@@ -74,11 +76,3 @@ h3 {
   margin-bottom: 4px;
 }
 `
-
-
-
-
-
-
-
-
