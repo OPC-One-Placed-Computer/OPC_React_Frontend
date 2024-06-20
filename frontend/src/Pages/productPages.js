@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import Product from '../Components/product'; 
 import '../Styles/product.css';
 
@@ -6,6 +7,7 @@ import Image1 from '../assets/bc_image.jpg';
 
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();  // Use useNavigate
   
   const products = [
     {
@@ -75,6 +77,10 @@ const ProductsPage = () => {
     setSearchTerm(event.target.value);
   };
 
+  const handleProductClick = (product) => {
+    navigate(`/product/${product.id}`, { state: { product } });
+  };
+
   return (
     <div className="products-page">
       <div className="search-bar">
@@ -88,7 +94,7 @@ const ProductsPage = () => {
       </div>
       <div className="products-list">
         {filteredProducts.map(product => (
-          <div key={product.id} className="product-card">
+          <div key={product.id} className="product-card" onClick={() => handleProductClick(product)}>
             <Product
               image={product.image}
               brand={product.brand}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../Styles/loginForm.css'; 
-
+//import '../Styles/loginForm.css'; 
+import styled from 'styled-components'
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,10 +13,11 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <h2 className="login-title">Login</h2>
-        <div className="form-group">
+    <div>
+    <loginContainer>
+      <form onSubmit={handleSubmit}>
+        <h2>Login</h2>
+        <formGroup>
           <label className="form-label" htmlFor="email">Email</label>
           <input 
             id="email"
@@ -26,7 +27,7 @@ const LoginForm = () => {
             required 
             className="form-input"
           />
-        </div>
+        </formGroup>
         <div className="form-group">
           <label className="form-label" htmlFor="password">Password</label>
           <input 
@@ -48,8 +49,51 @@ const LoginForm = () => {
           New customer? <Link to="/registerForm" className="register-link-text">Create your account</Link>
         </p>
       </form>
+      
+      </loginContainer>
+    <sampleDiv>
+        <p>HII</p>
+      </sampleDiv>
     </div>
   );
 };
 
 export default LoginForm;
+
+const sampleDiv = styled.div`
+display: flex;
+margin: 0 auto; 
+p {
+  font-color: #ffffff;
+  font-size: 100px;
+}
+`
+
+const loginContainer = styled.div `
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+
+  form {
+  background-color: #ffffff;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 350px;
+  }
+  h2 {
+  font-size: 2rem;
+  color: #13072E;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  }
+`
+const formGroup = styled.div `
+margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+
+`
