@@ -10,7 +10,7 @@ const ProductsPage = () => {
   const [products, setProducts] = useState([]);
 
  useEffect(() => {
-  Axios.get("https://onepc.online/api/V1/products")
+  Axios.get("https://onepc.online/api/v1/products")
   .then((response) => {
     console.log(response.data);
     if (response.data && Array.isArray(response.data.data)) {
