@@ -9,22 +9,21 @@ const ProductsPage = () => {
   const navigate = useNavigate();  
   const [products, setProducts] = useState([]);
 
- useEffect(() => {
-  Axios.get("https://onepc.online/api/v1/products")
-  .then((response) => {
-    console.log(response.data);
-    if (response.data && Array.isArray(response.data.data)) {
-      setProducts(response.data.data);
-    } else {
-      setProducts([]);
-    }
-  })
-  .catch((error) => {
-    console.log(error);
-    setProducts([]);
-  });
- }, []);
-  
+  useEffect(() => {
+    Axios.get("https://onepc.online/api/v1/products")
+      .then((response) => {
+        console.log(response.data);
+        if (response.data && Array.isArray(response.data.data)) {
+          setProducts(response.data.data);
+        } else {
+          setProducts([]);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setProducts([]);
+      });
+  }, []);
   
   // Filter products based on search term
   const filteredProducts = products.filter(product =>
@@ -68,36 +67,43 @@ const ProductsPage = () => {
 
 export default ProductsPage;
 
-const ProductPage = styled.div `
+const ProductPage = styled.div`
   padding: 30px;
 `
-const Search = styled.div `
+
+const Search = styled.div`
   margin-bottom: 20px;
   display: flex;
   justify-content: center;
   
   .search-input {
-  width: 70%;
-  padding: 15px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 25px;
+    width: 100%;
+    max-width: 400px; 
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
   }
 `
-const ProductList = styled.div `
+
+const ProductList = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+  }
 `
-const ProductCard = styled.div `
+
+const ProductCard = styled.div`
   border: 1px solid #ccc;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease-in-out;
 
-  ProductCard:hover {
+  &:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   }
-
 `

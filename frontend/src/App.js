@@ -7,6 +7,7 @@ import RegisterForm from './Components/registerForm';
 import Homepage from './Pages/HomePage';
 import ProductsPage from './Pages/productPages';
 import ProductDetailPage from './Pages/productDetailPage';
+import CartPage from './Pages/cartPage'
 
 function App() {
   const [overlayActive, setOverlayActive] = useState(false);
@@ -26,6 +27,7 @@ function App() {
           <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/loginForm" element={<LoginForm toggleOverlay={toggleOverlay} />} />
           <Route path="/registerForm" element={<RegisterForm />} />
+          <Route path="/cartPage" element={<CartPage />} />
           <Route path="/HomePage" element={<Homepage />} />
         </Routes>
       </div>
