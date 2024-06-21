@@ -21,6 +21,7 @@ function App() {
         <NavigationBar />
         <div className={`overlay ${overlayActive ? 'active' : ''}`} onClick={toggleOverlay}></div>
         <Routes>
+          <Route path="/" element={<Homepage />} />
           <Route path="/products/" element={<ProductsPage />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/loginForm" element={<LoginForm toggleOverlay={toggleOverlay} />} />

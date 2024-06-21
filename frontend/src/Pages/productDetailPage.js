@@ -44,16 +44,25 @@ const ProductContent = styled.div `
   max-width: 800px;
 `
 const ProductImage = styled.div `
-  flex: 0 0 auto; 
-  margin-right: 20px; 
+flex: 1 1 auto;
+max-width: 100%;
+margin-right: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
 
-  img {
-    width: 100%; 
-    max-width: 300px; 
-    height: auto; 
-    border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-  }
+img {
+  width: 100%;
+  height: auto;
+  object-fit: contain; /* This ensures the image fits within the container without cropping */
+  max-width: 100%; /* Ensures the image doesn't overflow the container */
+  max-height: 100%; /* Ensures the image doesn't overflow the container */
+}
+
+@media (min-width: 768px) {
+  width: 50%;
+  margin-right: 20px;
+}
 `
 const ProductInfo = styled.div `
 flex: 1; 
