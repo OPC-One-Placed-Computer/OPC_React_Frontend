@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import { RiAccountPinCircleFill } from "react-icons/ri";
+import { IoIosCloseCircle } from "react-icons/io";
 import logo from '../assets/logo.png';
 import styled from 'styled-components';
 
@@ -18,15 +19,19 @@ const NavigationBar = () => {
         <Link to="/homepage"> <img src={logo} alt="Logo" /></Link>
       </Logo>
       <Hamburger onClick={toggleMenu} isOpen={isOpen}>
-        <div className="bar"></div>
-        <div className="bar"></div>
-        <div className="bar"></div>
+      {isOpen && (
+          <CloseButton onClick={toggleMenu}><IoIosCloseCircle size={50} /></CloseButton>)}
+          <>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+          </>
       </Hamburger>
-      <Content className={`nav-content ${isOpen ? 'open' : ''}`}>
-        <Link to="/homepage" className="nav-item" onClick={() => setIsOpen(false)}>Home</Link>
-        <Link to="/products" className="nav-item" onClick={() => setIsOpen(false)}>Products</Link>
-        <Link to="/cart" className="nav-item" onClick={() => setIsOpen(false)}><MdOutlineShoppingCart size={24} /></Link>
-        <Link to="/loginForm" className="nav-item" onClick={() => setIsOpen(false)}><RiAccountPinCircleFill size={24} /></Link>
+      <Content isOpen={isOpen}>
+        <Link to="/homepage" className="nav-item" onClick={toggleMenu}>Home</Link>
+        <Link to="/products" className="nav-item" onClick={toggleMenu}>Products</Link>
+        <Link to="/cartPage" className="nav-item" onClick={toggleMenu}><MdOutlineShoppingCart size={24} /></Link>
+        <Link to="/loginForm" className="nav-item" onClick={toggleMenu}><RiAccountPinCircleFill size={24} /></Link>
       </Content>
     </NavBar>
   );
@@ -42,13 +47,13 @@ const NavBar = styled.nav`
   align-items: center;
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
+`
 
 const Logo = styled.div`
   flex: 1; 
   display: flex;
   align-items: center; 
-`;
+`
 
 const Content = styled.div`
   display: flex;
@@ -71,21 +76,22 @@ const Content = styled.div`
   }
 
   @media (max-width: 768px) {
-    display: none; 
+    display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
     position: fixed;
     top: 0;
     right: 0;
     height: 100vh; 
     width: 70%; 
     max-width: 250px; 
-    background-color: #333;
+    z-index: 999;
+    background-color: #3f2182;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    transform: ${props => props.isOpen ? 'translateX(0)' : 'translateX(100%)'};
+    transform: ${({ isOpen }) => (isOpen ? 'translateX(0)' : 'translateX(100%)')};
     transition: transform 0.3s ease-in-out;
   }
-`;
+`
 
 const Hamburger = styled.div`
   display: none;
@@ -103,5 +109,17 @@ const Hamburger = styled.div`
 
   @media (max-width: 768px) {
     display: flex;
+  }
+`
+const CloseButton = styled.div`
+  color: white;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  z-index: 1000;
+
+  &:hover {
+    color: #ccc; 
   }
 `
