@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import Footer from '../Components/footer';
 import sampleImage from '../assets/bc_image.jpg'; 
 
 const Homepage = () => {
   return (
+    <div>
     <HomepageCon>
       <HeroHeader>
         <HeroCon>
@@ -21,6 +23,8 @@ const Homepage = () => {
         </HeroCon>
       </HeroHeader>
     </HomepageCon>
+    <Footer />
+    </div>
   );
 };
 
@@ -31,17 +35,17 @@ const HomepageCon = styled.div`
   color: white;
   min-height: 100vh;
   display: flex;
+  padding: 25px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px; 
-`;
+`
 
 const HeroHeader = styled.header`
   text-align: center;
   padding: 20px;
   width: 100%; 
-`;
+`
 
 const HeroCon = styled.div`
   border-radius: 15px;
@@ -79,7 +83,7 @@ const HeroCon = styled.div`
       font-size: 1.2em;
     }
   }
-`;
+`
 
 const Content = styled.div`
   display: flex;
@@ -91,7 +95,7 @@ const Content = styled.div`
   @media (min-width: 768px) {
     flex-direction: row; 
   }
-`;
+`
 
 const TextContent = styled.div`
   flex: 1;
@@ -137,7 +141,7 @@ const TextContent = styled.div`
     from { width: 0; }
     to { width: 100%; }
   }
-`;
+`
 
 const ImgContent = styled.div`
   flex: 1;
@@ -150,4 +154,4 @@ const ImgContent = styled.div`
     display: block;
     border-radius: 25px;
   }
-`;
+`
