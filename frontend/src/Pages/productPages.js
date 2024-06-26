@@ -59,6 +59,7 @@ const ProductsPage = () => {
               brand={product.brand}
               product_name={product.product_name}
               price={product.price}
+              product_id={product.product_id}
             />
           </ProductCard>
         ))}
