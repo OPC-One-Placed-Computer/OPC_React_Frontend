@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
   const [products, setProducts] = useState([
@@ -29,6 +30,8 @@ const CartPage = () => {
     }
   ]);
 
+  const navigate = useNavigate();
+
   const decreaseQuantity = (productId) => {
     const updatedProducts = products.map(product => {
       if (product.id === productId && product.quantity > 1) {
@@ -54,6 +57,12 @@ const CartPage = () => {
       return total + (product.price * product.quantity);
     }, 0);
   };
+
+  const handleCheckout = () => {
+    // Implement the checkout logic here
+    navigate('/placeOrder', { state: { products, total: calculateTotal() } });
+  };
+
 
   return (
     <CartContainer>
@@ -91,7 +100,7 @@ const CartPage = () => {
         <Subtotal>
           SUBTOTAL: ₱{calculateTotal().toFixed(2)} PHP
         </Subtotal>
-        <CheckoutButton>Check Out</CheckoutButton>
+        <CheckoutButton onClick={handleCheckout}>Check Out</CheckoutButton>
       </Summary>
     </CartContainer>
   );

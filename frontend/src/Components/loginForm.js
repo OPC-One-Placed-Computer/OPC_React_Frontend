@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
+
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +26,14 @@ const LoginForm = () => {
     try {
       const response = await axios.post('https://onepc.online/api/v1/login', userData);
       console.log('Login successful:', response.data);
+      const { token } = response.data;
+      localStorage.setItem('token', token);
+
+      setSuccessMessage('Login successful! Redirecting to product...');
+      
+      setTimeout(() => {
+        navigate('/products'); 
+      }, 2000);
     } catch (error) {
       console.error('Login failed:', error.response ? error.response.data : error.message);
       setError('Invalid email or password. Please try again.');
@@ -43,6 +54,7 @@ const LoginForm = () => {
         <form onSubmit={handleSubmit}>
           <h2>Login</h2>
           {error && <ErrorMessage>{error}</ErrorMessage>}
+          {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
           <FormGroup>
             <label htmlFor="email">Email</label>
             <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="form-input"/>
@@ -145,6 +157,11 @@ const NewCustomer = styled.p`
 
 const ErrorMessage = styled.p`
   color: red;
+  text-align: center;
+  margin-bottom: 1rem;
+`
+const SuccessMessage = styled.p`
+  color: green;
   text-align: center;
   margin-bottom: 1rem;
 `

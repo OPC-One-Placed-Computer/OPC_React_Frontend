@@ -1,3 +1,20 @@
-body {
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
+
+.overlay.active {
+  display: block;
+}
+
+.App {
+  position: relative;
   font-family: 'Century Gothic', sans-serif;
 }
+

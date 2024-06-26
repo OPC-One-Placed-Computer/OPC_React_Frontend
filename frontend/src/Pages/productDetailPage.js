@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { FaShoppingCart } from 'react-icons/fa'; 
 import getImageUrl from '../tools/media';
 
 const ProductDetailPage = () => {
@@ -23,6 +24,10 @@ const ProductDetailPage = () => {
           <p className="product-description">{product.description}</p>
           <p className="product-price">Price: ${product.price}</p>
           <p className="product-quantity">Quantity: {product.quantity}</p>
+          <AddToCartButton>
+            <FaShoppingCart style={{ marginRight: '5px' }} />
+            Add to Cart
+          </AddToCartButton>
         </ProductInfo>
       </ProductContent>
     </ProductDetail>
@@ -42,19 +47,16 @@ const ProductDetail = styled.div`
 
 const ProductContent = styled.div`
   display: flex;
-  flex-direction: column;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  align-items: center;
   max-width: 800px;
-  @media (min-width: 768px) {
-    flex-direction: row;
+  @media (max-width: 768px) {
+    flex-direction: column;
   }
-`;
+`
 
 const ProductImage = styled.div`
-  flex: 1 1 auto;
+  flex: 1;
   max-width: 100%;
-  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,17 +69,15 @@ const ProductImage = styled.div`
     max-height: 100%;
   }
 
-  @media (min-width: 768px) {
-    width: 50%;
-    margin-bottom: 0;
-    margin-right: 20px;
+  @media (max-width: 768px) {
+    order: 2; 
   }
-`;
+`
 
 const ProductInfo = styled.div`
-  flex: 1; 
-  text-align: center;
-  
+  flex: 1;
+  padding: 20px;
+
   h1 {
     font-size: 2rem;
     margin: 10px 0;
@@ -95,13 +95,39 @@ const ProductInfo = styled.div`
     margin: 10px 0;
   }
 
-  .product-price, .product-quantity {
+  .product-price,
+  .product-quantity {
     font-size: 1.2rem;
     color: #333;
     margin: 5px 0;
   }
 
-  @media (min-width: 768px) {
-    text-align: left;
+  @media (max-width: 768px) {
+    order: 1; /* Moves text above image on smaller screens */
+    text-align: center;
   }
-`;
+`
+
+const AddToCartButton = styled.button`
+  margin-top: 10px;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    font-size: 1.2rem; /* Adjust icon size as needed */
+  }
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`

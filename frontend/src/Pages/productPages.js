@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Product from '../Components/product'; 
 import styled from 'styled-components';
 import Axios from 'axios';
+import Footer from '../Components/footer';
 
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +40,7 @@ const ProductsPage = () => {
   };
 
   return (
+    <div>
     <ProductPage>
       <Search>
         <input
@@ -62,6 +64,8 @@ const ProductsPage = () => {
         ))}
       </ProductList>
     </ProductPage>
+    <Footer />
+    </div>
   );
 };
 

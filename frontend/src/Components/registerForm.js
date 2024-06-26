@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -11,6 +11,8 @@ const RegisterForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,21 +41,21 @@ const RegisterForm = () => {
       const response = await axios.post('https://onepc.online/api/v1/register', userData);
       setSuccessMessage('Registration successful!');
       setErrorMessage('');
-      console.log('Registration successful:', response.data);
       
       setFirstName('');
       setLastName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+
       setTimeout(() => {
         setSuccessMessage('');
+        navigate('/loginForm'); 
       }, 2000); 
 
     } catch (error) {
       setErrorMessage(error.response ? error.response.data : error.message);
       setSuccessMessage('');
-      console.error('Registration failed:', error.response ? error.response.data : error.message);
     }
   };
 
@@ -65,7 +67,7 @@ const RegisterForm = () => {
         {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
         <FormGroup>
           <label>First Name</label>
-          <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-input" requiredd/>
+          <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-input" required/>
         </FormGroup>
         <FormGroup>
           <label>Last Name</label>

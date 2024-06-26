@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineShoppingCart } from 'react-icons/md';
-import { RiAccountPinCircleFill } from "react-icons/ri";
 import { IoIosCloseCircle } from "react-icons/io";
 import logo from '../assets/logo.png';
 import styled from 'styled-components';
+import ProfileDropdown from './profileDropdown';
 
 const NavigationBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,10 +28,9 @@ const NavigationBar = () => {
           </>
       </Hamburger>
       <Content isOpen={isOpen}>
-        <Link to="/homepage" className="nav-item" onClick={toggleMenu}>Home</Link>
         <Link to="/products" className="nav-item" onClick={toggleMenu}>Products</Link>
         <Link to="/cartPage" className="nav-item" onClick={toggleMenu}><MdOutlineShoppingCart size={24} /></Link>
-        <Link to="/loginForm" className="nav-item" onClick={toggleMenu}><RiAccountPinCircleFill size={24} /></Link>
+        <ProfileDropdown />
       </Content>
     </NavBar>
   );
@@ -46,6 +45,7 @@ const NavBar = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
+  z-index: 10000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `
 
