@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-
 const Profile = () => {
+  const [userId, setUserId] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -22,8 +22,9 @@ const Profile = () => {
       })
       .then(response => {
         const { data } = response.data;
-        const { first_name, last_name, email, address } = data;
+        const { user_id, first_name, last_name, email, address } = data;
     
+        setUserId(user_id);
         setFirstName(first_name);
         setLastName(last_name);
         setEmail(email);
@@ -65,6 +66,7 @@ const Profile = () => {
         <Status>Full Name: {fullName}</Status>
         <Status>Email: {email}</Status>
         <Status>Address: {address}</Status>
+        <Status>User ID: {userId}</Status> {/* Displaying user_id */}
         <EditProfileButton>Edit Profile</EditProfileButton>
         <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       </ProfileInfo>
@@ -78,7 +80,7 @@ const ProfileContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`
+`;
 
 const ProfileInfo = styled.div`
   opacity: 1;
@@ -87,7 +89,7 @@ const ProfileInfo = styled.div`
   &.fadeOut {
     opacity: 0;
   }
-`
+`;
 
 const ProfileImage = styled.img`
   width: 150px;
@@ -95,14 +97,14 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
   margin-top: 20px;
-`
+`;
 
 const Status = styled.p`
   margin-top: 10px;
   font-size: 1.2rem;
   font-weight: bold;
   color: black;
-`
+`;
 
 const EditProfileButton = styled.button`
   margin-top: 10px;
@@ -117,7 +119,7 @@ const EditProfileButton = styled.button`
   &:hover {
     background-color: #218838;
   }
-`
+`;
 
 const LogoutButton = styled.button`
   margin-top: 10px;
@@ -133,4 +135,4 @@ const LogoutButton = styled.button`
   &:hover {
     background-color: #c82333;
   }
-`
+`;

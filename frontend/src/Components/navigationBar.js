@@ -1,13 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import { IoIosCloseCircle } from "react-icons/io";
 import logo from '../assets/logo.png';
 import styled from 'styled-components';
 import ProfileDropdown from './profileDropdown';
+import axios from 'axios'; 
 
 const NavigationBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [productCount, setProductCount] = useState(0); 
+
+  useEffect(() => {
+    fetchProductCount(); // Fetch product count initially
+    const interval = setInterval(fetchProductCount, 5000); // Fetch product count every 5 seconds
+    return () => clearInterval(interval); // Clean up the interval on component unmount
+  }, []);
+
+  const fetchProductCount = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Assuming you have a token stored in localStorage
+      const response = await axios.get('https://onepc.online/api/v1/cart', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setProductCount(response.data.data.length); // Set the count based on the number of items in the cart
+    } catch (error) {
+      console.error('Error fetching product count:', error);
+    }
+  };
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -29,7 +51,12 @@ const NavigationBar = () => {
       </Hamburger>
       <Content isOpen={isOpen}>
         <Link to="/products" className="nav-item" onClick={toggleMenu}>Products</Link>
-        <Link to="/cartPage" className="nav-item" onClick={toggleMenu}><MdOutlineShoppingCart size={24} /></Link>
+       <Link to="/cartPage" className="nav-item" onClick={toggleMenu}>
+          <CartIconContainer>
+            <MdOutlineShoppingCart size={24} />
+            {productCount > 0 && <ItemCount>{productCount}</ItemCount>}
+          </CartIconContainer>
+        </Link>
         <ProfileDropdown />
       </Content>
     </NavBar>
@@ -122,4 +149,19 @@ const CloseButton = styled.div`
   &:hover {
     color: #ccc; 
   }
+`
+const CartIconContainer = styled.div`
+  position: relative;
+`
+
+const ItemCount = styled.span`
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: red;
+  color: white;
+  border-radius: 100%;
+  padding: 4px;
+  font-size: 12px;
+  font-weight: bold;
 `
