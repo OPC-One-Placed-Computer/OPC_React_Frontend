@@ -10,6 +10,7 @@ import ProductDetailPage from './Pages/productDetailPage';
 import CartPage from './Pages/cartPage'
 import Profile from './Components/profile';
 import PlaceOrder from './Components/placeOrder';
+import PlacedOrderItems from './Components/placedOrderItems';
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/HomePage" element={<Homepage />} />
           <Route path="/placeOrder" element={<PlaceOrder />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/placedOrderItems" element={<PlacedOrderItems />} />
         </Routes>
       </div>
     </Router>

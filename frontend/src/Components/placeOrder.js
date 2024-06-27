@@ -1,92 +1,116 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useLocation, useNavigate } from 'react-router-dom';
+import ClipLoader from 'react-spinners/ClipLoader';
+import { CgDetailsMore } from "react-icons/cg";
+import { IoIosInformationCircle } from "react-icons/io";
+import axios from 'axios';
 
 const PlaceOrder = () => {
-  const [formData, setFormData] = useState({
-    fullName: 'John Doe',
-    address: '123 Main St, Anytown, USA',
-    productName: 'Sample Product',
-    price: 100,
-    quantity: 2,
-    productImage: 'https://via.placeholder.com/150',
-    shippingOption: 'COD',
-    productSubtotal: 200,
-    shippingSubtotal: 20,
-    totalPayment: 220,
-  });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(false);
+  const products = location.state ? location.state.products : [];
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('https://onepc.online/api/v1/user', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
+        setFirstName(response.data.first_name);
+        setLastName(response.data.last_name);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
 
-  const handlePlaceOrder = (e) => {
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    setFullName(`${firstName} ${lastName}`);
+  }, [firstName, lastName]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement the order submission logic here
-    console.log('Order placed:', formData);
+    setLoading(true);
+  
+    const orderData = {
+      full_name: fullName,
+      shipping_address: address,
+    };
+  
+    try {
+      const token = localStorage.getItem('token');
+      console.log(orderData, 'test Order')
+      const response = await axios.post('https://onepc.online/api/v1/orders', orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      console.log('Order placed successfully:', response.data);
+      setLoading(false);
+      navigate('/placedOrderItems');
+    } catch (error) {
+      console.error('Error placing order:', error);
+      setLoading(false);
+    }
   };
+  
+  const totalPayment = products.reduce((acc, product) => acc + Number(product.subtotal), 0);
 
   return (
     <OrderContainer>
-      <Form onSubmit={handlePlaceOrder}>
+      <Form onSubmit={handleSubmit}>
         <Section>
-          <Label>Delivery Address</Label>
-          <FormGroup>
-            <InputLabel>Name:</InputLabel>
-            <TextView>{formData.fullName}</TextView>
-          </FormGroup>
-          <FormGroup>
-            <InputLabel>Address:</InputLabel>
-            <TextView>{formData.address}</TextView>
-          </FormGroup>
+          <SectionTitle><IoIosInformationCircle/>Customer Information</SectionTitle>
+          <FormRow>
+            <FormLabel>Full Name:</FormLabel>
+            <FormInput
+              type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+          </FormRow>
+          <FormRow>
+            <FormLabel>Address:</FormLabel>
+            <FormInput
+              type="text" value={address} onChange={(e) => setAddress(e.target.value)} required />
+          </FormRow>
         </Section>
 
         <Section>
-          <Label>Product Details</Label>
-          <FormGroup>
-            <InputLabel>Product Name:</InputLabel>
-            <TextView>{formData.productName}</TextView>
-          </FormGroup>
-          <FormGroup>
-            <InputLabel>Price:</InputLabel>
-            <TextView>{`₱${formData.price.toFixed(2)}`}</TextView>
-          </FormGroup>
-          <FormGroup>
-            <InputLabel>Quantity:</InputLabel>
-            <TextView>{formData.quantity}</TextView>
-          </FormGroup>
-          <ProductImage src={formData.productImage} alt="Product" />
+          <SectionTitle><CgDetailsMore />Order Summary</SectionTitle>
+          {products.map((product, index) => (
+            <ProductDetail key={index}>
+              <ProductImage src={product.productImage} alt={product.productName} />
+              <ProductInfo>
+                <ProductName>{product.productName}</ProductName>
+                <ProductPrice>₱{Number(product.price)}</ProductPrice>
+                <ProductQuantity>Quantity: {product.quantity}</ProductQuantity>
+                <ProductSubtotal>Subtotal: ₱{Number(product.subtotal)}</ProductSubtotal>
+              </ProductInfo>
+            </ProductDetail>
+          ))}
         </Section>
 
-        <Section>
-          <Label>Shipping Option</Label>
-          <FormGroup>
-            <InputLabel>COD:</InputLabel>
-            <TextView>{formData.shippingOption}</TextView>
-          </FormGroup>
-        </Section>
-
-        <Section>
-          <Label>Payment Details</Label>
-          <FormGroup>
-            <InputLabel>Product Subtotal:</InputLabel>
-            <TextView>{`₱${formData.productSubtotal.toFixed(2)}`}</TextView>
-          </FormGroup>
-          <FormGroup>
-            <InputLabel>Shipping Subtotal:</InputLabel>
-            <TextView>{`₱${formData.shippingSubtotal.toFixed(2)}`}</TextView>
-          </FormGroup>
-          <FormGroup>
-            <InputLabel>Total Payment:</InputLabel>
-            <TextView>{`₱${formData.totalPayment.toFixed(2)}`}</TextView>
-          </FormGroup>
-        </Section>
+        <TotalSection>
+          <TotalLabel>Total Payment:</TotalLabel>
+          <TotalAmount>₱{totalPayment.toFixed(2)}</TotalAmount>
+        </TotalSection>
 
         <SubmitButton type="submit">Place Order</SubmitButton>
       </Form>
+      {loading && (
+        <LoaderContainer>
+          <ClipLoader color="#007bff" loading={loading} size={35} />
+        </LoaderContainer>
+      )}
     </OrderContainer>
   );
 };
@@ -112,40 +136,103 @@ const Form = styled.form`
 
 const Section = styled.div`
   margin-bottom: 20px;
+  color: #black;
 `
 
-const Label = styled.h3`
+const SectionTitle = styled.h3`
   font-size: 1.5rem;
-  color: #333;
   margin-bottom: 10px;
-`
-
-const FormGroup = styled.div`
   display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
+  align-items: center;
+
+  svg {
+    margin-right: 10px; 
+    font-size: 2.5rem; 
+  }
+
 `
 
-const InputLabel = styled.label`
-  margin-bottom: 5px;
-  color: #666;
+const FormRow = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
 `
 
-const TextView = styled.span`
-  padding: 10px;
+const FormLabel = styled.label`
+  width: 120px;
+  font-size: 1rem;
+  color: #black;
+`
+
+const FormInput = styled.input`
+  flex: 1;
+  padding: 8px;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
+`
+
+const ProductDetail = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+`
+
+const ProductImage = styled.img`
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-right: 20px;
+`
+
+const ProductInfo = styled.div`
+  flex: 1;
+  color: #black;
+`
+
+const ProductName = styled.h4`
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+`
+
+const ProductPrice = styled.p`
   font-size: 1rem;
-  display: inline-block;
+`
+
+const ProductQuantity = styled.p`
+  font-size: 1rem;
+`
+
+const ProductSubtotal = styled.p`
+  font-size: 1rem;
+  font-weight: bold;
+`
+
+const TotalSection = styled.div`
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+`
+
+const TotalLabel = styled.p`
+  font-size: 1.2rem;
+  margin-right: 20px;
+`
+
+const TotalAmount = styled.p`
+  font-size: 1.2rem;
+  font-weight: bold;
 `
 
 const SubmitButton = styled.button`
+  font-family: 'Poppins', sans-serif;
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
-  color: #fff;
+  background-color: #000099;
+  color: #ffffff;
   border: none;
-  border-radius: 5px;
+  border-radius: 25px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -154,11 +241,9 @@ const SubmitButton = styled.button`
     background-color: #0056b3;
   }
 `
-
-const ProductImage = styled.img`
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  margin-top: 10px;
-  border-radius: 5px;
+const LoaderContainer = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `

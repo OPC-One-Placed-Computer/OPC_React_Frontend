@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -23,13 +24,13 @@ const LoginForm = () => {
       password: password,
     };
 
+    setIsLoading(true);
+
     try {
       const response = await axios.post('https://onepc.online/api/v1/login', userData);
       console.log('Login successful:', response.data);
       const { token } = response.data;
       localStorage.setItem('token', token);
-
-      setSuccessMessage('Login successful! Redirecting to product...');
       
       setTimeout(() => {
         navigate('/products'); 
@@ -37,6 +38,7 @@ const LoginForm = () => {
     } catch (error) {
       console.error('Login failed:', error.response ? error.response.data : error.message);
       setError('Invalid email or password. Please try again.');
+      setIsLoading(false);
     }
   };
 
@@ -50,11 +52,15 @@ const LoginForm = () => {
 
   return (
     <div>
+      {isLoading && (
+        <LoaderContainer>
+          <ClipLoader color="#007bff" />
+        </LoaderContainer>
+      )}
       <LoginContainer>
         <form onSubmit={handleSubmit}>
           <h2>Login</h2>
           {error && <ErrorMessage>{error}</ErrorMessage>}
-          {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
           <FormGroup>
             <label htmlFor="email">Email</label>
             <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="form-input"/>
@@ -72,6 +78,19 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+
+const LoaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+`
 
 const LoginContainer = styled.div`
   display: flex;

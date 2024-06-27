@@ -17,6 +17,7 @@ const ProfileDropdown = () => {
       </ProfileIcon>
       {isOpen && (
         <DropdownMenu>
+          <Link to="/placedOrderItems" className="dropdown-item" onClick={toggleDropdown}>My Purchase</Link>
           <Link to="/profile" className="dropdown-item" onClick={toggleDropdown}>Profile</Link>
           <Link to="/loginForm" className="dropdown-item" onClick={toggleDropdown}>Login</Link>
         </DropdownMenu>
@@ -29,8 +30,7 @@ export default ProfileDropdown;
 
 const ProfileContainer = styled.div`
   position: relative;
-  display: flex;
-  z-index: 10000; 
+  display: flex; 
   align-items: center;
 `
 
@@ -44,23 +44,23 @@ const ProfileIcon = styled.div`
 `
 
 const DropdownMenu = styled.div`
+  width: 105px;
   position: absolute;
-  top: 35px;
-  right: 0;
-  background-color: #ff6600;
-  border: 1px solid #ccc;
+  padding: 10px;
+  top: 50px;
+  right: -50px;
+  background-color: #2d1663;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
+  z-index: 1;
   
   .dropdown-item {
     color: white;
     text-decoration: none;
     display: block;
-    z-index: 11000;
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: #575757;
+      color: #ff6600;
     }
   }
 `

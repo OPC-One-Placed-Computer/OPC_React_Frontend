@@ -91,20 +91,20 @@ const ProductInfo = styled.div`
 
   h2 {
     font-size: 1.5rem;
-    color: #555;
+    color: black;
     margin: 10px 0;
   }
 
   .product-description {
     font-size: 1rem;
-    color: #666;
+    color: black;
     margin: 10px 0;
   }
 
   .product-price,
   .product-quantity {
     font-size: 1.2rem;
-    color: #333;
+    color: black;
     margin: 5px 0;
   }
 
@@ -114,12 +114,13 @@ const ProductInfo = styled.div`
   }
 `
 const AddToCartButton = styled.button`
+  font-family: 'Poppins', sans-serif;
   margin-top: 10px;
   padding: 0.5rem 1rem;
-  background-color: #007bff;
+  background-color: #000099;
   color: #ffffff;
   border: none;
-  border-radius: 5px;
+  border-radius: 25px;
   cursor: pointer;
   display: block;
   width: 100%;

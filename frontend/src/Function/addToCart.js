@@ -20,10 +20,10 @@ const addToCart = (product_id, product_name, setErrorMessage, setSuccessMessage)
   })
   .catch(error => {
     console.error('Error adding product to cart:', error);
-    setErrorMessage('Failed to add product to cart. Please try again later.');
+    setErrorMessage('Failed to add product to cart. Please login.');
     setTimeout(() => {
       setErrorMessage('');
-    }, 10000);
+    }, 1000);
   });
 };
 
