@@ -71,7 +71,6 @@ const NavBar = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `
 
