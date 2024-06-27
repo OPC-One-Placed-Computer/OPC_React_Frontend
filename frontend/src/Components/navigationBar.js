@@ -12,20 +12,20 @@ const NavigationBar = () => {
   const [productCount, setProductCount] = useState(0); 
 
   useEffect(() => {
-    fetchProductCount(); // Fetch product count initially
-    const interval = setInterval(fetchProductCount, 5000); // Fetch product count every 5 seconds
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    fetchProductCount(); 
+    const interval = setInterval(fetchProductCount, 5000); 
+    return () => clearInterval(interval); 
   }, []);
 
   const fetchProductCount = async () => {
     try {
-      const token = localStorage.getItem('token'); // Assuming you have a token stored in localStorage
+      const token = localStorage.getItem('token'); 
       const response = await axios.get('https://onepc.online/api/v1/cart', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setProductCount(response.data.data.length); // Set the count based on the number of items in the cart
+      setProductCount(response.data.data.length);
     } catch (error) {
       console.error('Error fetching product count:', error);
     }
@@ -40,24 +40,24 @@ const NavigationBar = () => {
       <Logo>
         <Link to="/homepage"> <img src={logo} alt="Logo" /></Link>
       </Logo>
-      <Hamburger onClick={toggleMenu} isOpen={isOpen}>
-      {isOpen && (
+      <Hamburger onClick={toggleMenu}>
+        {isOpen && (
           <CloseButton onClick={toggleMenu}><IoIosCloseCircle size={50} /></CloseButton>)}
-          <>
-            <div className="bar"></div>
-            <div className="bar"></div>
-            <div className="bar"></div>
-          </>
+        <>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </>
       </Hamburger>
-      <Content isOpen={isOpen}>
+      <Content open={isOpen}>
         <Link to="/products" className="nav-item" onClick={toggleMenu}>Products</Link>
-       <Link to="/cartPage" className="nav-item" onClick={toggleMenu}>
+        <Link to="/cartPage" className="nav-item" onClick={toggleMenu}>
           <CartIconContainer>
             <MdOutlineShoppingCart size={24} />
             {productCount > 0 && <ItemCount>{productCount}</ItemCount>}
           </CartIconContainer>
         </Link>
-        <ProfileDropdown />
+        <ProfileDropdown className="nav-item" />
       </Content>
     </NavBar>
   );
@@ -67,23 +67,24 @@ export default NavigationBar;
 
 const NavBar = styled.nav`
   background-color: #13072E;
-  overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  z-index: 10000;
+  z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `
 
 const Logo = styled.div`
   flex: 1; 
   display: flex;
+  margin-left: 40px;
   align-items: center; 
 `
 
 const Content = styled.div`
   display: flex;
+  margin-right: 50px;
   justify-content: flex-end;
   gap: 10px;
 
@@ -103,7 +104,7 @@ const Content = styled.div`
   }
 
   @media (max-width: 768px) {
-    display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
+    display: ${({ open }) => (open ? 'flex' : 'none')};
     position: fixed;
     top: 0;
     right: 0;
@@ -115,7 +116,7 @@ const Content = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    transform: ${({ isOpen }) => (isOpen ? 'translateX(0)' : 'translateX(100%)')};
+    transform: ${({ open }) => (open ? 'translateX(0)' : 'translateX(100%)')};
     transition: transform 0.3s ease-in-out;
   }
 `

@@ -27,10 +27,11 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
       <ProdImg onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         {isHovered && (
           <AddCart onClick={handleAddToCart}>
-            <BiSolidCartAdd size={30} color="#FF6600" />
+            <BiSolidCartAdd size={40} color="#ff6600" />
           </AddCart>
         )}
         <img src={getImageUrl(image)} alt={product_name} />
+        <Overlay isHovered={isHovered} />
       </ProdImg>
       <ProdDetails>
         <h3>{brand}</h3>
@@ -58,18 +59,39 @@ const ProdImg = styled.div`
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease, filter 0.3s ease;
   }
+  &:hover img {
+    filter: brightness(0.7);
+  }
+  
 `
 const AddCart = styled.div`
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: rgba(0, 0, 0, 0.5);
+  top: 40px;
+  left: 250px;
   padding: 8px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  ${ProdImg}:hover & {
+    opacity: 2;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+`
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease;
+  opacity: ${({ isHovered }) => (isHovered ? 1 : 0)};
 `
 const ProdDetails = styled.div`
   padding: 10px;
@@ -79,7 +101,7 @@ const ProdDetails = styled.div`
   }
   .product-price {
     font-size: 16px;
-    color: #666;
+    color: #333;
   }
   .product-name {
     font-size: 16px;

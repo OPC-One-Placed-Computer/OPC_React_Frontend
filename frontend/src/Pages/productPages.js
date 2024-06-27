@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import Product from '../Components/product'; 
 import styled from 'styled-components';
+import { IoSearchOutline } from "react-icons/io5";
 import Axios from 'axios';
 import Footer from '../Components/footer';
 
@@ -26,7 +27,6 @@ const ProductsPage = () => {
       });
   }, []);
   
-  // Filter products based on search term
   const filteredProducts = products.filter(product =>
     product.product_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -40,20 +40,24 @@ const ProductsPage = () => {
   };
 
   return (
-    <div>
+    <PageContainer>
+      <Content>
     <ProductPage>
       <Search>
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="search-input"
-        />
-      </Search>
+    <SearchContainer>
+          <IoSearchOutline className="search-icon" />
+          <input 
+            type="text" 
+            placeholder="Search products..." 
+            value={searchTerm} 
+            onChange={handleSearchChange} 
+            className="search-input" 
+          />
+        </SearchContainer>
+        </Search>
       <ProductList>
         {filteredProducts.map(product => (
-          <ProductCard key={product.id} onClick={() => handleProductClick(product)}>
+          <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
             <Product
               image={product.image_path}
               brand={product.brand}
@@ -65,26 +69,51 @@ const ProductsPage = () => {
         ))}
       </ProductList>
     </ProductPage>
+    </Content>
     <Footer />
-    </div>
+    </PageContainer>
   );
 };
 
 export default ProductsPage;
 
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+`
+
 const ProductPage = styled.div`
   padding: 30px;
+`
+const Content = styled.div`
+  flex: 1;
 `
 
 const Search = styled.div`
   margin-bottom: 20px;
   display: flex;
   justify-content: center;
-  
+
+`
+const SearchContainer = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #ccc;
+  }
+
   .search-input {
+    font-family: 'Poppins', sans-serif;
     width: 100%;
-    max-width: 400px; 
-    padding: 15px;
+    padding: 15px 20px 15px 45px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 25px;
