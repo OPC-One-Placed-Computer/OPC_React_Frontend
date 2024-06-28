@@ -231,6 +231,11 @@ const Td = styled.td`
 
     button {
       background-color: #007bff;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: white;
       border: none;
       border-radius: 50%;
@@ -243,6 +248,7 @@ const Td = styled.td`
       }
     }
     .subtract {
+      
       background-color: #dc3545;
     }
     .addition {

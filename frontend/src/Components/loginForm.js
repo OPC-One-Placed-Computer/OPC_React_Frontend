@@ -116,6 +116,7 @@ const LoginContainer = styled.div`
   }
 
   button {
+    font-family: 'Poppins', sans-serif;
     width: 100%;
     padding: 0.75rem;
     background-color: #007bff;
@@ -144,6 +145,7 @@ const FormGroup = styled.div`
   }
 
   input {
+    font-family: 'Poppins', sans-serif;
     padding: 0.5rem;
     border: 1px solid #cccccc;
     border-radius: 10px;
@@ -176,11 +178,6 @@ const NewCustomer = styled.p`
 
 const ErrorMessage = styled.p`
   color: red;
-  text-align: center;
-  margin-bottom: 1rem;
-`
-const SuccessMessage = styled.p`
-  color: green;
   text-align: center;
   margin-bottom: 1rem;
 `
