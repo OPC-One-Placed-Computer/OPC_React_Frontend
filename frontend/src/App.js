@@ -1,5 +1,6 @@
 import './App.css';
-import React, { useState } from 'react';
+import React from 'react';
+import styled from 'styled-components';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import NavigationBar from './Components/navigationBar';
 import LoginForm from './Components/loginForm';
@@ -14,18 +15,11 @@ import PlacedOrderItems from './Components/placedOrderItems';
 
 
 function App() {
-  const [overlayActive, setOverlayActive] = useState(false);
-
-  const toggleOverlay = () => {
-    setOverlayActive(!overlayActive);
-  };
-
-
   return (
     <Router>
-      <div className="App">
-      <NavigationBar toggleOverlay={toggleOverlay} overlayActive={overlayActive} />
-        <div className={`overlay ${overlayActive ? 'active' : ''}`} onClick={toggleOverlay}></div>
+      <Container>
+      <NavigationBar />
+      <Content>
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/products/" element={<ProductsPage />} />
@@ -38,9 +32,18 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/placedOrderItems" element={<PlacedOrderItems />} />
         </Routes>
-      </div>
+      </Content>
+      </Container>
     </Router>
   );
 }
 
 export default App;
+
+const Container = styled.div `
+  font-family: 'Poppins', sans-serif;
+`
+const Content = styled.div `
+position:relative;
+  padding-top: 90px;
+`

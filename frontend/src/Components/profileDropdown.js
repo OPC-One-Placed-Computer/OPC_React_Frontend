@@ -1,17 +1,59 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { RiAccountPinCircleFill } from "react-icons/ri";
 import styled from 'styled-components';
+import axios from 'axios';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('https://onepc.online/api/v1/logout', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      localStorage.removeItem('token');
+      setIsLoggedIn(false); 
+      navigate('/loginForm');
+
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
-    <ProfileContainer>
+    <ProfileContainer ref={dropdownRef}>
       <ProfileIcon onClick={toggleDropdown}>
         <RiAccountPinCircleFill size={24} />
       </ProfileIcon>
@@ -19,7 +61,11 @@ const ProfileDropdown = () => {
         <DropdownMenu>
           <Link to="/placedOrderItems" className="dropdown-item" onClick={toggleDropdown}>My Purchase</Link>
           <Link to="/profile" className="dropdown-item" onClick={toggleDropdown}>Profile</Link>
-          <Link to="/loginForm" className="dropdown-item" onClick={toggleDropdown}>Login</Link>
+          {isLoggedIn ? ( 
+            <Link className="dropdown-item" onClick={handleLogout}>Logout</Link>
+          ) : (
+            <Link to="/loginForm" className="dropdown-item" onClick={toggleDropdown}>Login</Link>
+          )}
         </DropdownMenu>
       )}
     </ProfileContainer>
@@ -33,16 +79,39 @@ const ProfileContainer = styled.div`
   display: flex; 
   align-items: center;
 `
-
 const ProfileIcon = styled.div`
   cursor: pointer;
   color: white;
 
-  &:hover {
-    color: #ccc;
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #ff6600;
+    transition: width 0.3s ease, left 0.3s ease, right 0.3s ease;
+  }
+  
+  &::before {
+    left: 50%;
+  }
+  
+  &::after {
+    right: 50%;
+  }
+
+  &:hover::before {
+    width: 50%;
+    left: 0;
+  }
+  
+  &:hover::after {
+    width: 50%;
+    right: 0;
   }
 `
-
 const DropdownMenu = styled.div`
   width: 105px;
   position: absolute;

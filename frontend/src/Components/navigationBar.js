@@ -13,7 +13,7 @@ const NavigationBar = () => {
 
   useEffect(() => {
     fetchProductCount(); 
-    const interval = setInterval(fetchProductCount, 5000); 
+    const interval = setInterval(fetchProductCount, 1000); 
     return () => clearInterval(interval); 
   }, []);
 
@@ -66,12 +66,17 @@ const NavigationBar = () => {
 export default NavigationBar;
 
 const NavBar = styled.nav`
+position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   background-color: #13072E;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 `
 
 const Logo = styled.div`
@@ -83,25 +88,50 @@ const Logo = styled.div`
 
 const Content = styled.div`
   display: flex;
-  margin-right: 50px;
+  margin-right: 80px;
   justify-content: flex-end;
   gap: 10px;
 
   .nav-item {
+    position: relative;
     color: white;
     text-align: center;
     border-radius: 25px;
     margin-right: 10px;
-    padding: 14px 20px;
+    padding: 0 20px;
     text-decoration: none;
     transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  .nav-item:hover {
-    border-radius: 25px;
-    background-color: #575757;
-    color: white;
-  }
+    
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background-color: #ff6600;
+      transition: width 0.3s ease, left 0.3s ease, right 0.3s ease;
+    }
+    
+    &::before {
+      left: 50%;
+    }
+    
+    &::after {
+      right: 50%;
+    }
 
+    &:hover::before {
+      width: 50%;
+      left: 0;
+    }
+    
+    &:hover::after {
+      width: 50%;
+      right: 0;
+    }
+  }
+  
   @media (max-width: 768px) {
     display: ${({ open }) => (open ? 'flex' : 'none')};
     position: fixed;
@@ -118,7 +148,8 @@ const Content = styled.div`
     transform: ${({ open }) => (open ? 'translateX(0)' : 'translateX(100%)')};
     transition: transform 0.3s ease-in-out;
   }
-`
+`;
+
 
 const Hamburger = styled.div`
   display: none;
@@ -156,12 +187,17 @@ const CartIconContainer = styled.div`
 
 const ItemCount = styled.span`
   position: absolute;
+  width: 15px;
+  height: 15px;
   top: -8px;
   right: -8px;
   background-color: red;
   color: white;
-  border-radius: 100%;
-  padding: 4px;
+  padding: 2px;
+  border-radius: 50%;
   font-size: 12px;
   font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 `

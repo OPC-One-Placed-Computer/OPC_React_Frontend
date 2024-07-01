@@ -103,7 +103,7 @@ const RegisterContainer = styled.div`
 
   form {
     background-color: #ffffff;
-    padding: 2rem;
+    padding: 1rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 350px;
@@ -118,6 +118,7 @@ const RegisterContainer = styled.div`
   }
 
   button {
+    font-family: 'Poppins', sans-serif;
     width: 100%;
     padding: 0.75rem;
     background-color: #007bff;
@@ -146,6 +147,7 @@ const FormGroup = styled.div`
   }
 
   input {
+    font-family: 'Poppins', sans-serif;
     padding: 0.5rem;
     border: 1px solid #cccccc;
     border-radius: 10px;

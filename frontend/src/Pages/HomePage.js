@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Footer from '../Components/footer';
+import FeaturedProducts from '../Components/featuredProducts';
 import sampleImage from '../assets/bc_image.jpg'; 
 
 const Homepage = () => {
@@ -23,6 +24,7 @@ const Homepage = () => {
         </HeroCon>
       </HeroHeader>
     </HomepageCon>
+    <FeaturedProducts />
     <Footer />
     </div>
   );
@@ -49,7 +51,7 @@ const HeroHeader = styled.header`
 
 const HeroCon = styled.div`
   border-radius: 15px;
-  background: linear-gradient(135deg, #13072E, #3f2182);
+  //background: linear-gradient(135deg, #13072E, #3f2182);
   max-width: 1400px;
   width: 100%; 
   max-height: 600px;
