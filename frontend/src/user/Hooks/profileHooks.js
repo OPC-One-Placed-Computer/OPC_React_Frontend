@@ -129,7 +129,7 @@ const ProfileHooks = () => {
           setEditedAddress(user.address);
           setSuccessMessage(message);
           setSelectedImage(null);
-          setImageUrl(`https://onepc.online/api/v1/download/file?path=${user.image_path}`);
+          fetchImageUrl(user.image_path, token);
           setIsEditing(false);
         } else {
           throw new Error('Invalid response data');
