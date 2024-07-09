@@ -23,11 +23,10 @@ export default Footer;
 const FooterContainer = styled.footer`
   background-color: #0a0820;
   color: white;
-  max-width: 100%;
+  width: 100%;
   padding: 20px;
   min-height: 200px;
 `
-
 const FooterContent = styled.div`
   margin: 0 auto;
   max-width: 1200px;
@@ -37,17 +36,14 @@ const FooterContent = styled.div`
   justify-content: center; 
   text-align: center;
 `
-
 const Paragraph = styled.p`
   margin: 0;
   margin-bottom: 20px; 
 `
-
 const SocialIconsContainer = styled.div`
   display: flex;
   justify-content: center; 
 `
-
 const SocialIcon = styled.div`
   font-size: 1.5em;
   margin: 0 10px;
