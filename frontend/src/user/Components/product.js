@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BiSolidCartAdd } from "react-icons/bi";
-import getImageUrl from '../tools/media';
+import getImageUrl from '../../tools/media';
 import styled, { keyframes, css } from 'styled-components';
 import addToCart from '../Function/addToCart';
 
@@ -8,6 +8,7 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const quantity = 1;
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -19,7 +20,7 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
 
   const handleAddToCart = (event) => {
     event.stopPropagation();
-    addToCart(product_id, product_name, setErrorMessage, setSuccessMessage);
+    addToCart(product_id, product_name, quantity, setErrorMessage, setSuccessMessage);
   };
 
   return (
@@ -31,7 +32,7 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
           </AddCart>
         )}
         <img src={getImageUrl(image)} alt={product_name} />
-        <Overlay isHovered={isHovered} />
+        <Overlay $isHovered={isHovered} />
       </ProdImg>
       <ProdDetails>
         <h3>{brand}</h3>
@@ -91,7 +92,7 @@ const Overlay = styled.div`
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
   transition: opacity 0.3s ease;
-  opacity: ${({ isHovered }) => (isHovered ? 1 : 0)};
+  opacity: ${({ $isHovered }) => ($isHovered ? 1 : 0)};
 `
 const ProdDetails = styled.div`
   padding: 10px;

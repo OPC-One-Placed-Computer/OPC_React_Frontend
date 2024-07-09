@@ -1,54 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import axios from 'axios';
 import ClipLoader from 'react-spinners/ClipLoader';
-
+import LoginFormHooks from '../Hooks/loginFormHooks';
 
 const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError('Please fill out all fields.');
-      return;
-    }
-
-    const userData = {
-      email: email,
-      password: password,
-    };
-
-    setIsLoading(true);
-
-    try {
-      const response = await axios.post('https://onepc.online/api/v1/login', userData);
-      console.log('Login successful:', response.data);
-      const { token } = response.data;
-      localStorage.setItem('token', token);
-      
-      setTimeout(() => {
-        navigate('/products'); 
-      }, 2000);
-    } catch (error) {
-      console.error('Login failed:', error.response ? error.response.data : error.message);
-      setError('Invalid email or password. Please try again.');
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setError('');
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [error]);
+  const {
+     email, 
+     setEmail, 
+     password, 
+     setPassword, 
+     error, 
+     isLoading, 
+     handleSubmit 
+    } = LoginFormHooks();
 
   return (
     <div>
@@ -91,7 +56,6 @@ const LoaderContainer = styled.div`
   background-color: rgba(255, 255, 255, 0.8);
   z-index: 9999;
 `
-
 const LoginContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -132,7 +96,6 @@ const LoginContainer = styled.div`
     background-color: #0a1827;
   }
 `
-
 const FormGroup = styled.div`
   margin-bottom: 1rem;
   display: flex;
@@ -158,7 +121,6 @@ const FormGroup = styled.div`
     border-color: #007bff;
   }
 `
-
 const NewCustomer = styled.p`
   margin-top: 1rem;
   text-align: center;
@@ -175,7 +137,6 @@ const NewCustomer = styled.p`
     text-decoration: underline;
   }
 `
-
 const ErrorMessage = styled.p`
   color: red;
   text-align: center;

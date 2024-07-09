@@ -1,35 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineShoppingCart } from 'react-icons/md';
-import { IoIosCloseCircle } from "react-icons/io";
-import logo from '../assets/logo.png';
+import { IoIosCloseCircle } from 'react-icons/io';
+import { HiMenuAlt3 } from "react-icons/hi";
+import logo from '../../assets/logo.png';
 import styled from 'styled-components';
 import ProfileDropdown from './profileDropdown';
-import axios from 'axios'; 
+import ProductCountHooks from '../Hooks/productCountHooks';
 
 const NavigationBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [productCount, setProductCount] = useState(0); 
-
-  useEffect(() => {
-    fetchProductCount(); 
-    const interval = setInterval(fetchProductCount, 1000); 
-    return () => clearInterval(interval); 
-  }, []);
-
-  const fetchProductCount = async () => {
-    try {
-      const token = localStorage.getItem('token'); 
-      const response = await axios.get('https://onepc.online/api/v1/cart', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setProductCount(response.data.data.length);
-    } catch (error) {
-      console.error('Error fetching product count:', error);
-    }
-  };
+  const productCount = ProductCountHooks();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -38,19 +19,23 @@ const NavigationBar = () => {
   return (
     <NavBar>
       <Logo>
-        <Link to="/homepage"> <img src={logo} alt="Logo" /></Link>
+        <Link to="/homepage">
+          <img src={logo} alt="Logo" />
+        </Link>
       </Logo>
       <Hamburger onClick={toggleMenu}>
-        {isOpen && (
-          <CloseButton onClick={toggleMenu}><IoIosCloseCircle size={50} /></CloseButton>)}
-        <>
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
-        </>
+        {isOpen ? (
+          <CloseButton onClick={toggleMenu}>
+            <IoIosCloseCircle size={30} />
+          </CloseButton>
+        ) : (
+          <HiMenuAlt3 size={30} color="white" />
+        )}
       </Hamburger>
       <Content open={isOpen}>
-        <Link to="/products" className="nav-item" onClick={toggleMenu}>Products</Link>
+        <Link to="/products" className="nav-item" onClick={toggleMenu}>
+          Products
+        </Link>
         <Link to="/cartPage" className="nav-item" onClick={toggleMenu}>
           <CartIconContainer>
             <MdOutlineShoppingCart size={24} />
@@ -66,10 +51,10 @@ const NavigationBar = () => {
 export default NavigationBar;
 
 const NavBar = styled.nav`
-position: fixed;
+width: 100%;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
   background-color: #13072E;
   display: flex;
   justify-content: space-between;
@@ -77,14 +62,14 @@ position: fixed;
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-`
+`;
 
 const Logo = styled.div`
   flex: 1; 
   display: flex;
   margin-left: 40px;
   align-items: center; 
-`
+`;
 
 const Content = styled.div`
   display: flex;
@@ -133,15 +118,15 @@ const Content = styled.div`
   }
   
   @media (max-width: 768px) {
-    display: ${({ open }) => (open ? 'flex' : 'none')};
+    display: flex;
     position: fixed;
     top: 0;
-    right: 0;
-    height: 100vh; 
+    right: ${props => (props.open ? '-90px' : '-100%')};
+    height: 100%; 
     width: 70%; 
-    max-width: 250px; 
+    max-width: 200px; 
     z-index: 999;
-    background-color: #3f2182;
+    background-color: #13072E;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -150,40 +135,33 @@ const Content = styled.div`
   }
 `;
 
-
 const Hamburger = styled.div`
   display: none;
   flex-direction: column;
   cursor: pointer;
-  margin-right: 20px; 
-
-  .bar {
-    width: 25px;
-    height: 3px;
-    background-color: white;
-    margin: 4px 0;
-    transition: 0.4s;
-  }
+  margin-right: 40px; 
 
   @media (max-width: 768px) {
     display: flex;
   }
-`
+`;
+
 const CloseButton = styled.div`
   color: white;
   cursor: pointer;
   position: absolute;
-  top: 20px;
-  right: 30px;
+  top: 35px;
+  right: 60px;
   z-index: 1000;
 
   &:hover {
     color: #ccc; 
   }
-`
+`;
+
 const CartIconContainer = styled.div`
   position: relative;
-`
+`;
 
 const ItemCount = styled.span`
   position: absolute;
@@ -200,4 +178,4 @@ const ItemCount = styled.span`
   justify-content: center;
   align-items: center;
   display: flex;
-`
+`;
