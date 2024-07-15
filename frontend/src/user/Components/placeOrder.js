@@ -234,6 +234,7 @@ const TotalLabel = styled.p`
   margin-right: 20px;
 `
 const TotalAmount = styled.p`
+  color: #B22222;
   font-size: 1.2rem;
   font-weight: bold;
 `

@@ -88,10 +88,9 @@ const ProductImage = styled.div`
 
   img {
     width: 100%;
-    height: auto;
-    object-fit: contain;
+    height: 400px; /* Explicit height */
+    object-fit: cover; /* Ensures the aspect ratio is maintained */
     max-width: 100%;
-    max-height: 100%;
   }
 
   @media (max-width: 768px) {
