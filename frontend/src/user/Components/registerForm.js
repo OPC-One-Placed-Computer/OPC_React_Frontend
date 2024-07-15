@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import RegisterFormHooks from '../Hooks/registerFormHooks';
+import registerAnimated from '../Animations/registerAnimated.json';
+import Lottie from 'lottie-react';
 
 const RegisterForm = () => {
   const {
@@ -21,57 +23,81 @@ const RegisterForm = () => {
   } = RegisterFormHooks();
 
   return (
-    <RegisterContainer>
-      <form onSubmit={handleSubmit}>
-        <h2>Register</h2>
-        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-        {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
-        <FormGroup>
-          <label>First Name</label>
-          <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-input" required/>
-        </FormGroup>
-        <FormGroup>
-          <label>Last Name</label>
-          <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-        </FormGroup>
-        <FormGroup>
-          <label>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </FormGroup>
-        <FormGroup>
-          <label>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </FormGroup>
-        <FormGroup>
-          <label>Confirm Password</label>
-          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-        </FormGroup>
-        <button type="submit">Register</button>
-        <Account>Already have an account? <Link to="/loginForm" className="link">Login here</Link></Account>
-      </form>
-    </RegisterContainer>
+    <RegisterPage>
+      <RegisterContainer>
+        <LottieContainer>
+          <Lottie animationData={registerAnimated} />
+        </LottieContainer>
+        <FormContainer>
+          <form onSubmit={handleSubmit}>
+            <h2>Register</h2>
+            {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+            {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+            <FormGroup>
+              <label>First Name</label>
+              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-input" required/>
+            </FormGroup>
+            <FormGroup>
+              <label>Last Name</label>
+              <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+            </FormGroup>
+            <FormGroup>
+              <label>Email</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </FormGroup>
+            <FormGroup>
+              <label>Password</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            </FormGroup>
+            <FormGroup>
+              <label>Confirm Password</label>
+              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+            </FormGroup>
+            <button type="submit">Register</button>
+            <Account>Already have an account? <Link to="/loginForm" className="link">Login here</Link></Account>
+          </form>
+        </FormContainer>
+      </RegisterContainer>
+    </RegisterPage>
   );
 };
 
 export default RegisterForm;
 
-const RegisterContainer = styled.div`
+const RegisterPage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background-color: #f5f5f5;
+`;
 
-  form {
-    background-color: #ffffff;
-    padding: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 350px;
-  }
+const RegisterContainer = styled.div`
+  display: flex;
+  background-color: #ffffff;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 25px;
+  width: 100%;
+  max-width: 800px;
+`;
 
-  h2 {
-    font-size: 2rem;
+const LottieContainer = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 2rem;
+`;
+
+const FormContainer = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h2{
+    font-size: 3rem;
     color: #13072E;
     font-weight: bold;
     margin-bottom: 1.5rem;
@@ -94,7 +120,7 @@ const RegisterContainer = styled.div`
   button:hover {
     background-color: #0a1827;
   }
-`
+`;
 
 const FormGroup = styled.div`
   margin-bottom: 1rem;
@@ -109,12 +135,12 @@ const FormGroup = styled.div`
 
   input {
     font-family: 'Poppins', sans-serif;
-    padding: 0.5rem;
-    border: 1px solid #cccccc;
-    border-radius: 10px;
+    border: none;
+    border-bottom: 1px solid black; /* Add bottom border */
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s;
+    width: 100%;
   }
 
   input:focus {

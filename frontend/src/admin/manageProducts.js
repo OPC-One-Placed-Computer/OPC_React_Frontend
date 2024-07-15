@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Product from '../admin/Components/adminProduct'; 
 import AddProductForm from '../admin/Components/addProductForm';
+import UpdateProductForm from '../admin/Components/updateProductForm';
 import styled from 'styled-components';
 import { IoSearchOutline } from "react-icons/io5";
 import Axios from 'axios';
@@ -9,13 +10,16 @@ import ReactPaginate from 'react-paginate';
 const ManageProducts = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 3;
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(0);
   const [newProductData, setNewProductData] = useState({
     product_name: '',
     category: '',
@@ -24,32 +28,76 @@ const ManageProducts = () => {
     image_path: ''
   });
 
+ 
   useEffect(() => {
-    Axios.get("https://onepc.online/api/v1/products")
+    fetchProducts(currentPage);
+  }, [currentPage]);
+
+  const fetchProducts = (page) => {
+    Axios.get(`https://onepc.online/api/v1/products?page=${page}`)
       .then((response) => {
-        console.log(response.data);
-        if (response.data && Array.isArray(response.data.data)) {
-          setProducts(response.data.data);
-          const uniqueCategories = [...new Set(response.data.data.map(product => product.category))];
-          const uniqueBrands = [...new Set(response.data.data.map(product => product.brand))];
+        console.log("API response:", response);
+        if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
+          const productsData = response.data.data.data;
+          const meta = response.data.data.meta;
+          setProducts(productsData);
+          setFilteredProducts(productsData);
+          const uniqueCategories = [...new Set(productsData.map(product => product.category))];
+          const uniqueBrands = [...new Set(productsData.map(product => product.brand))];
           setCategories(uniqueCategories);
           setBrands(uniqueBrands);
+
+          if (meta && meta.last_page) {
+            setTotalPages(meta.last_page);
+          } else {
+            setTotalPages(1); 
+          }
+
+          if (meta && meta.per_page) {
+            setItemsPerPage(meta.per_page); 
+          }
         } else {
           setProducts([]);
+          setFilteredProducts([]);
+          setTotalPages(1); 
         }
       })
       .catch((error) => {
-        console.log(error);
+        console.error("Error fetching products:", error);
         setProducts([]);
+        setFilteredProducts([]);
+        setTotalPages(1); 
       });
-  }, []);
-  
-  const filteredProducts = products.filter(product =>
-    product.product_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedCategory ? product.category === selectedCategory : true) &&
-    (selectedBrand ? product.brand === selectedBrand : true)
-  );
+  };
 
+  useEffect(() => {
+    const fetchFilteredProducts = async () => {
+      try {
+        const baseURL = 'https://onepc.online/api/v1/products';
+        const params = new URLSearchParams();
+  
+        if (searchTerm) params.append('search', searchTerm);
+        if (selectedBrand) params.append('brand', selectedBrand);
+        if (selectedCategory) params.append('category', selectedCategory);
+      
+        const query = `${baseURL}?${params.toString()}`;
+  
+        const response = await Axios.get(query);
+  
+        if (response.data && response.data.data) {
+          setFilteredProducts(response.data.data.data);
+        } else {
+          setFilteredProducts([]);
+        }
+      } catch (error) {
+        console.error("Error fetching filtered products:", error);
+        setFilteredProducts([]);
+      }
+    };
+  
+    fetchFilteredProducts();
+  }, [searchTerm, selectedBrand, selectedCategory, currentPage]);
+  
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
   };
@@ -67,11 +115,6 @@ const ManageProducts = () => {
     setCurrentPage(selected);
   };
 
-  const handleUpdate = (product) => {
-    // Implement your update logic here
-    console.log(`Updating product ${product.product_id}`);
-  };
-  
 
   const handleDelete = (productId) => {
     Axios.delete(`https://onepc.online/api/v1/products/${productId}`)
@@ -87,6 +130,10 @@ const ManageProducts = () => {
     setShowAddForm(true); 
   };
 
+  const updateAdd = () => {
+    setShowUpdateForm(true);
+  }
+
   const handleCloseForm = () => {
     setShowAddForm(false);
   };
@@ -96,31 +143,11 @@ const ManageProducts = () => {
     setNewProductData({ ...newProductData, [name]: value });
   };
 
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    
-    const newProduct = { ...newProductData };
-    
-    Axios.post('https://onepc.online/api/v1/products', newProduct)
-      .then(response => {
-        setProducts([...products, response.data]);
-        setShowAddForm(false);
-        setNewProductData({
-          product_name: '',
-          category: '',
-          brand: '',
-          price: 0,
-          image_path: ''
-        });
-      })
-      .catch(error => {
-        console.error("There was an error adding the product!", error);
-      });
-  };
+  
 
   const offset = currentPage * itemsPerPage;
   const currentPageData = filteredProducts.slice(offset, offset + itemsPerPage);
-  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
+
 
   return (
     <PageContainer>
@@ -155,9 +182,10 @@ const ManageProducts = () => {
           <AddButton onClick={handleAdd}>Add New Product</AddButton>
           <AddProductForm
             showAddForm={showAddForm}
+            showUpdateForm={showUpdateForm}
             handleCloseForm={handleCloseForm}
             handleInputChange={handleInputChange}
-            handleFormSubmit={handleFormSubmit}
+            // handleFormSubmit={handleFormSubmit}
             newProductData={newProductData}
           />
           <ProductList>
@@ -171,7 +199,7 @@ const ManageProducts = () => {
                   product_id={product.product_id}
                 />
                 <ButtonContainer>
-                  <ActionButton onClick={() => handleUpdate(product)}>Update</ActionButton>
+                  <ActionButton onClick={updateAdd}>Update</ActionButton>
                   <ActionButton onClick={() => handleDelete(product.product_id)}>Delete</ActionButton>
                 </ButtonContainer>
               </ProductCard>
@@ -183,7 +211,7 @@ const ManageProducts = () => {
               nextLabel={"Next"}
               breakLabel={"..."}
               breakClassName={"break-me"}
-              pageCount={pageCount}
+              pageCount={totalPages}
               marginPagesDisplayed={2}
               pageRangeDisplayed={5}
               onPageChange={handlePageClick}

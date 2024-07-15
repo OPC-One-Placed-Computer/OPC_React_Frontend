@@ -31,7 +31,7 @@ const SidebarContainer = styled.div`
   background-color: #13072E;
   width: 200px;
   padding: 20px;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
   border-radius: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);

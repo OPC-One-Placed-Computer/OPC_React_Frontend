@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { AiOutlineShoppingCart } from 'react-icons/ai';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import updateCartItem from '../Function/updateCartItem';
 import ProductDetailPage from './productDetailPage';
+import emptyCart from '../Animations/emptyCart.json'
+import Lottie from 'lottie-react';
 import Modal from '../Components/modal';
 
 const CartPage = () => {
@@ -166,8 +167,9 @@ const CartPage = () => {
 
   const renderEmptyCart = () => (
     <EmptyCartContainer>
-      <AiOutlineShoppingCart size={80} color="#007bff" />
+      <Lottie animationData={emptyCart} autoplay loop style={{ width: 250, height: 250 }} />
       <p>Your cart is empty.</p>
+      <ReturnToShopButton onClick={() => navigate('/products')}>Return to Shop</ReturnToShopButton>
     </EmptyCartContainer>
   );
 
@@ -183,48 +185,38 @@ const CartPage = () => {
     } else {
       return (
         <>
-          <Table>
-            <thead>
-              <tr>
-                <Th>
+          <CheckboxContainer>
+            <Checkbox
+              type="checkbox"
+              checked={isAllChecked}
+              onChange={handleAllCheckboxChange}
+            />
+            <CheckboxLabel>Select All</CheckboxLabel>
+          </CheckboxContainer>
+          <ProductsContainer>
+            {products.map(product => (
+              <ProductCard key={product.product_id} onClick={() => handleProductClick(product.product_id)}>
+                <CheckboxContainer onClick={(e) => e.stopPropagation()}>
                   <Checkbox
                     type="checkbox"
-                    checked={isAllChecked}
-                    onChange={handleAllCheckboxChange}
+                    checked={selectedItems.includes(product.product_id)}
+                    onChange={() => handleCheckboxChange(product.product_id)}
                   />
-                </Th>
-                <Th>IMAGE</Th>
-                <Th>PRODUCT NAME</Th>
-                <Th>PRICE</Th>
-                <Th>QUANTITY</Th>
-                <Th>SUBTOTAL</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(product => (
-                <tr key={product.product_id}>
-                  <Td>
-                    <Checkbox
-                      type="checkbox"
-                      checked={selectedItems.includes(product.product_id)}
-                      onChange={() => handleCheckboxChange(product.product_id)}
-                    />
-                  </Td>
-                  <Td><img src={`https://onepc.online${product.product.image_path}`} alt={product.product.product_name} width="50" /></Td>
-                  <Td onClick={() => handleProductClick(product.product_id)}>{product.product.product_name}</Td>
-                  <Td>₱{Number(product.product.price).toFixed(2)}</Td>
-                  <Td>
-                    <QuantityControls>
-                      <button className='subtract' onClick={() => handleQuantityChange(product.cart_id, product.quantity - 1)}>-</button>
-                      <span>{product.quantity}</span>
-                      <button className='addition' onClick={() => handleQuantityChange(product.cart_id, product.quantity + 1)}>+</button>
-                    </QuantityControls>
-                  </Td>
-                  <Td>₱{Number(product.subtotal).toFixed(2)}</Td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+                </CheckboxContainer>
+                <ProductImage src={`https://onepc.online${product.product.image_path}`} alt={product.product.product_name} />
+                <ProductInfo>
+                  <ProductName>{product.product.product_name}</ProductName>
+                  <ProductPrice>₱{Number(product.product.price).toFixed(2)}</ProductPrice>
+                  <QuantityControls onClick={(e) => e.stopPropagation()}>
+                    <button className='subtract' onClick={() => handleQuantityChange(product.cart_id, product.quantity - 1)}>-</button>
+                    <span>{product.quantity}</span>
+                    <button className='addition' onClick={() => handleQuantityChange(product.cart_id, product.quantity + 1)}>+</button>
+                  </QuantityControls>
+                  <ProductSubtotal>Subtotal: ₱{Number(product.subtotal).toFixed(2)}</ProductSubtotal>
+                </ProductInfo>
+              </ProductCard>
+            ))}
+          </ProductsContainer>
           <Modal isOpen={isModalOpen} onClose={handleModalClose}>
             {selectedProduct && <ProductDetailPage product={selectedProduct} />}
           </Modal>
@@ -251,8 +243,6 @@ const CartPage = () => {
 
 export default CartPage;
 
-
-
 const CartContainer = styled.div`
   width: 100%;
   max-width: 1200px;
@@ -267,89 +257,86 @@ const LoaderContainer = styled.div`
   height: 100vh; 
 `;
 
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  background-color: #fff;
+const ProductsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+`;
+
+const ProductCard = styled.div`
+  background-color: #fefefe;
   border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-`;
+  width: 100%;
+  display: flex;
+  padding: 20px;
+  align-items: center;
+  cursor: pointer; 
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.3s ease-in-out;
 
-const Th = styled.th`
-  text-align: left;
-  padding: 15px;
-  border-bottom: 2px solid #ddd;
-  font-size: 1.2em;
-  background-color: #000099;
-  color: white;
-
-  @media (max-width: 768px) {
-    font-size: 1em;
+  &:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
   }
 `;
 
-const Td = styled.td`
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
-  font-size: 1.1em;
-  background-color: #f9f9f9;
-  color: #333;
-
-  @media (max-width: 768px) {
-    font-size: 1em;
-  }
-
-  img {
-    border-radius: 5px;
-  }
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;
-
-// const ThCheckbox = styled.td`
-//   padding: 15px;
-//   font-size: 1.1em;
-//   color: #333;
-//   text-align: center;
-// `;
-
-// const TdCheckbox = styled.td`
-//   padding: 15px;
-//   border-bottom: 1px solid #ddd;
-//   font-size: 1.1em;
-//   background-color: #f9f9f9;
-//   color: #333;
-//   text-align: center;
-// `;
-
 
 const Checkbox = styled.input`
   margin-right: 10px;
 `;
 
+const CheckboxLabel = styled.label`
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+const ProductImage = styled.img`
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-right: 20px;
+`;
+
+const ProductInfo = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const ProductName = styled.h2`
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+`;
+
+const ProductPrice = styled.p`
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+  margin: 0;
+`;
+
 const QuantityControls = styled.div`
   display: flex;
   align-items: center;
+  gap: 10px;
 
   button {
-    background-color: #007bff;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    border: none;
-    border-radius: 50%;
     padding: 5px 10px;
+    background-color: #007bff;
+    height: 30px;
+    width: 30px;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
     cursor: pointer;
-    font-size: 1em;
-
-    &:hover {
-      background-color: #0056b3;
-    }
   }
-
   .subtract {
     background-color: #dc3545;
   }
@@ -357,56 +344,54 @@ const QuantityControls = styled.div`
   .addition {
     background-color: #000099;
   }
+  .
 
   span {
-    margin: 0 10px;
-    font-size: 1.1em;
+    font-size: 16px;
   }
+`;
+
+const ProductSubtotal = styled.p`
+  font-size: 16px;
+  color: #FF8C00;
+  margin: 0;
 `;
 
 const ActionButtons = styled.div`
   display: flex;
   justify-content: space-between;
-`;
-
-const baseButtonStyles = `
-font-family: 'Poppins', sans-serif;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 1em;
-  color: white;
+  margin-top: 20px;
 `;
 
 const DeleteButton = styled.button`
-  ${baseButtonStyles}
-  background-color:  #dc3545;
-
-  &:hover {
-    background-color: #c82333;
-  }
+  font-family: 'Poppins', sans-serif;
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
 `;
 
 const CheckoutButton = styled.button`
-  ${baseButtonStyles}
-  background-color: #000099;
-
-  &:hover {
-    background-color: #0056b3;
-  }
+  font-family: 'Poppins', sans-serif;
+  padding: 10px 20px;
+  background-color: #000099;    
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
 `;
 
 const EmptyCartContainer = styled.div`
-  text-align: center;
-  padding: 50px;
-  background-color: #f8f9fa;
-  border-radius: 10px;
-  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
 
   p {
-    font-size: 1.2em;
-    margin-top: 20px;
+    font-size: 18px;
+    color: #333;
   }
 `;
 
@@ -415,10 +400,24 @@ const AlertMessage = styled.div`
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color:  rgba(255, 0, 0, 0.8);
-  color: #fff;
+  background-color: #f8d7da;
+  color: #721c24;
   padding: 10px 20px;
+  border: 1px solid #f5c6cb;
   border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+`;
+const ReturnToShopButton = styled.button`
+  font-family: 'Poppins', sans-serif;
+  background-color: #00008B;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 25px;
+
+  &:hover {
+    background-color: #0000CD;
+  }
 `;

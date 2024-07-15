@@ -12,6 +12,7 @@ const Profile = () => {
     address,
     isLoading,
     imageUrl,
+    previewImageUrl,
     isEditing,
     editedFullName,
     editedEmail,
@@ -30,7 +31,7 @@ const Profile = () => {
 
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState(''); // State for password confirmation
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [changePasswordError, setChangePasswordError] = useState('');
   const [changePasswordLoading, setChangePasswordLoading] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
@@ -67,8 +68,6 @@ const Profile = () => {
     setChangePasswordError('');
   };
 
-  console.log('Profile image URL:', (imageUrl));
-
   return (
     <ProfileContainer>
       <ProfileHeader>
@@ -81,7 +80,7 @@ const Profile = () => {
           {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
           {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
           <ProfileImageContainer>
-            <ProfileImage src={imageUrl} alt="Profile Picture" />
+            <ProfileImage src={previewImageUrl || imageUrl} alt="Profile Picture" />
             {isEditing && (
               <UploadIcon>
                 <label htmlFor="upload-input">
@@ -230,7 +229,7 @@ const ProfileImage = styled.img`
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
   border: 4px solid #ffffff;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 `;

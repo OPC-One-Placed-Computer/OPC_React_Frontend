@@ -2,16 +2,28 @@ import React from 'react';
 import styled from 'styled-components';
 import getImageUrl from '../../tools/media'; 
 import useFetchOrders from '../Hooks/placeOrderItemsHooks';
+import emptyOrder from '../Animations/emptyOrder.json'
+import Lottie from 'lottie-react';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const PlacedOrderItems = () => {
   const { orders, loading } = useFetchOrders();
 
   if (loading) {
-    return <LoadingMessage>Loading orders...</LoadingMessage>;
+    return (
+      <LoadingContainer>
+        <ClipLoader color="#333" size={50} />
+      </LoadingContainer>
+    );
   }
 
   if (!Array.isArray(orders) || orders.length === 0) {
-    return <NoOrdersMessage>No orders found.</NoOrdersMessage>;
+    return (
+      <EmptyOrdersContainer>
+        <Lottie animationData={emptyOrder} style={{ width: 300, height: 300 }} />
+        <NoOrdersMessage>No orders found.</NoOrdersMessage>
+      </EmptyOrdersContainer>
+    );
   }
 
   return (
@@ -38,7 +50,7 @@ const PlacedOrderItems = () => {
                 </ProductItem>
               ))}
               <Amount>
-              <TotalAmount><strong>Total Amount:</strong> ₱{order.total}</TotalAmount>
+                <TotalAmount><strong>Total Amount:</strong> ₱{order.total}</TotalAmount>
               </Amount>
               <TotalWrapper>
                 <OrderStatus><strong>Status:</strong> {order.status}</OrderStatus>
@@ -129,8 +141,10 @@ const Amount = styled.div`
   justify-content: flex-end;
   margin-left: auto;
 `;
+
 const TotalAmount = styled.span`
   font-weight: bold;
+  color: #B22222;
 `;
 
 const OrderStatus = styled.p`
@@ -138,7 +152,7 @@ const OrderStatus = styled.p`
 `;
 
 const CancelButton = styled.button`
-font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
   background-color:  #dc3545;
   color: #fff;
   border: none;
@@ -148,14 +162,24 @@ font-family: 'Poppins', sans-serif;
   transition: background-color 0.3s ease;
 `;
 
-const LoadingMessage = styled.p`
-  font-size: 1.2rem;
-  color: #333;
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 `;
 
 const NoOrdersMessage = styled.p`
   font-size: 1.2rem;
   color: #333;
+`;
+
+const EmptyOrdersContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 `;
 
 export default PlacedOrderItems;

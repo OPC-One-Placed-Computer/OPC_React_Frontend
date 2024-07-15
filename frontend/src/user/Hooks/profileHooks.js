@@ -10,6 +10,7 @@ const ProfileHooks = () => {
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState(null); 
   const [isEditing, setIsEditing] = useState(false);
   const [editedFullName, setEditedFullName] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
@@ -50,12 +51,9 @@ const ProfileHooks = () => {
           fetchImageUrl(image_path, token);
           setIsLoading(false);
           console.log(token);
-        } else {
-          // navigate('/login');
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        // navigate('/login');
       }
     };
 
@@ -83,6 +81,7 @@ const ProfileHooks = () => {
     const file = e.target.files[0];
     if (file) {
       setSelectedImage(file);
+      setPreviewImageUrl(URL.createObjectURL(file));
     }
   };
 
@@ -94,11 +93,16 @@ const ProfileHooks = () => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
+        const firstName = editedFullName.split(' ')[0]?.trim() || '';
+        const lastName = editedFullName.split(' ')[1]?.trim() || '';
+        const email = editedEmail?.trim() || '';
+        const address = editedAddress?.trim() || '';
+  
         const formData = new FormData();
-        formData.append('first_name', editedFullName.split(' ')[0].trim());
-        formData.append('last_name', editedFullName.split(' ')[1].trim());
-        formData.append('email', editedEmail.trim());
-        formData.append('address', editedAddress.trim());
+        formData.append('first_name', firstName);
+        formData.append('last_name', lastName);
+        formData.append('email', email);
+        formData.append('address', address);
         if (selectedImage) {
           formData.append('image', selectedImage);
         }
@@ -114,9 +118,9 @@ const ProfileHooks = () => {
           }
         );
   
-        console.log('Response:', response); // Log the entire response object
+        console.log('Response:', response);
   
-        const { message, user } = response.data; // Accessing user inside response.data
+        const { message, user } = response.data;
         if (user) {
           setFullName(`${user.first_name} ${user.last_name}`);
           setEmail(user.email);
@@ -130,6 +134,8 @@ const ProfileHooks = () => {
           setSuccessMessage(message);
           setSelectedImage(null);
           fetchImageUrl(user.image_path, token);
+          setPreviewImageUrl(null);
+          fetchImageUrl(user.imagePath, token);
           setIsEditing(false);
         } else {
           throw new Error('Invalid response data');
@@ -141,12 +147,12 @@ const ProfileHooks = () => {
     }
   };
   
-
   const handleCancelClick = () => {
     setEditedFullName(originalFullName);
     setEditedEmail(originalEmail);
     setEditedAddress(originalAddress);
     setIsEditing(false);
+    setPreviewImageUrl(null);
   };
 
   const fetchCurrentUser = async () => {
@@ -161,7 +167,7 @@ const ProfileHooks = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data.data; // Access the correct nested object
+      return response.data.data; 
     } catch (error) {
       console.error('Error fetching current user data:', error);
       throw error;
@@ -180,10 +186,9 @@ const ProfileHooks = () => {
     }
 
     try {
-      // Fetch the current user data
+
       const currentUser = await fetchCurrentUser();
 
-      // Create a FormData object and append the necessary fields
       const formData = new FormData();
       formData.append('old_password', oldPassword.trim());
       formData.append('new_password', newPassword.trim());
@@ -193,7 +198,6 @@ const ProfileHooks = () => {
       formData.append('email', currentUser.email);
       formData.append('address', currentUser.address);
 
-      // Make the password change request
       await axios.post(`https://onepc.online/api/v1/update-user/${currentUser.user_id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -220,6 +224,7 @@ const ProfileHooks = () => {
     address,
     isLoading,
     imageUrl,
+    previewImageUrl,
     isEditing,
     editedFullName,
     editedEmail,

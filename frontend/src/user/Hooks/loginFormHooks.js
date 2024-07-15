@@ -24,18 +24,19 @@ const LoginFormHooks = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://onepc.online/api/v1/login', userData);
-      console.log('Login successful:', response.data);
-      const { token } = response.data;
-      localStorage.setItem('token', token);
-      
       if (email === 'admin@gmail.com' && password === 'admin123') {
         setTimeout(() => {
           navigate('/admin/AdminDashboard'); 
         }, 2000);
       } else {
+        const response = await axios.post('https://onepc.online/api/v1/login', userData);
+        console.log('Login successful:', response.data);
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+        
         setTimeout(() => {
           navigate('/products'); 
+          window.location.reload(true);
         }, 2000);
       }
     } catch (error) {

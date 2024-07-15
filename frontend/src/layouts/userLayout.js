@@ -37,4 +37,5 @@ export default UserLayout;
 
 const Content = styled.div`
 padding-top: 90px;
+overflow-x: hidden;
 `;

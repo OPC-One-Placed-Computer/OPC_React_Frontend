@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { BiSolidCartAdd } from "react-icons/bi";
 import getImageUrl from '../../tools/media';
 import styled, { keyframes, css } from 'styled-components';
 import addToCart from '../Function/addToCart';
+import Lottie from 'lottie-react';
+import addCart from '../Animations/addCart.json';
+import { MdOutlineShoppingCart } from "react-icons/md";
 
 const Product = ({ image, brand, product_name, price, product_id }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false); // New state for button hover
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const quantity = 1;
@@ -18,6 +21,14 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
     setIsHovered(false);
   };
 
+  const handleButtonMouseEnter = () => {
+    setIsButtonHovered(true);
+  };
+
+  const handleButtonMouseLeave = () => {
+    setIsButtonHovered(false);
+  };
+
   const handleAddToCart = (event) => {
     event.stopPropagation();
     addToCart(product_id, product_name, quantity, setErrorMessage, setSuccessMessage);
@@ -26,18 +37,30 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
   return (
     <ProdCon>
       <ProdImg onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-        {isHovered && (
-          <AddCart onClick={handleAddToCart}>
-            <BiSolidCartAdd size={40} color="#ff6600" />
-          </AddCart>
-        )}
+        <LottieAnimationContainer $isHovered={isHovered}>
+          <Lottie
+            animationData={addCart}
+            loop={true}
+            autoplay={true}
+            style={{ width: 300, height: 300 }}
+          />
+        </LottieAnimationContainer>
         <img src={getImageUrl(image)} alt={product_name} />
         <Overlay $isHovered={isHovered} />
+        {isHovered && (
+          <AddCartButton
+            onClick={handleAddToCart}
+            onMouseEnter={handleButtonMouseEnter}
+            onMouseLeave={handleButtonMouseLeave}
+          >
+            {isButtonHovered ? <StyledCartIcon /> : 'Add to Cart'}
+          </AddCartButton>
+        )}
       </ProdImg>
       <ProdDetails>
         <h3>{brand}</h3>
         <p className="product-name">{product_name}</p>
-        <p className="product-price">${price}</p>
+        <p className="product-price">₱{price}</p>
       </ProdDetails>
       {errorMessage && <ErrorMessage errorMessage={errorMessage}>{errorMessage}</ErrorMessage>}
       {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
@@ -51,49 +74,56 @@ const ProdCon = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-`
+`;
+
 const ProdImg = styled.div`
   position: relative;
   height: 300px;
   overflow: hidden;
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease, filter 0.3s ease;
   }
-  &:hover img {
-    filter: brightness(0.7);
-  }
-  
-`
-const AddCart = styled.div`
+`;
+
+const LottieAnimationContainer = styled.div`
   position: absolute;
-  top: 40px;
-  left: 250px;
-  padding: 8px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: ${({ $isHovered }) => ($isHovered ? 1 : 0)};
   z-index: 1;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  ${ProdImg}:hover & {
-    opacity: 2;
-    transform: translate(-50%, -50%) scale(1.2);
+  transition: opacity 0.3s ease;
+`;
+
+const overlayAnimation = keyframes`
+  0% {
+    top: -100%;
   }
-`
+  100% {
+    top: 0;
+  }
+`;
+
 const Overlay = styled.div`
   position: absolute;
-  top: 0;
+  top: ${({ $isHovered }) => ($isHovered ? '0' : '-100%')};
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  transition: opacity 0.3s ease;
-  opacity: ${({ $isHovered }) => ($isHovered ? 1 : 0)};
-`
+  background-color: white;
+  transition: top 0.5s ease;
+
+  ${({ $isHovered }) =>
+    $isHovered &&
+    css`
+      animation: ${overlayAnimation} 0.5s forwards;
+    `}
+`;
+
 const ProdDetails = styled.div`
   padding: 10px;
   h3 {
@@ -101,15 +131,21 @@ const ProdDetails = styled.div`
     margin-bottom: 8px;
   }
   .product-price {
+    font-weight: bold;
     font-size: 16px;
-    color: #333;
+    color: #d22630; 
   }
   .product-name {
+    font-family: 'Poppins', sans-serif;
     font-size: 16px;
     color: #333;
     margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-`
+`;
+
 const ErrorMessage = styled.p`
   position: fixed;
   top: 20px;
@@ -122,10 +158,13 @@ const ErrorMessage = styled.p`
   font-size: 14px;
   z-index: 1000;
 
-  ${({ errorMessage }) => errorMessage && css`
-    animation: ${shakeAnimation} 0.5s ease-in-out;
-  `}
-`
+  ${({ errorMessage }) =>
+    errorMessage &&
+    css`
+      animation: ${shakeAnimation} 0.5s ease-in-out;
+    `}
+`;
+
 const SuccessMessage = styled.p`
   position: fixed;
   top: 20px;
@@ -137,7 +176,8 @@ const SuccessMessage = styled.p`
   border-radius: 5px;
   font-size: 14px;
   z-index: 1000;
-`
+`;
+
 const shakeAnimation = keyframes`
   0% { transform: translateX(0); }
   20% { transform: translateX(-10px); }
@@ -145,4 +185,34 @@ const shakeAnimation = keyframes`
   60% { transform: translateX(-10px); }
   80% { transform: translateX(10px); }
   100% { transform: translateX(0); }
-`
+`;
+
+const AddCartButton = styled.button`
+  font-family: 'Poppins', sans-serif;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #000099;
+  color: #fff;
+  height: 40px;
+  z-index: 1;
+  padding: 10px 20px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: #d22630;
+  }
+`;
+
+const StyledCartIcon = styled(MdOutlineShoppingCart)`
+  font-size: 24px; // Adjust the size of the icon here
+`;
