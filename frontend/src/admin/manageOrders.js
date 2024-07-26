@@ -293,11 +293,13 @@ const Title = styled.h1`
 const FilterContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 
   .filter-group {
     display: flex;
     flex-direction: column;
+    margin-right: 20px;
 
     label {
       margin-bottom: 5px;
