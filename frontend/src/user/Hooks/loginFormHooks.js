@@ -34,7 +34,7 @@ const LoginFormHooks = () => {
       setTimeout(() => {
         if (roles && roles.length > 0) {
           if (roles.includes('admin')) {
-            navigate('/admin/AdminDashboard');
+            navigate('/admin/manageProducts');
           } else if (roles.includes('user')) {
             navigate('/products');
           } else {

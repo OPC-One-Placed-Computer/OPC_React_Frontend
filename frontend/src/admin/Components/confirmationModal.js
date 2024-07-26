@@ -1,4 +1,3 @@
-// src/components/ConfirmationModal.js
 import React from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
@@ -42,8 +41,8 @@ const ModalContent = styled.div`
 `;
 
 const Message = styled.p`
-font-family: 'Poppins', sans-serif;
-  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
   margin-bottom: 20px;
 `;
 
@@ -68,13 +67,13 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.button`
-font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
   padding: 10px 20px;
   border: none;
   border-radius: 25px;
   cursor: pointer;
   color: white;
-  font-size: 14px;
+  font-size: 12px;
 `;
 
 export default ConfirmationModal;

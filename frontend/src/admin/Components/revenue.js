@@ -1,18 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Pie } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend
-} from 'chart.js';
-
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const RevenueAnalytics = ({ revenueData }) => {
- 
   const pieData = {
     labels: ['Total Revenue', 'Average Order Value', 'Revenue Per Customer'],
     datasets: [
@@ -28,38 +21,60 @@ const RevenueAnalytics = ({ revenueData }) => {
     ]
   };
 
+  const pieOptions = {
+    plugins: {
+      legend: {
+        labels: {
+          font: {
+            family: 'Poppins', 
+          },
+          color: '#333', 
+        },
+      },
+      tooltip: {
+        bodyFont: {
+          family: 'Poppins', 
+        },
+        titleFont: {
+          family: 'Poppins', 
+        },
+      },
+    },
+  };
+
   return (
     <RevenueContainer>
-      <h2>Revenue Statistics</h2>
-      <RevenueItem>Total Revenue: ${revenueData.total_revenue}</RevenueItem>
-      <RevenueItem>Average Order Value: ${revenueData.average_order_value}</RevenueItem>
-      <RevenueItem>Revenue Per Customer: ${revenueData.revenue_per_customer}</RevenueItem>
+      <Title>Revenue</Title>
       <PieContainer>
-        <Pie data={pieData} />
+        <Pie data={pieData} options={pieOptions} />
       </PieContainer>
     </RevenueContainer>
   );
 };
 
 const RevenueContainer = styled.div`
-  margin-top: 30px;
+  margin-top: 20px;
   padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   text-align: center;
+  max-width: 1000px;
+  margin: 0 auto;
 `;
 
-const RevenueItem = styled.p`
-  font-size: 18px;
-  margin: 10px 0;
-  font-weight: 500;
+const Title = styled.h2`
+  margin-bottom: 20px;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
 `;
 
 const PieContainer = styled.div`
-  width: 50%;
+  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
-  margin-top: 30px;
 `;
 
 export default RevenueAnalytics;

@@ -6,6 +6,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import OrderStatusModal from './Components/updateStatusModal';
 import { FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
+import ScaleLoader from 'react-spinners/ScaleLoader';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import ReactPaginate from 'react-paginate';
 
 const ManageOrders = () => {
@@ -50,15 +53,18 @@ const ManageOrders = () => {
     setPage(data.selected + 1);
   };
 
+ 
   const handleStatusChange = async (orderId, status) => {
-    console.log('Attempting to update order status:', { orderId, status });
+    // Optimistically update the UI
+    const updatedOrders = orders.map(order =>
+      order.order_id === orderId ? { ...order, status } : order
+    );
+    setOrders(updatedOrders);
 
     try {
       const token = localStorage.getItem('token');
-      console.log('Authorization token:', token);
-
       const response = await Axios.post(`https://onepc.online/api/v1/orders/status/${orderId}`, 
-        { status: status },
+        { status },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,24 +73,19 @@ const ManageOrders = () => {
         }
       );
 
-      console.log('API Response:', response.data);
-
-      if (response.data.status) {
-        setOrders(orders.map(order =>
-          order.order_id === orderId ? { ...order, status: response.data.data.status } : order
-        ));
-        setUpdatingOrder(null);
-        setNewStatus('');
-        console.log('Order status updated successfully.');
-      } else {
-        console.error('Unexpected response status:', response.data.status);
+      if (!response.data.status) {
+        throw new Error('Error updating status');
       }
+      setUpdatingOrder(null);
+      setNewStatus('');
+      toast.success('Order status updated successfully!');
     } catch (err) {
+      setOrders(orders);
       console.error('Error updating order status:', err.response ? err.response.data : err.message);
       setError('Error updating order status.');
+      toast.error('Failed to update order status.');
     }
   };
-
   const handleFilterChange = (event) => {
     setFilterStatus(event.target.value);
     setPage(1);
@@ -152,16 +153,18 @@ const ManageOrders = () => {
   };
 
   if (loading) {
-    return <Loading>Loading orders...</Loading>;
+    return (
+      <Loading>
+        <ScaleLoader color="#000099" />
+      </Loading>
+    );
   }
 
   if (error) {
     return <Error>{error}</Error>;
   }
-
   return (
     <PageContainer>
-      <Title>Manage Orders</Title>
       <FilterContainer>
         <div className="filter-group">
           <label htmlFor="statusFilter">Filter by status:</label>
@@ -257,8 +260,8 @@ const ManageOrders = () => {
       </TableWrapper>
       <PaginationContainer>
                 <ReactPaginate
-                  previousLabel={"Previous"}
-                  nextLabel={"Next"}
+                  previousLabel={"<"}
+                  nextLabel={">"}
                   breakLabel={"..."}
                   pageCount={totalPages}
                   marginPagesDisplayed={2}
@@ -276,6 +279,7 @@ const ManageOrders = () => {
         setNewStatus={setNewStatus}
         handleStatusChange={handleStatusChange}
       />
+       <ToastContainer />
     </PageContainer>
   );
 };
@@ -285,10 +289,20 @@ const PageContainer = styled.div`
   font-family: 'Poppins', sans-serif;
 `;
 
-const Title = styled.h1`
-  text-align: center;
-  margin-bottom: 20px;
+const Loading = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 `;
+
+const Error = styled.div`
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+`;
+
 
 const FilterContainer = styled.div`
   display: flex;
@@ -302,10 +316,12 @@ const FilterContainer = styled.div`
 
     label {
       margin-bottom: 5px;
+      font-size: 14px;
     }
 
     select {
-      padding: 8px;
+      padding: 4px;
+      font-size: 12px;
       font-family: 'Poppins', sans-serif;
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -341,7 +357,7 @@ const TableWrapper = styled.div`
 `;
 
 const OrderTable = styled.table`
-font-size: 14px;
+  font-size: 12px;
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #ddd;
@@ -383,26 +399,16 @@ const ActionButtons = styled.div`
   }
 `;
 
-const Loading = styled.div`
-  text-align: center;
-  font-size: 20px;
-`;
-
-const Error = styled.div`
-  color: red;
-  text-align: center;
-  font-size: 20px;
-`;
 const PaymentMethod = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   .payment-icon {
-    font-size: 16px;
+    font-size: 12px;
     margin-right: 8px;
   }
   span {
-    font-size: 16px;
+    font-size: 12px;
   }
 `;
 
@@ -425,15 +431,15 @@ const PaginationContainer = styled.div`
   .pagination li a {
     padding: 8px 12px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 50%;
     text-decoration: none;
-    color: #007BFF;
+    color: #000099;
   }
 
   .pagination li.active a {
-    background-color: #007BFF;
+    background-color: #000099;
     color: white;
-    border-color: #007BFF;
+    border-color: #000099;
   }
 `;
 

@@ -18,7 +18,6 @@ const ProductPerformance = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response);
         setLowStockProducts(response.data.data.low_stock_products);
         setOutOfStockProducts(response.data.data.out_of_stock_products);
       } catch (err) {
@@ -43,88 +42,137 @@ const ProductPerformance = () => {
   return (
     <Container>
       <h2>Product Performance</h2>
-      <TableContainer>
-        <h3>Low Stock Products</h3>
-        <ProductTable>
-          <thead>
-            <tr>
-              <th>Product ID</th>
-              <th>Product Name</th>
-              <th>Stock Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {lowStockProducts.length === 0 ? (
+      <TablesContainer>
+        <TableLow>
+          <Title>Low Stock Products</Title>
+          <ProductTable>
+            <thead>
               <tr>
-                <td colSpan="3">No low stock products found.</td>
+                <TableHeader>ID</TableHeader>
+                <TableHeader>Product Name</TableHeader>
+                <TableHeader>Quantity</TableHeader>
               </tr>
-            ) : (
-              lowStockProducts.map((product, index) => (
-                <tr key={`${product.id}-${index}`}>
-                  <td>{product.id}</td>
-                  <td>{product.product_name}</td>
-                  <td>{product.quantity}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </ProductTable>
-      </TableContainer>
+            </thead>
+            <tbody>
+              {lowStockProducts.length === 0 ? (
+                <TableRow>
+                  <TableData colSpan="3">No low stock products found.</TableData>
+                </TableRow>
+              ) : (
+                lowStockProducts.map((product, index) => (
+                  <TableRow key={`${product.id}-${index}`}>
+                    <TableData>{product.id}</TableData>
+                    <TableData>{product.product_name}</TableData>
+                    <TableData>{product.quantity}</TableData>
+                  </TableRow>
+                ))
+              )}
+            </tbody>
+          </ProductTable>
+        </TableLow>
 
-      <TableContainer>
-        <h3>Out of Stock Products</h3>
-        <ProductTable>
-          <thead>
-            <tr>
-              <th>Product ID</th>
-              <th>Product Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {outOfStockProducts.length === 0 ? (
+        <TableWrapper>
+          <Title>Out of Stock Products</Title>
+          <ProductTable>
+            <thead>
               <tr>
-                <td colSpan="2">No out of stock products found.</td>
+                <TableHeader>Product ID</TableHeader>
+                <TableHeader>Product Name</TableHeader>
               </tr>
-            ) : (
-              outOfStockProducts.map((product, index) => (
-                <tr key={`${product.id}-${index}`}>
-                  <td>{product.id}</td>
-                  <td>{product.product_name}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </ProductTable>
-      </TableContainer>
+            </thead>
+            <tbody>
+              {outOfStockProducts.length === 0 ? (
+                <TableRow>
+                  <TableData colSpan="2">No out of stock products found.</TableData>
+                </TableRow>
+              ) : (
+                outOfStockProducts.map((product, index) => (
+                  <TableRow key={`${product.id}-${index}`}>
+                    <TableData>{product.id}</TableData>
+                    <TableData>{product.product_name}</TableData>
+                  </TableRow>
+                ))
+              )}
+            </tbody>
+          </ProductTable>
+        </TableWrapper>
+      </TablesContainer>
     </Container>
   );
 };
 
 const Container = styled.div`
   padding: 30px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
-const TableContainer = styled.div`
-  margin-bottom: 30px;
+const TablesContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+`;
+
+const TableWrapper = styled.div`
+  width: 35%;
+  height: auto;
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+`;
+
+const TableLow = styled.div`
+  width: 65%;
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+`;
+
+const Title = styled.h3`
+  position: relative;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 600;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #ddd;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
 `;
 
 const ProductTable = styled.table`
   width: 100%;
+  border: 1px solid #ddd;
   border-collapse: collapse;
   margin-top: 10px;
+`;
 
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
+const TableHeader = styled.th`
+  background-color: #f2f2f2;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+  padding: 10px;
+  text-align: left;
+`;
 
-  th {
-    background-color: #f2f2f2;
+const TableRow = styled.tr`
+  &:nth-child(even) {
+    background-color: #f9f9f9;
   }
+`;
+
+const TableData = styled.td`
+  border-bottom: 1px solid #ddd;
+  font-size: 12px;
+  padding: 10px;
+  text-align: left;
 `;
 
 const Loading = styled.div`
