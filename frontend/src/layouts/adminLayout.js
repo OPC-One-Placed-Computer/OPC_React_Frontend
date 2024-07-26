@@ -1,6 +1,5 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import AdminDashboard from '../admin/AdminDashboard';
 import ManageProducts from '../admin/manageProducts';
 import ManageOrders from '../admin/manageOrders';
 import styled from 'styled-components';
@@ -14,7 +13,6 @@ const AdminLayout = () => (
     <Sidebar />
     <AdminContent>
       <Routes>
-        <Route path="/AdminDashboard" element={<AdminDashboard />} /> 
         <Route path="/manageProducts" element={<ManageProducts />} />
         <Route path="/manageOrders" element={<ManageOrders />} />
         <Route path="/adminProduct" element={<AdminProduct />} />

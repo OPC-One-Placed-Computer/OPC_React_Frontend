@@ -103,7 +103,7 @@ const Title = styled.h2`
 const CloseButton = styled.button`
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 20px;
   cursor: pointer;
 `;
 
@@ -116,12 +116,14 @@ font-family: 'Poppins', sans-serif;
 const Label = styled.label`
   margin-bottom: 1rem;
   font-weight: bold;
+  font-size: 14px;
 `;
 
 const Input = styled.input`
-font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
   padding: 0.5rem;
   border: 1px solid #ccc;
+  font-size: 12px;
   border-radius: 5px;
   width: 95%;
   margin-top: 0.5rem;
@@ -134,10 +136,11 @@ font-family: 'Poppins', sans-serif;
 `;
 
 const Select = styled.select`
-font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 5px;
+  font-size: 12px;
   width: 100%;
   margin-top: 0.5rem;
   transition: border-color 0.3s;
@@ -157,6 +160,7 @@ const ButtonContainer = styled.div`
 const CancelButton = styled.button`
   font-family: 'Poppins', sans-serif;
   padding: 0.5rem 1rem;
+  font-size: 12px;
   border: 1px solid #ccc;
   background-color: #dc3545;
   color: white;
@@ -175,6 +179,7 @@ const SaveButton = styled.button`
   font-family: 'Poppins', sans-serif;
   padding: 0.5rem 1rem;
   border: none;
+  font-size: 12px;
   background-color: #000099;
   color: white;
   border-radius: 25px;

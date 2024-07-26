@@ -206,7 +206,7 @@ const FormGroup = styled.div`
   width: 100%; 
 
   label {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     display: block;
     color: #555;
@@ -275,6 +275,7 @@ const FormGroup = styled.div`
     }
 
     resize: vertical;
+    height: 150px;
   }
 
   input[type="checkbox"] {
@@ -372,12 +373,12 @@ const ImagePreview = styled.div`
 `;
 
 const SubmitButton = styled.button`
-  background-color: #007bff;
+  background-color: #000099;
   color: #fff;
   padding: 12px 24px;
   border: none;
   border-radius: 25px;
-  font-size: 16px;
+  font-size: 12px;
   cursor: pointer;
   transition: background-color 0.3s;
   font-family: 'Poppins', sans-serif;

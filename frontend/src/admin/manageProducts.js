@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import getImageUrl from '../tools/media';
 import ReactPaginate from 'react-paginate';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import ConfirmationModal from './Components/confirmationModal';
 
 const ManageProducts = () => {
@@ -20,7 +21,6 @@ const ManageProducts = () => {
   const [brands, setBrands] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [visibleActions, setVisibleActions] = useState(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [isEditingProduct, setIsEditingProduct] = useState(false); 
@@ -134,7 +134,6 @@ fetchProducts();
       .then(() => {
         fetchProducts(currentPage);
         setIsModalOpen(false);
-        setVisibleActions(null);
         toast.success('Product deleted successfully!');
       })
       .catch(error => {
@@ -188,10 +187,6 @@ fetchProducts();
     setCurrentProduct(null);
   };
 
-  const toggleActions = (productId) => {
-    setVisibleActions(visibleActions === productId ? null : productId);
-  };
-  
 
   return (
     <PageContainer>
@@ -258,14 +253,9 @@ fetchProducts();
                         <td>{product.quantity}</td>
                         <td>${product.price}</td>
                         <td>
-                          <ActionsContainer>
-                            <ActionsButton onClick={() => toggleActions(product.product_id)}>⋮</ActionsButton>
-                            {visibleActions === product.product_id && (
-                              <ActionsDropdown>
-                                 <ActionButton onClick={() => handleEdit(product)}>Update</ActionButton>
-                                <ActionButton onClick={() => handleDelete(product.product_id)}>Delete</ActionButton>
-                              </ActionsDropdown>
-                            )}
+                        <ActionsContainer>
+                            <FaEdit className="icon edit" onClick={() => handleEdit(product)} />
+                            <FaTrash className="icon delete" onClick={() => handleDelete(product.product_id)} />
                           </ActionsContainer>
                         </td>
                       </tr>
@@ -275,8 +265,8 @@ fetchProducts();
               </ProductTableContainer>
               <PaginationContainer>
                 <ReactPaginate
-                  previousLabel={"Previous"}
-                  nextLabel={"Next"}
+                  previousLabel={"<"}
+                  nextLabel={">"}
                   breakLabel={"..."}
                   pageCount={totalPages}
                   marginPagesDisplayed={2}
@@ -343,7 +333,7 @@ const SearchInput = styled.input`
   padding: 10px;
   border: none;
   outline: none;
-  font-size: 16px;
+  font-size: 12px;
   border-radius: 20px;
   background: none; 
 `;
@@ -370,7 +360,7 @@ const Filters = styled.div`
 const Select = styled.select`
   font-family: 'Poppins', sans-serif;
   padding: 10px;
-  font-size: 16px;
+  font-size: 12px;
   border: 1px solid #ccc;
   border-radius: 5px;
   margin-right: 10px;
@@ -386,7 +376,7 @@ const AddButton = styled.button`
   font-family: 'Poppins', sans-serif;
   align-self: flex-end;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 12px;
   background-color: #000099;
   color: white;
   border: none;
@@ -408,6 +398,7 @@ const ProductTableContainer = styled.div`
 const ProductTable = styled.table`
   width: 100%;
   border-collapse: collapse;
+  font-size: 12px;
   thead {
     position: sticky;
     top: 0;
@@ -441,61 +432,25 @@ const ProductTable = styled.table`
 `;
 
 const ActionsContainer = styled.div`
-  position: relative;
-`;
-
-const ActionsButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 24px;
-  color: #007bff;
-  transition: color 0.3s;
-  &:hover {
-    color: #0056b3;
+  display: flex;
+  gap: 10px;
+  .icon {
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .edit {
+    color: #007bff;
+    &:hover {
+      color: #0056b3;
+    }
+  }
+  .delete {
+    color: #dc3545;
+    &:hover {
+      color: #c82333;
+    }
   }
 `;
-
-const ActionsDropdown = styled.div`
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  padding: 10px;
-  z-index: 10;
-  width: 150px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
-  
-  ${ActionsContainer}:hover & {
-    opacity: 1;
-    visibility: visible;
-  }
-`;
-
-const ActionButton = styled.button`
-font-family: 'Poppins', sans-serif;
-  display: block;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  color: #333;
-  transition: background-color 0.3s, color 0.3s;
-  
-  &:hover {
-    background-color: #f8f9fa;
-    color: #ff6600;
-  }
-`;
-
-
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -515,14 +470,14 @@ const PaginationContainer = styled.div`
   .pagination li a {
     padding: 8px 12px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 50%;
     text-decoration: none;
-    color: #007BFF;
+    color: #000099;
   }
 
   .pagination li.active a {
-    background-color: #007BFF;
+    background-color: #000099;
     color: white;
-    border-color: #007BFF;
+    border-color: #000099;
   }
 `;
