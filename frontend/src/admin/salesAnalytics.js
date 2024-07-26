@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import styled from 'styled-components';
 import RevenueAnalytics from './Components/revenue';
+import ProductPerformance from './Components/productPerformance';
 
 ChartJS.register(
   CategoryScale,
@@ -115,6 +116,7 @@ const SalesAnalytics = () => {
             <Line data={chartData} />
           </ChartContainer>
           <RevenueAnalytics revenueData={revenueData} />
+          <ProductPerformance />
         </>
       )}
     </Container>

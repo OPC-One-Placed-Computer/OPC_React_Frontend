@@ -292,7 +292,6 @@ const Title = styled.h1`
 
 const FilterContainer = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 
@@ -307,9 +306,17 @@ const FilterContainer = styled.div`
 
     select {
       padding: 8px;
+      font-family: 'Poppins', sans-serif;
       border: 1px solid #ccc;
       border-radius: 4px;
+
+      
+    &:focus {
+    border-color: #ff6600;
+    outline: none;
+  }
     }
+
   }
 `;
 
@@ -318,7 +325,15 @@ const DatePickerContainer = styled.div`
 
   .date-picker {
     margin-left: 10px;
+    font-family: 'Poppins', sans-serif;
+     border: 1px solid #ccc;
+
+    &:focus {
+    border-color: #ff6600;
+    outline: none;
   }
+  }
+   
 `;
 
 const TableWrapper = styled.div`
@@ -365,21 +380,6 @@ const ActionButtons = styled.div`
     .trash-icon {
       color: #dc3545;
     }
-  }
-`;
-
-const LoadMoreButton = styled.button`
-  margin: 20px auto;
-  display: block;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #0056b3;
   }
 `;
 
