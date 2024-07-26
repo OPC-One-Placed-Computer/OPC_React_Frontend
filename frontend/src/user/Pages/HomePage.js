@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import Footer from '../Components/footer';
 import FeaturedProducts from '../Components/featuredProducts';
-import sampleImage from '../../assets/bc_image.jpg'; 
+import homeAnimated from '../Animations/homeAnimated.json'; 
+import Lottie from 'lottie-react';
 
 const Homepage = () => {
   return (
@@ -12,13 +13,13 @@ const Homepage = () => {
         <HeroHeader>
           <HeroCon>
             <Content>
-              <TextContent>
+              <TextContent className="animate-text">
                 <h1>Welcome to <br /><span className='animated-span'>One Place Computer</span></h1>
                 <p>Where high quality products are in one place.</p>
                 <Link to="/products" className="btn btn-primary">View Products</Link>
               </TextContent>
-              <ImgContent>
-                <img src={sampleImage} alt="Sample" className="hero-image" />
+              <ImgContent className="animate-img">
+                <Lottie animationData={homeAnimated} autoplay loop style={{ maxWidth: '100%', height: 'auto' }} />
               </ImgContent>
             </Content>
           </HeroCon>
@@ -31,9 +32,10 @@ const Homepage = () => {
 };
 
 export default Homepage;
+
 const HomePageParentContainer = styled.div`
   overflow-x: hidden;
-`;
+`
 const HomepageCon = styled.div`
   background-color: #13072E;
   color: white;
@@ -68,17 +70,38 @@ const HeroCon = styled.div`
 `
 const Content = styled.div`
   display: flex;
-  margin-top: 50px;
+  margin-left: 25px;
   flex-direction: column; 
 
   @media (min-width: 768px) {
     flex-direction: row; 
   }
 `
+const slideInLeft = keyframes`
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`
+const slideInRight = keyframes`
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`
 const TextContent = styled.div`
   flex: 1;
   text-align: center; 
   margin-top: 30px; 
+  animation: ${slideInRight} 1s forwards;
 
   @media (min-width: 768px) {
     text-align: left; 
@@ -124,11 +147,5 @@ const ImgContent = styled.div`
   flex: 1;
   text-align: center;
   max-width: 100%; 
-
-  .hero-image {
-    max-width: 100%; 
-    height: auto;
-    display: block;
-    border-radius: 25px;
-  }
+  animation: ${slideInLeft} 1s forwards;
 `

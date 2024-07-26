@@ -2,21 +2,21 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-
 const ProfileHooks = () => {
   const [userId, setUserId] = useState('');
   const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState(null); 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedFullName, setEditedFullName] = useState('');
+  const [editedFirstName, setEditedFirstName] = useState('');
+  const [editedLastName, setEditedLastName] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
   const [editedAddress, setEditedAddress] = useState('');
-  const [originalFullName, setOriginalFullName] = useState('');
-  const [originalEmail, setOriginalEmail] = useState('');
-  const [originalAddress, setOriginalAddress] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -27,40 +27,35 @@ const ProfileHooks = () => {
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          const response = await axios.get('https://onepc.online/api/v1/current-authentication', {
+          const response = await axios.get('https://onepc.online/api/v1/current/authentication', {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
           const { data } = response.data;
           const { user_id, first_name, last_name, email, address, image_path } = data;
-
-          console.log(data);
-
+  
           setUserId(user_id);
           setFullName(`${first_name} ${last_name}`);
+          setFirstName(first_name);
+          setLastName(last_name);
           setEmail(email);
           setAddress(address);
-          setOriginalFullName(`${first_name} ${last_name}`);
-          setOriginalEmail(email);
-          setOriginalAddress(address);
-          setEditedFullName(`${first_name} ${last_name}`);
+          setEditedFirstName(first_name);
+          setEditedLastName(last_name);
           setEditedEmail(email);
           setEditedAddress(address);
           fetchImageUrl(image_path, token);
           setIsLoading(false);
-          console.log(token);
-        } else {
-          // navigate('/login');
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        // navigate('/login');
       }
     };
-
+  
     fetchUserProfile();
   }, [navigate]);
+  
 
   const fetchImageUrl = async (imagePath, token) => {
     try {
@@ -75,7 +70,6 @@ const ProfileHooks = () => {
       setImageUrl(imageUrl);
     } catch (error) {
       console.error('Error fetching image:', error);
-     
     }
   };
   
@@ -83,6 +77,7 @@ const ProfileHooks = () => {
     const file = e.target.files[0];
     if (file) {
       setSelectedImage(file);
+      setPreviewImageUrl(URL.createObjectURL(file));
     }
   };
 
@@ -94,17 +89,24 @@ const ProfileHooks = () => {
     try {
       const token = localStorage.getItem('token');
       if (token) {
+        const firstName = editedFirstName?.trim() || '';
+        const lastName = editedLastName?.trim() || '';
+        const email = editedEmail?.trim() || '';
+        const address = editedAddress?.trim() || '';
+  
         const formData = new FormData();
-        formData.append('first_name', editedFullName.split(' ')[0].trim());
-        formData.append('last_name', editedFullName.split(' ')[1].trim());
-        formData.append('email', editedEmail.trim());
-        formData.append('address', editedAddress.trim());
+        formData.append('first_name', firstName);
+        if (lastName) {
+          formData.append('last_name', lastName);
+        }
+        formData.append('email', email);
+        formData.append('address', address);
         if (selectedImage) {
           formData.append('image', selectedImage);
         }
   
         const response = await axios.post(
-          `https://onepc.online/api/v1/update-user/${userId}`,
+          `https://onepc.online/api/v1/user/update/${userId}`,
           formData,
           {
             headers: {
@@ -114,22 +116,23 @@ const ProfileHooks = () => {
           }
         );
   
-        console.log('Response:', response); // Log the entire response object
+        console.log('Response:', response);
   
-        const { message, user } = response.data; // Accessing user inside response.data
+        const { message, user } = response.data;
         if (user) {
           setFullName(`${user.first_name} ${user.last_name}`);
+          setFirstName(user.first_name);
+          setLastName(user.last_name);
           setEmail(user.email);
           setAddress(user.address);
-          setOriginalFullName(`${user.first_name} ${user.last_name}`);
-          setOriginalEmail(user.email);
-          setOriginalAddress(user.address);
-          setEditedFullName(`${user.first_name} ${user.last_name}`);
+          setEditedFirstName(user.first_name);
+          setEditedLastName(user.last_name);
           setEditedEmail(user.email);
           setEditedAddress(user.address);
           setSuccessMessage(message);
           setSelectedImage(null);
-          setImageUrl(`https://onepc.online/api/v1/download/file?path=${user.image_path}`);
+          setPreviewImageUrl(null);
+          fetchImageUrl(user.image_path, token);
           setIsEditing(false);
         } else {
           throw new Error('Invalid response data');
@@ -141,13 +144,15 @@ const ProfileHooks = () => {
     }
   };
   
-
   const handleCancelClick = () => {
-    setEditedFullName(originalFullName);
-    setEditedEmail(originalEmail);
-    setEditedAddress(originalAddress);
+    setEditedFirstName(firstName);
+    setEditedLastName(lastName);
+    setEditedEmail(email);
+    setEditedAddress(address);
+    setPreviewImageUrl(null);
     setIsEditing(false);
   };
+  
 
   const fetchCurrentUser = async () => {
     const token = localStorage.getItem('token');
@@ -156,12 +161,12 @@ const ProfileHooks = () => {
     }
 
     try {
-      const response = await axios.get('https://onepc.online/api/v1/current-authentication', {
+      const response = await axios.get('https://onepc.online/api/v1/current/authentication', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data.data; // Access the correct nested object
+      return response.data.data; 
     } catch (error) {
       console.error('Error fetching current user data:', error);
       throw error;
@@ -180,10 +185,8 @@ const ProfileHooks = () => {
     }
 
     try {
-      // Fetch the current user data
       const currentUser = await fetchCurrentUser();
 
-      // Create a FormData object and append the necessary fields
       const formData = new FormData();
       formData.append('old_password', oldPassword.trim());
       formData.append('new_password', newPassword.trim());
@@ -193,8 +196,7 @@ const ProfileHooks = () => {
       formData.append('email', currentUser.email);
       formData.append('address', currentUser.address);
 
-      // Make the password change request
-      await axios.post(`https://onepc.online/api/v1/update-user/${currentUser.user_id}`, formData, {
+      await axios.post(`https://onepc.online/api/v1/user/update/${currentUser.user_id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -214,19 +216,25 @@ const ProfileHooks = () => {
   };
 
   return {
-    userId,
     fullName,
+    firstName,
+    lastName,
     email,
     address,
     isLoading,
     imageUrl,
+    previewImageUrl,
     isEditing,
-    editedFullName,
+    editedFirstName,
+    editedLastName,
     editedEmail,
     editedAddress,
     successMessage,
     errorMessage,
-    setEditedFullName,
+    setSuccessMessage,
+    setErrorMessage,
+    setEditedFirstName,
+    setEditedLastName,
     setEditedEmail,
     setEditedAddress,
     handleImageChange,
@@ -234,6 +242,7 @@ const ProfileHooks = () => {
     handleSaveClick,
     handleCancelClick,
     handleChangePassword,
+    setPreviewImageUrl
   };
 };
 

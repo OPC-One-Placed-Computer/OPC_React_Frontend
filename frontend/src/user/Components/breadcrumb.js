@@ -1,0 +1,45 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+
+const BreadcrumbContainer = styled.nav`
+ margin: 20px 0;
+  font-size: 18px;
+`;
+
+const BreadcrumbItem = styled.span`
+  &::after {
+    content: '>';
+    margin: 0 8px;
+    color: #888;
+  }
+  &:last-child::after {
+    content: '';
+  }
+`;
+
+const BreadcrumbLink = styled(Link)`
+  text-decoration: none;
+  color: #00008B;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Breadcrumb = ({ items }) => {
+  return (
+    <BreadcrumbContainer>
+      {items.map((item, index) => (
+        <BreadcrumbItem key={index}>
+          {item.path ? (
+            <BreadcrumbLink to={item.path}>{item.label}</BreadcrumbLink>
+          ) : (
+            item.label
+          )}
+        </BreadcrumbItem>
+      ))}
+    </BreadcrumbContainer>
+  );
+};
+
+export default Breadcrumb;

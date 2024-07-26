@@ -6,17 +6,13 @@ import axios from 'axios';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
+    setIsLoggedIn(!!token);
   }, []);
 
   useEffect(() => {
@@ -44,28 +40,31 @@ const ProfileDropdown = () => {
         },
       });
       localStorage.removeItem('token');
-      setIsLoggedIn(false); 
+      setIsLoggedIn(false);
       navigate('/loginForm');
-
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
+  const handleIconClick = () => {
+    if (isLoggedIn) {
+      toggleDropdown();
+    } else {
+      navigate('/loginForm');
+    }
+  };
+
   return (
     <ProfileContainer ref={dropdownRef}>
-      <ProfileIcon onClick={toggleDropdown}>
+      <ProfileIcon onClick={handleIconClick}>
         <RiAccountPinCircleFill size={24} />
       </ProfileIcon>
-      {isOpen && (
+      {isOpen && isLoggedIn && (
         <DropdownMenu>
           <Link to="/placedOrderItems" className="dropdown-item" onClick={toggleDropdown}>My Purchase</Link>
-          <Link to="/profile" className="dropdown-item" onClick={toggleDropdown}>Profile</Link>
-          {isLoggedIn ? ( 
-            <Link className="dropdown-item" onClick={handleLogout}>Logout</Link>
-          ) : (
-            <Link to="/loginForm" className="dropdown-item" onClick={toggleDropdown}>Login</Link>
-          )}
+          <Link to="/profile" className="dropdown-item" onClick={toggleDropdown}>My Account</Link>
+          <Link className="dropdown-item" onClick={handleLogout}>Logout</Link>
         </DropdownMenu>
       )}
     </ProfileContainer>
@@ -76,9 +75,10 @@ export default ProfileDropdown;
 
 const ProfileContainer = styled.div`
   position: relative;
-  display: flex; 
+  display: flex;
   align-items: center;
-`
+`;
+
 const ProfileIcon = styled.div`
   cursor: pointer;
   color: white;
@@ -93,11 +93,11 @@ const ProfileIcon = styled.div`
     background-color: #ff6600;
     transition: width 0.3s ease, left 0.3s ease, right 0.3s ease;
   }
-  
+
   &::before {
     left: 50%;
   }
-  
+
   &::after {
     right: 50%;
   }
@@ -106,12 +106,13 @@ const ProfileIcon = styled.div`
     width: 50%;
     left: 0;
   }
-  
+
   &:hover::after {
     width: 50%;
     right: 0;
   }
-`
+`;
+
 const DropdownMenu = styled.div`
   width: 105px;
   position: absolute;
@@ -121,7 +122,7 @@ const DropdownMenu = styled.div`
   background-color: #2d1663;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
-  
+
   .dropdown-item {
     color: white;
     text-decoration: none;
@@ -132,4 +133,4 @@ const DropdownMenu = styled.div`
       color: #ff6600;
     }
   }
-`
+`;

@@ -1,0 +1,410 @@
+import React, { useState, useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import { FaPlus } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const EditProfileModal = ({
+  isOpen,
+  onClose,
+  editedFirstName,
+  editedLastName,
+  editedEmail,
+  editedAddress,
+  setEditedFirstName,
+  setEditedLastName,
+  setEditedEmail,
+  setEditedAddress,
+  handleSaveClick,
+  handleImageChange,
+  imageUrl,
+  previewImageUrl,
+  setPreviewImageUrl,
+  isEditing,
+  successMessage,
+  errorMessage,
+  setSuccessMessage,
+  setErrorMessage,
+  handleCancelClick,
+  handleChangePassword,
+}) => {
+  const [currentView, setCurrentView] = useState('editProfile');
+  const toastContainerRef = useRef(null); 
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); 
+  const [changePasswordError, setChangePasswordError] = useState('');
+ 
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+  
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setChangePasswordError('Please fill out all fields.');
+      return;
+    }
+  
+    if (newPassword !== confirmPassword) {
+      setChangePasswordError('Passwords do not match.');
+      return;
+    }
+
+    try {
+      await handleChangePassword(oldPassword, newPassword, confirmPassword);
+      console.log('Password updated successfully!');
+      setChangePasswordError('');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      console.error('Password change failed:', error);
+      setChangePasswordError('Failed to change password. Please try again.');
+    } 
+  };
+
+  useEffect(() => {
+  
+    return () => {
+      toast.dismiss(); 
+    };
+  }, []);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      setSuccessMessage(null); 
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      setErrorMessage(null);
+    }
+    if (changePasswordError) {
+      toast.error(changePasswordError);
+      setChangePasswordError(null); 
+    }
+  }, [successMessage, errorMessage, changePasswordError, setSuccessMessage, setErrorMessage]);
+
+  const handleCancel = () => {
+    handleCancelClick();
+    onClose();
+  };
+
+  return (
+    <>
+      <ToastContainer ref={toastContainerRef} />
+      {isOpen && (
+        <ModalBackdrop onClick={onClose}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
+            <ModalHeader>
+              <h3>User Account</h3>
+              <CloseButton onClick={onClose} aria-label="Close modal">×</CloseButton>
+            </ModalHeader>
+
+            <ModalNav>
+              <NavItem
+                active={currentView === 'editProfile'}
+                onClick={() => setCurrentView('editProfile')}
+              >
+                Edit Profile
+              </NavItem>
+              <NavItem
+                active={currentView === 'changePassword'}
+                onClick={() => setCurrentView('changePassword')}
+              >
+                Change Password
+              </NavItem>
+            </ModalNav>
+
+            {currentView === 'editProfile' && (
+              <>
+                <ProfileImageContainer>
+                  <ProfileImage src={previewImageUrl || imageUrl} alt="Profile Picture" />
+                  {isEditing && (
+                    <UploadIcon htmlFor="upload-input">
+                      <FaPlus />
+                      <input
+                        id="upload-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          handleImageChange(e);
+                          setPreviewImageUrl(URL.createObjectURL(e.target.files[0]));
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                    </UploadIcon>
+                  )}
+                </ProfileImageContainer>
+
+                <ModalBody>
+                  <ProfileDetailItem>
+                    <ProfileDetailLabel>First Name:</ProfileDetailLabel>
+                    <ProfileInput
+                      type="text"
+                      value={editedFirstName}
+                      onChange={(e) => setEditedFirstName(e.target.value)}
+                    />
+                  </ProfileDetailItem>
+                  <ProfileDetailItem>
+                    <ProfileDetailLabel>Last Name:</ProfileDetailLabel>
+                    <ProfileInput
+                      type="text"
+                      value={editedLastName}
+                      onChange={(e) => setEditedLastName(e.target.value)}
+                    />
+                  </ProfileDetailItem>
+                  <ProfileDetailItem>
+                    <ProfileDetailLabel>Email:</ProfileDetailLabel>
+                    <ProfileInput
+                      type="email"
+                      value={editedEmail}
+                      onChange={(e) => setEditedEmail(e.target.value)}
+                    />
+                  </ProfileDetailItem>
+                  <ProfileDetailItem>
+                    <ProfileDetailLabel>Address:</ProfileDetailLabel>
+                    <ProfileInput
+                      type="text"
+                      value={editedAddress}
+                      onChange={(e) => setEditedAddress(e.target.value)}
+                    />
+                  </ProfileDetailItem>
+                </ModalBody>
+
+                <ModalFooter>
+                  <CancelButton onClick={handleCancel}>Cancel</CancelButton>
+                  <SaveButton onClick={handleSaveClick}>Save Changes</SaveButton>
+                </ModalFooter>
+              </>
+            )}
+
+            {currentView === 'changePassword' && (
+              <>
+                <ModalBody>
+                  <PasswordInput
+                    type="password"
+                    placeholder="Old Password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    required
+                  />
+                  <PasswordInput
+                    type="password"
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                  />
+                  <PasswordInput
+                    type="password"
+                    placeholder="Confirm New Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <CancelButton onClick={handleCancel}>Cancel</CancelButton>
+                  <SaveButton onClick={handlePasswordChange}>Change Password</SaveButton>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </ModalBackdrop>
+      )}
+    </>
+  );
+};
+
+export default EditProfileModal;
+
+const ModalBackdrop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 450px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: height 1s ease-in-out; 
+  overflow: hidden;
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+  }
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: #333;
+
+  &:hover {
+    color: #ff5c5c;
+  }
+`;
+
+const ModalNav = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+`;
+
+const NavItem = styled.div`
+  flex: 1;
+  padding: 10px 20px;
+  text-align: center;
+  cursor: pointer;
+  border-bottom: ${(props) => (props.active ? '3px solid #000099' : 'none')};
+  font-weight: ${(props) => (props.active ? 'bold' : 'normal')};
+  color: ${(props) => (props.active ? '#000099' : '#333')};
+  transition: border-bottom 0.3s, color 0.3s;
+
+  &:hover {
+    color: #000099;
+  }
+`;
+
+const ModalBody = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ProfileImageContainer = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+const UploadIcon = styled.label`
+  position: absolute;
+  bottom: -10px;
+  background-color: #007bff;
+  color: #ffffff;
+  right: 40%;
+  transform: translateX(50%);
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+  height: 25px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+`;
+
+const ProfileImage = styled.img`
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+const ProfileDetailItem = styled.div`
+  display: flex;
+  margin-bottom: 15px;
+  align-items: center;
+`;
+
+const ProfileDetailLabel = styled.div`
+  font-weight: bold;
+  margin-right: 10px;
+  width: 100px; 
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+`;
+
+const ProfileInput = styled.input`
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+
+  &:focus {
+    border-color: #ff6600;
+    outline: none;
+  }
+`;
+
+const ModalFooter = styled.div`
+  display: flex;
+  justify-content: space-between; 
+  margin-top: 20px;
+  width: 100%;
+`;
+
+const SaveButton = styled.button`
+  flex: 1;
+  font-family: 'Poppins', sans-serif;
+  padding: 10px 20px;
+  background-color: #000099;
+  color: #ffffff;
+  border: none;
+  border-radius: 25px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+`;
+
+const CancelButton = styled.button`
+  flex: 1;
+  font-family: 'Poppins', sans-serif;
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: #ffffff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-right: 10px;
+
+`;
+
+
+const PasswordInput = styled.input`
+  font-family: 'Poppins', sans-serif;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  width: 95%;
+  color: #333;
+
+  &:focus {
+    border-color: #ff6600;
+    outline: none;
+  }
+`;

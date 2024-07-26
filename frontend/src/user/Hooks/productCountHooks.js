@@ -19,7 +19,6 @@ const ProductCountHooks = () => {
           setProductCount(0);
         }
       } catch (error) {
-        // Handle errors silently by setting the product count to 0
         setProductCount(0);
       }
     };

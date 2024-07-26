@@ -17,7 +17,11 @@ const Sidebar = () => {
           <IconWrapper><FaClipboardList /></IconWrapper>
           Manage Orders
         </SidebarLink>
-        <LogoutLink to="/loginForm"> {/* Updated to navigate to loginForm */}
+        <SidebarLink to="/admin/salesAnalytics">
+          <IconWrapper><FaClipboardList /></IconWrapper>
+          Sales Report
+        </SidebarLink>
+        <LogoutLink to="/loginForm"> 
           Logout
         </LogoutLink>
       </SidebarNav>
@@ -31,7 +35,7 @@ const SidebarContainer = styled.div`
   background-color: #13072E;
   width: 200px;
   padding: 20px;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
   border-radius: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);

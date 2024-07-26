@@ -1,28 +1,77 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import styled, { keyframes } from 'styled-components';
 import Slider from "react-slick";
 import axios from 'axios';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { BsBookmarkStarFill } from "react-icons/bs";
+import addToCart from '../Function/addToCart';
+import getImageUrl from '../../tools/media';
 
 const FeaturedProducts = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const fetchFeaturedProducts = async (page) => {
       try {
-        const response = await axios.get('https://onepc.online/api/v1/products/featured');
-        if (response.data.status) {
-          setFeaturedProducts(response.data.data);
+        const response = await axios.get('https://onepc.online/api/v1/products', {
+          params: { page, featured: true }
+        });
+        if (response.data.status && response.data.data && Array.isArray(response.data.data.data)) {
+          setFeaturedProducts(response.data.data.data);
+        } else {
+          console.error("Unexpected data format:", response.data);
+          setErrorMessage("Failed to fetch featured products");
         }
       } catch (error) {
         console.error("Error fetching the featured products", error);
+        setErrorMessage("Error fetching the featured products");
+      }
+    };
+  
+    fetchFeaturedProducts(currentPage);
+  
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+  
+    window.addEventListener('scroll', handleScroll);
+  
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [currentPage, setCurrentPage]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const updatedProducts = await Promise.all(
+          featuredProducts.map(async (product) => {
+            const imageUrl = await getImageUrl(product.image_path);
+            return { ...product, imageUrl };
+          })
+        );
+        setFeaturedProducts(updatedProducts);
+      } catch (error) {
+        console.error('Error fetching images:', error);
       }
     };
 
-    fetchFeaturedProducts();
-  }, []);
+    if (featuredProducts.length > 0) {
+      fetchImages();
+    }
+  }, [featuredProducts]);
+  
 
   const settings = {
     dots: true,
@@ -35,23 +84,33 @@ const FeaturedProducts = () => {
     prevArrow: <PrevArrow />,
   };
 
+  const handleAddToCart = (product_id, product_name) => {
+    const quantity = 1; 
+    addToCart(product_id, product_name, quantity, setErrorMessage, setSuccessMessage);
+  };
+
+  const handleProductClick = (product) => {
+    navigate(`/product/${product.product_id}`, { state: { product } });
+  };
+
   return (
-    <Section>
-      <Title>Our <span>Featured</span> Products</Title>
+    <Section className={scrolled ? 'slide-up' : ''}>
+      <Title><span>Featured</span> Products</Title>
       <MobileView>
         <Slider {...settings}>
           {featuredProducts.map(product => (
-            <ProductCard key={product.product_id}>
+            <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
               {product.featured && <FireBadge />}
               <ProductImage 
-                src={`https://onepc.online${product.image_path}`} 
+                src={product.imageUrl} 
                 alt={product.product_name} 
               />
+              <BrandName>{product.brand}</BrandName>
               <ProductName>{product.product_name}</ProductName>
               <ProductPrice>
                 ${parseFloat(product.price).toFixed(2)}
               </ProductPrice>
-              <AddToCartButton>ADD TO CART</AddToCartButton>
+              <AddToCartButton onClick={(e) => { e.stopPropagation(); handleAddToCart(product.product_id, product.product_name); }}>ADD TO CART</AddToCartButton>
             </ProductCard>
           ))}
         </Slider>
@@ -59,21 +118,25 @@ const FeaturedProducts = () => {
       <DesktopView>
         <ProductGrid>
           {featuredProducts.map(product => (
-            <ProductCard key={product.product_id}>
+            <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
               {product.featured && <FireBadge />}
               <ProductImage 
-                src={`https://onepc.online${product.image_path}`} 
+                src={product.imageUrl} 
                 alt={product.product_name} 
               />
+              <BrandName>{product.brand}</BrandName>
               <ProductName>{product.product_name}</ProductName>
               <ProductPrice>
                 ${parseFloat(product.price).toFixed(2)}
               </ProductPrice>
-              <AddToCartButton>ADD TO CART</AddToCartButton>
+              <AddToCartButton onClick={(e) => { e.stopPropagation(); handleAddToCart(product.product_id, product.product_name); }}>ADD TO CART</AddToCartButton>
             </ProductCard>
           ))}
         </ProductGrid>
       </DesktopView>
+     
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+      {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
     </Section>
   );
 };
@@ -98,8 +161,18 @@ const PrevArrow = (props) => {
 
 export default FeaturedProducts;
 
+const slideUp = keyframes`
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
 const Section = styled.section`
-  // width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -108,6 +181,10 @@ const Section = styled.section`
   text-align: center;
   min-height: 800px;
   overflow-x: hidden;
+
+  &.slide-up {
+    animation: ${slideUp} 1s ease forwards;
+  }
 `;
 
 const Title = styled.h2`
@@ -153,12 +230,18 @@ const ProductCard = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Center children vertically */
+  justify-content: space-between; 
+`;
+
+const BrandName = styled.h3`
+  font-size: 1rem;
+  font-weight: bold;
 `;
 
 const ProductPrice = styled.p`
   font-size: 1rem;
   font-weight: bold;
+  color: #FF4500;
   margin-bottom: 10px;
 `;
 
@@ -180,6 +263,12 @@ const AddToCartButton = styled.button`
 const ProductName = styled.h3`
   font-size: 1rem;
   margin-bottom: 10px;
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const FireBadge = styled(BsBookmarkStarFill)`
@@ -217,4 +306,30 @@ const Arrow = styled.div`
   &.next {
     right: 10px;
   }
+`;
+
+const ErrorMessage = styled.p`
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 0, 0, 0.8);
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  z-index: 1000;
+`;
+
+const SuccessMessage = styled.p`
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 128, 0, 0.8);
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  z-index: 1000;
 `;

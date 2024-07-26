@@ -1,65 +1,93 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
-import Product from '../Components/product'; 
+import { useNavigate } from 'react-router-dom';
+import Product from '../Components/product';
 import styled from 'styled-components';
 import { IoSearchOutline } from "react-icons/io5";
 import Axios from 'axios';
-import Footer from '../Components/footer';
 import ReactPaginate from 'react-paginate';
+import Slider from 'react-slider';
 
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();  
-  const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(100000);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 4;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    Axios.get("https://onepc.online/api/v1/products")
-      .then((response) => {
-        console.log(response.data);
-        if (response.data && Array.isArray(response.data.data)) {
-          setProducts(response.data.data);
-          setFilteredProducts(response.data.data);
-          const uniqueCategories = [...new Set(response.data.data.map(product => product.category))];
-          const uniqueBrands = [...new Set(response.data.data.map(product => product.brand))];
-          setCategories(uniqueCategories);
-          setBrands(uniqueBrands);
+    fetchProducts(currentPage);
+  }, [currentPage]);
+
+  const fetchProducts = async (page) => {
+    try {
+      const response = await Axios.get(`https://onepc.online/api/v1/products?page=${page}`);
+      console.log("Fetch Products Response:", response.data); // Log response data
+      if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
+        const { data, meta } = response.data.data;
+        setFilteredProducts(data);
+        const uniqueCategories = [...new Set(data.map(product => product.category))];
+        const uniqueBrands = [...new Set(data.map(product => product.brand))];
+        setCategories(uniqueCategories);
+        setBrands(uniqueBrands);
+
+        if (meta && meta.last_page) {
+          setTotalPages(meta.last_page);
         } else {
-          setProducts([]);
-          setFilteredProducts([]);
+          setTotalPages(1);
         }
-      })
-      .catch((error) => {
-        console.log(error);
-        setProducts([]);
+      } else {
         setFilteredProducts([]);
-      });
-  }, []);
+        setTotalPages(1);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setFilteredProducts([]);
+      setTotalPages(1);
+    }
+  };
 
   useEffect(() => {
-    if (searchTerm) {
-      Axios.get(`https://onepc.online/api/v1/products/search?keyword=${searchTerm}`)
-        .then((response) => {
-          if (response.data && Array.isArray(response.data.data)) {
-            setFilteredProducts(response.data.data);
+    const fetchFilteredProducts = async () => {
+      try {
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('search', searchTerm);
+        if (selectedBrand) params.append('brand', selectedBrand);
+        if (selectedCategory) params.append('category', selectedCategory);
+        if (minPrice !== '') params.append('min_price', minPrice);
+        if (maxPrice !== '') params.append('max_price', maxPrice);
+
+        const query = `https://onepc.online/api/v1/products?${params.toString()}`;
+
+        const response = await Axios.get(query);
+        console.log("Filtered Products Response:", response.data); 
+
+        if (response.data && response.data.data) {
+          setFilteredProducts(response.data.data.data);
+          const { meta } = response.data.data;
+          if (meta && meta.last_page) {
+            setTotalPages(meta.last_page);
           } else {
-            setFilteredProducts([]);
+            setTotalPages(1);
           }
-        })
-        .catch((error) => {
-          console.log(error);
+        } else {
           setFilteredProducts([]);
-        });
-    } else {
-      setFilteredProducts(products);
-    }
-  }, [searchTerm, products]);
+          setTotalPages(1);
+        }
+      } catch (error) {
+        console.error("Error fetching filtered products:", error);
+        setFilteredProducts([]);
+        setTotalPages(1);
+      }
+    };
+
+    fetchFilteredProducts();
+  }, [searchTerm, selectedBrand, selectedCategory, minPrice, maxPrice]);
 
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
@@ -73,81 +101,112 @@ const ProductsPage = () => {
     setSelectedBrand(event.target.value);
   };
 
+  const handleMinPriceChange = event => {
+    setMinPrice(event.target.value);
+  };
+
+  const handleMaxPriceChange = event => {
+    setMaxPrice(event.target.value);
+  };
+
+  const handleSliderChange = (values) => {
+    setMinPrice(values[0]);
+    setMaxPrice(values[1]);
+  };
+
   const handleProductClick = (product) => {
     navigate(`/product/${product.product_id}`, { state: { product } });
   };
 
   const handlePageClick = ({ selected }) => {
-    setCurrentPage(selected);
+    const nextPage = selected + 1;
+    setCurrentPage(nextPage);
   };
-
-  const offset = currentPage * itemsPerPage;
-  const currentPageData = filteredProducts.filter(product =>
-    (selectedCategory ? product.category === selectedCategory : true) &&
-    (selectedBrand ? product.brand === selectedBrand : true)
-  ).slice(offset, offset + itemsPerPage);
-  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
-
+  
   return (
     <PageContainer>
-      <Content>
-        <ProductPage>
-          <Search>
-            <SearchContainer>
-              <IoSearchOutline className="search-icon" />
-              <input 
-                type="text" 
-                placeholder="Search products..." 
-                value={searchTerm} 
-                onChange={handleSearchChange} 
-                className="search-input" 
-              />
-            </SearchContainer>
-          </Search>
-          <Filters>
-            <Select value={selectedCategory} onChange={handleCategoryChange}>
-              <option value="">All Categories</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </Select>
-            <Select value={selectedBrand} onChange={handleBrandChange}>
-              <option value="">All Brands</option>
-              {brands.map(brand => (
-                <option key={brand} value={brand}>{brand}</option>
-              ))}
-            </Select>
-          </Filters>
-          <ProductList>
-            {currentPageData.map(product => (
-              <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
-                <Product
-                  image={product.image_path}
-                  brand={product.brand}
-                  product_name={product.product_name}
-                  price={product.price}
-                  product_id={product.product_id}
-                />
-              </ProductCard>
-            ))}
-          </ProductList>
-          <PaginationContainer>
-            <ReactPaginate
-              previousLabel={"Previous"}
-              nextLabel={"Next"}
-              breakLabel={"..."}
-              breakClassName={"break-me"}
-              pageCount={pageCount}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
-              onPageChange={handlePageClick}
-              containerClassName={"pagination"}
-              activeClassName={"active"}
+      <Sidebar>
+        <Search>
+          <SearchContainer>
+            <IoSearchOutline className="search-icon" />
+            <input 
+              type="text" 
+              placeholder="Search products..." 
+              value={searchTerm} 
+              onChange={handleSearchChange} 
+              className="search-input" 
             />
-          </PaginationContainer>
-        </ProductPage>
+          </SearchContainer>
+        </Search>
+        <Filters>
+          <Select value={selectedCategory} onChange={handleCategoryChange}>
+            <option value="">All Categories</option>
+            {categories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </Select>
+          <Select value={selectedBrand} onChange={handleBrandChange}>
+            <option value="">All Brands</option>
+            {brands.map(brand => (
+              <option key={brand} value={brand}>{brand}</option>
+            ))}
+          </Select>
+          <PriceInputsContainer>
+            <Input 
+              type="number" 
+              placeholder="Min Price" 
+              value={minPrice} 
+              onChange={handleMinPriceChange} 
+            />
+            <Input 
+              type="number" 
+              placeholder="Max Price" 
+              value={maxPrice} 
+              onChange={handleMaxPriceChange} 
+            />
+          </PriceInputsContainer>
+          <SliderContainer>
+            <Slider
+              value={[minPrice, maxPrice]}
+              min={0}
+              max={100000}
+              step={10}
+              onChange={handleSliderChange}
+              renderTrack={(props, state) => <div {...props} />}
+              renderThumb={(props, state) => <div {...props} />}
+            />
+          </SliderContainer>
+        </Filters>
+      </Sidebar>
+      <Content>
+        <ProductList>
+          {filteredProducts.map(product => (
+            <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
+              <Product
+                image={product.image_path}
+                brand={product.brand}
+                product_name={product.product_name}
+                price={product.price}
+                product_id={product.product_id}
+              />
+            </ProductCard>
+          ))}
+        </ProductList>
+        <PaginationContainer>
+          <ReactPaginate
+            previousLabel={"Previous"}
+            nextLabel={"Next"}
+            breakLabel={"..."}
+            breakClassName={"break-me"}
+            pageCount={totalPages}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
+          />
+        </PaginationContainer>
       </Content>
-      <Footer />
     </PageContainer>
   );
 };
@@ -158,34 +217,41 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-`;
+  overflow-x: hidden;
 
-const ProductPage = styled.div`
-  padding: 3rem;
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
+  @media (min-width: 768px) {
+    flex-direction: row;
   }
+`
+const Sidebar = styled.div`
+  width: 100%;
+  padding: 20px;
+  position: fixed;
+  background-color: #f8f8f8;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 
-  @media (max-width: 480px) {
-    padding: 1rem;
+  @media (min-width: 768px) {
+    width: 250px;
+    height: 100vh;
   }
-`;
-
+`
 const Content = styled.div`
+  margin-left: 0;
+  padding: 1.5rem;
   flex: 1;
-`;
 
+  @media (min-width: 768px) {
+    margin-left: 270px;
+    padding: 3rem;
+  }
+`
 const Search = styled.div`
   margin-bottom: 2rem;
-  display: flex;
-  justify-content: center;
-`;
-
+`
 const SearchContainer = styled.div`
   position: relative;
   width: 100%;
-  max-width: 37.5rem;
 
   .search-icon {
     position: absolute;
@@ -198,67 +264,94 @@ const SearchContainer = styled.div`
 
   .search-input {
     font-family: 'Poppins', sans-serif;
-    width: 100%;
-    padding: 1rem 1.25rem 1rem 2.5rem;
+    padding: 1rem 1rem 1rem 2.75rem; 
     font-size: 1rem;
     border: 1px solid #ccc;
-    border-radius: 1.25rem;
+    border-radius: 2rem;
     box-sizing: border-box;
-  }
 
-  @media (max-width: 768px) {
-    .search-icon {
-      left: 0.75rem;
-      font-size: 1rem;
-    }
-    
-    .search-input {
-      padding: 0.625rem 0.9375rem 0.625rem 2.25rem;
+    @media (max-width: 768px) {
+      width: 100%; 
+      padding: 0.75rem 1rem 0.75rem 2.75rem; 
       font-size: 0.875rem;
     }
   }
-`;
-
+`
 const Filters = styled.div`
-  font-family: 'Poppins', sans-serif;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   gap: 1.25rem;
-  margin-bottom: 2rem;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    width: calc(100% - 2.75rem);
+    gap: 0.625rem;
+  }
+`
+const PriceInputsContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%; /* Ensure container takes full width */
 
   @media (max-width: 768px) {
     flex-direction: column;
-    align-items: center;
     gap: 0.625rem;
   }
-`;
+`
+const Input = styled.input`
+  font-family: 'Poppins', sans-serif;
+  padding: 0.5rem 1rem; 
+  font-size: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 2rem;
+  box-sizing: border-box;
+  width: calc(50% - 0.5rem); 
 
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    width: 100%; 
+  }
+`
 const Select = styled.select`
   font-family: 'Poppins', sans-serif;
+  width: 100%;
   padding: 0.625rem 0.9375rem;
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 1.25rem;
+  border-radius: 2rem;
 
   @media (max-width: 768px) {
+    width: calc(100% - 2px);
     font-size: 0.875rem;
     padding: 0.5rem 0.75rem;
   }
-`
 
+  option {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.9375rem;
+    font-family: 'Poppins', sans-serif;
+    width: 100%; 
+
+    @media (max-width: 768px) {
+      padding: 0.5rem 0.75rem; 
+    }
+  }
+`
 const ProductList = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15.625rem, 1fr));
-  gap: 1.25rem;
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); 
+gap: 1rem;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); 
+    margin-top: 200px;
   }
   @media (max-width: 480px) {
     grid-template-columns: repeat(auto-fill, minmax(9.375rem, 1fr)); 
+    margin-top: 200px;
   }
 `
-
 const ProductCard = styled.div`
   border: 1px solid #ccc;
   border-radius: 0.5rem;
@@ -290,20 +383,65 @@ const PaginationContainer = styled.div`
     border: 1px solid #ccc;
     border-radius: 0.3125rem;
     cursor: pointer;
-  }
-
-  .pagination li a:hover {
-    background-color: #f0f0f0;
+    text-decoration: none;
+    color: inherit;
+    font-family: 'Poppins', sans-serif;
   }
 
   .pagination li.active a {
     background-color: #007bff;
-    color: white;
+    color: #fff;
     border-color: #007bff;
   }
+`
+const SliderContainer = styled.div`
+  .track {
+    height: 1px; 
+    background: black; 
+    border-radius: 3px; 
+    border: 1px solid black; 
+  }
 
-  .pagination li.disabled a {
-    color: #ccc;
-    cursor: not-allowed;
+  .thumb {
+    height: 20px; 
+    width: 20px; 
+    background: #fff; 
+    border: 2px solid #000; 
+    border-radius: 50%; 
+    cursor: grab; 
+    transition: 
+
+    &:hover {
+      background: #000; 
+      border-color: #fff; 
+    }
+  }
+
+  .thumb.active {
+    background: #000; 
+    border-color: #fff; 
+  }
+
+  .slider {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .value-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .value {
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-family: 'Poppins', sans-serif;
+    color: #000;
+    font-size: 14px;
   }
 `

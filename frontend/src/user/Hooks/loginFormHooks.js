@@ -26,18 +26,25 @@ const LoginFormHooks = () => {
     try {
       const response = await axios.post('https://onepc.online/api/v1/login', userData);
       console.log('Login successful:', response.data);
-      const { token } = response.data;
+      const { token, data } = response.data; 
+      const { roles } = data; 
+
       localStorage.setItem('token', token);
-      
-      if (email === 'admin@gmail.com' && password === 'admin123') {
-        setTimeout(() => {
-          navigate('/admin/AdminDashboard'); 
-        }, 2000);
-      } else {
-        setTimeout(() => {
-          navigate('/products'); 
-        }, 2000);
-      }
+
+      setTimeout(() => {
+        if (roles && roles.length > 0) {
+          if (roles.includes('admin')) {
+            navigate('/admin/AdminDashboard');
+          } else if (roles.includes('user')) {
+            navigate('/products');
+          } else {
+            setError('Invalid role assigned.');
+          }
+        } else {
+          setError('No roles assigned.');
+        }
+        window.location.reload(true);
+      }, 2000);
     } catch (error) {
       console.error('Login failed:', error.response ? error.response.data : error.message);
       setError('Invalid email or password. Please try again.');

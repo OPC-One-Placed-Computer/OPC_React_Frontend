@@ -2,11 +2,17 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { AiOutlineShoppingCart } from 'react-icons/ai';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import updateCartItem from '../Function/updateCartItem';
 import ProductDetailPage from './productDetailPage';
+import emptyCart from '../Animations/emptyCart.json';
+import Lottie from 'lottie-react';
 import Modal from '../Components/modal';
+import getImageUrl from '../../tools/media';
+import Footer from '../Components/footer';
+import Breadcrumb from '../Components/breadcrumb';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CartPage = () => {
   const [products, setProducts] = useState([]);
@@ -41,8 +47,15 @@ const CartPage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setProducts(response.data.data);
+      const productsWithImageUrls = await Promise.all(
+        response.data.data.map(async (product) => {
+          const imageUrl = await getImageUrl(product.product.image_path);
+          return { ...product, imageUrl };
+        })
+      );
+      setProducts(productsWithImageUrls);
     } catch (error) {
+      toast.error('Error fetching cart data.');
       console.error('Error fetching cart data:', error);
     } finally {
       setIsLoading(false);
@@ -71,9 +84,10 @@ const CartPage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      // Update the products state after successful deletion
       setProducts(prevProducts => prevProducts.filter(product => product.cart_id !== cart_id));
+      toast.success('Item removed from cart.');
     } catch (error) {
+      toast.error('Error removing item from cart.');
       console.error('Error deleting cart item:', error);
     }
   };
@@ -97,7 +111,7 @@ const CartPage = () => {
 
   const handleDeleteSelectedItems = async () => {
     if (selectedItems.length === 0) {
-      setAlertMessage('Please select a product to delete');
+      toast.info('Please select a product to delete.');
     } else {
       const token = localStorage.getItem('token');
       try {
@@ -114,9 +128,10 @@ const CartPage = () => {
           })
         );
         setSelectedItems([]);
-        // Update the products state after successful deletion
         setProducts(prevProducts => prevProducts.filter(product => !selectedItems.includes(product.product_id)));
+        toast.success('Selected items deleted successfully.');
       } catch (error) {
+        toast.error('Error deleting selected items.');
         console.error('Error deleting cart items:', error);
       }
     }
@@ -124,7 +139,7 @@ const CartPage = () => {
 
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
-      setAlertMessage('Please select a product to checkout.');
+      toast.info('Please select a product to checkout.');
     } else {
       const selectedProducts = products.filter(product => selectedItems.includes(product.product_id));
       navigate('/placeOrder', {
@@ -133,7 +148,7 @@ const CartPage = () => {
             productName: product.product.product_name,
             price: product.product.price,
             quantity: product.quantity,
-            productImage: `https://onepc.online${product.product.image_path}`,
+            productImage: product.imageUrl,
             subtotal: product.subtotal,
             cart_id: product.cart_id
           })),
@@ -150,9 +165,11 @@ const CartPage = () => {
         setSelectedProduct(response.data.data);
         setIsModalOpen(true);
       } else {
+        toast.info('Product not found.');
         console.log('Product not found:', product_id);
       }
     } catch (error) {
+      toast.error('Error fetching product details.');
       console.error('Error fetching product details:', error);
     } finally {
       setIsLoading(false);
@@ -166,8 +183,9 @@ const CartPage = () => {
 
   const renderEmptyCart = () => (
     <EmptyCartContainer>
-      <AiOutlineShoppingCart size={80} color="#007bff" />
+      <Lottie animationData={emptyCart} autoplay loop style={{ width: 200, height: 200 }} />
       <p>Your cart is empty.</p>
+      <ReturnToShopButton onClick={() => navigate('/products')}>Return to Shop</ReturnToShopButton>
     </EmptyCartContainer>
   );
 
@@ -183,242 +201,252 @@ const CartPage = () => {
     } else {
       return (
         <>
-          <Table>
-            <thead>
-              <tr>
-                <Th>
-                  <Checkbox
-                    type="checkbox"
-                    checked={isAllChecked}
-                    onChange={handleAllCheckboxChange}
-                  />
-                </Th>
-                <Th>IMAGE</Th>
-                <Th>PRODUCT NAME</Th>
-                <Th>PRICE</Th>
-                <Th>QUANTITY</Th>
-                <Th>SUBTOTAL</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(product => (
-                <tr key={product.product_id}>
-                  <Td>
-                    <Checkbox
-                      type="checkbox"
-                      checked={selectedItems.includes(product.product_id)}
-                      onChange={() => handleCheckboxChange(product.product_id)}
-                    />
-                  </Td>
-                  <Td><img src={`https://onepc.online${product.product.image_path}`} alt={product.product.product_name} width="50" /></Td>
-                  <Td onClick={() => handleProductClick(product.product_id)}>{product.product.product_name}</Td>
-                  <Td>₱{Number(product.product.price).toFixed(2)}</Td>
-                  <Td>
-                    <QuantityControls>
-                      <button className='subtract' onClick={() => handleQuantityChange(product.cart_id, product.quantity - 1)}>-</button>
-                      <span>{product.quantity}</span>
-                      <button className='addition' onClick={() => handleQuantityChange(product.cart_id, product.quantity + 1)}>+</button>
-                    </QuantityControls>
-                  </Td>
-                  <Td>₱{Number(product.subtotal).toFixed(2)}</Td>
+         
+          <CartLayout>
+          <CheckboxContainer>
+            <Checkbox
+              type="checkbox"
+              checked={isAllChecked}
+              onChange={handleAllCheckboxChange}
+            />
+            <CheckboxLabel>Select All</CheckboxLabel>
+          </CheckboxContainer>
+            <TableContainer>
+              <Table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map(product => (
+                    <tr key={product.product_id}>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          type="checkbox"
+                          checked={selectedItems.includes(product.product_id)}
+                          onChange={() => handleCheckboxChange(product.product_id)}
+                        />
+                      </td>
+                      <td>
+                        <ProductImage src={product.imageUrl} alt={product.product.product_name} />
+                      </td>
+                      <td>
+                        <ProductName onClick={() => handleProductClick(product.product_id)}>{product.product.product_name}</ProductName>
+                      </td>
+                      <td>₱{Number(product.product.price).toFixed(2)}</td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <QuantityControls>
+                          <button className='subtract' onClick={() => handleQuantityChange(product.cart_id, product.quantity - 1)}>-</button>
+                          <span>{product.quantity}</span>
+                          <button className='addition' onClick={() => handleQuantityChange(product.cart_id, product.quantity + 1)}>+</button>
+                        </QuantityControls>
+                      </td>
+                      <td>₱{Number(product.subtotal).toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              <TotalsTable>
+                <thead>
+                  <tr>
+                    <th>Cart Totals</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Subtotal</td>
+                    <td>₱{products.reduce((total, product) => total + parseFloat(product.subtotal), 0).toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td>Total</td>
+                    <td>₱{products.reduce((total, product) => total + parseFloat(product.subtotal), 0).toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                <td colSpan="5">
+                <ActionButtons>
+                <CheckoutButton onClick={handleCheckout}>Check Out</CheckoutButton>
+                <DeleteButton onClick={handleDeleteSelectedItems}>Clear Cart</DeleteButton>
+              </ActionButtons>
+                </td>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+                </tbody>
+              </TotalsTable>
+            </TableContainer>
+          </CartLayout>
           <Modal isOpen={isModalOpen} onClose={handleModalClose}>
             {selectedProduct && <ProductDetailPage product={selectedProduct} />}
           </Modal>
-          <ActionButtons>
-            <DeleteButton onClick={handleDeleteSelectedItems}>Delete</DeleteButton>
-            <CheckoutButton onClick={handleCheckout}>Check Out</CheckoutButton>
-          </ActionButtons>
+          
         </>
       );
     }
   };
 
   return (
-    <CartContainer>
+    <>
+    <PageContainer>
+    <Breadcrumb items={[{ label: 'Home', path: '/HomePage' }, { label: 'Shopping Cart' }]} />
+    <ToastContainer />
       {renderCartContent()}
-      {alertMessage && (
-        <AlertMessage>
-          {alertMessage}
-        </AlertMessage>
-      )}
-    </CartContainer>
+    </PageContainer>
+    <Footer />
+    </>
   );
 };
 
 export default CartPage;
 
-
-
-const CartContainer = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-`;
-
-const LoaderContainer = styled.div`
+const PageContainer = styled.div`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  padding: 50px;
+`
+const CartLayout = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 100vh; 
-`;
-
+  margin-top: 20px;
+`
+const TableContainer = styled.div`
+  width: 90%;
+  overflow-x: auto;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  background-color: #fff;
+`
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-`;
+  border: 1px solid #ddd;
 
-const Th = styled.th`
-  text-align: left;
-  padding: 15px;
-  border-bottom: 2px solid #ddd;
-  font-size: 1.2em;
-  background-color: #000099;
-  color: white;
-
-  @media (max-width: 768px) {
-    font-size: 1em;
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
   }
-`;
-
-const Td = styled.td`
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
-  font-size: 1.1em;
-  background-color: #f9f9f9;
-  color: #333;
-
-  @media (max-width: 768px) {
-    font-size: 1em;
+  td, {
+    height: 70px;
   }
 
-  img {
-    border-radius: 5px;
+  th {
+    background-color: #f4f4f4;
   }
-`;
+`
+const TotalsTable = styled.table`
+  width: 50%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  height: 400px;
 
-// const ThCheckbox = styled.td`
-//   padding: 15px;
-//   font-size: 1.1em;
-//   color: #333;
-//   text-align: center;
-// `;
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
 
-// const TdCheckbox = styled.td`
-//   padding: 15px;
-//   border-bottom: 1px solid #ddd;
-//   font-size: 1.1em;
-//   background-color: #f9f9f9;
-//   color: #333;
-//   text-align: center;
-// `;
-
-
-const Checkbox = styled.input`
-  margin-right: 10px;
-`;
-
+  th {
+    background-color: #f4f4f4;
+  }
+`
+const ProductImage = styled.img`
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+`
+const ProductName = styled.span`
+  cursor: pointer;
+  color: #00008B;
+`
 const QuantityControls = styled.div`
   display: flex;
   align-items: center;
 
   button {
-    background-color: #007bff;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
+    background: #ddd;
     border: none;
-    border-radius: 50%;
     padding: 5px 10px;
     cursor: pointer;
-    font-size: 1em;
-
-    &:hover {
-      background-color: #0056b3;
-    }
-  }
-
-  .subtract {
-    background-color: #dc3545;
-  }
-
-  .addition {
-    background-color: #000099;
   }
 
   span {
     margin: 0 10px;
-    font-size: 1.1em;
   }
-`;
-
+`
 const ActionButtons = styled.div`
   display: flex;
-  justify-content: space-between;
-`;
-
-const baseButtonStyles = `
-font-family: 'Poppins', sans-serif;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 1em;
-  color: white;
-`;
-
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+`
 const DeleteButton = styled.button`
-  ${baseButtonStyles}
-  background-color:  #dc3545;
-
-  &:hover {
-    background-color: #c82333;
-  }
-`;
-
+  font-family: 'Poppins', sans-serif;
+  background-color:  #d22630;
+  color: white;
+  border: none;
+  border-radius: 35px;
+  height: 60px;
+  padding: 10px 20px;
+  cursor: pointer;
+`
 const CheckoutButton = styled.button`
-  ${baseButtonStyles}
+  font-family: 'Poppins', sans-serif;
+  height: 60px;
   background-color: #000099;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
+  border-radius: 35px;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+`
 const EmptyCartContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 50px;
-  background-color: #f8f9fa;
-  border-radius: 10px;
-  color: #333;
-
+  height: 100vh;
   p {
-    font-size: 1.2em;
+    font-size: 18px;
     margin-top: 20px;
   }
-`;
-
-const AlertMessage = styled.div`
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color:  rgba(255, 0, 0, 0.8);
-  color: #fff;
+`
+const ReturnToShopButton = styled.button`
+  font-family: 'Poppins', sans-serif;
+  background-color: #007bff;
+  color: white;
+  border: none;
   padding: 10px 20px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-`;
+  cursor: pointer;
+  margin-top: 10px;
+`
+const CheckboxContainer = styled.div`
+  width: 90%;
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+`
+const Checkbox = styled.input`
+  margin-right: 10px;
+`
+const CheckboxLabel = styled.label`
+  font-size: 16px;
+  color: #333;
+`
+const LoaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`
+
+

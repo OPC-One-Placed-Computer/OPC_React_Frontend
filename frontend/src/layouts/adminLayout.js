@@ -1,10 +1,13 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AdminDashboard from '../admin/AdminDashboard';
-import ManageProducts from '../admin/manageProducts'; 
+import ManageProducts from '../admin/manageProducts';
+import ManageOrders from '../admin/manageOrders';
 import styled from 'styled-components';
 import Sidebar from '../admin/Components/Sidebar';
 import AdminProduct from '../admin/Components/adminProduct';
+import AddProductPage from '../admin/addProductPage';
+import SalesAnalytics from '../admin/salesAnalytics';
 
 const AdminLayout = () => (
   <AdminContainer>
@@ -13,7 +16,10 @@ const AdminLayout = () => (
       <Routes>
         <Route path="/AdminDashboard" element={<AdminDashboard />} /> 
         <Route path="/manageProducts" element={<ManageProducts />} />
+        <Route path="/manageOrders" element={<ManageOrders />} />
         <Route path="/adminProduct" element={<AdminProduct />} />
+        <Route path="/salesAnalytics" element={<SalesAnalytics />} />
+        <Route path="/adminProductPage" element={<AddProductPage />} />
       </Routes>
     </AdminContent>
   </AdminContainer>
