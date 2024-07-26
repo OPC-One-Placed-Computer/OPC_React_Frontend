@@ -70,8 +70,7 @@ const RegisterPage = styled.div`
   align-items: center;
   min-height: 100vh;
   background-color: #f5f5f5;
-`;
-
+`
 const RegisterContainer = styled.div`
   display: flex;
   background-color: #ffffff;
@@ -80,16 +79,14 @@ const RegisterContainer = styled.div`
   border-radius: 25px;
   width: 100%;
   max-width: 800px;
-`;
-
+`
 const LottieContainer = styled.div`
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-right: 2rem;
-`;
-
+`
 const FormContainer = styled.div`
   flex: 1;
   display: flex;
@@ -120,8 +117,7 @@ const FormContainer = styled.div`
   button:hover {
     background-color: #0a1827;
   }
-`;
-
+`
 const FormGroup = styled.div`
   margin-bottom: 1rem;
   display: flex;
@@ -147,7 +143,6 @@ const FormGroup = styled.div`
     border-color: #007bff;
   }
 `
-
 const Account = styled.p`
   margin-top: 1rem;
   text-align: center;
@@ -164,7 +159,6 @@ const Account = styled.p`
     text-decoration: underline;
   }
 `
-
 const ErrorMessage = styled.div`
   background-color: #f8d7da;
   color: #721c24;
@@ -173,7 +167,6 @@ const ErrorMessage = styled.div`
   border-radius: 5px;
   margin-bottom: 1rem;
 `
-
 const SuccessMessage = styled.div`
   background-color: #d4edda;
   color: #155724;

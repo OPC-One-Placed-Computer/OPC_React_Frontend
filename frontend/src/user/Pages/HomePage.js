@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import Footer from '../Components/footer';
 import FeaturedProducts from '../Components/featuredProducts';
-import homeAnimated from '../Animations/homeAnimated.json'; // Import your Lottie animation file
+import homeAnimated from '../Animations/homeAnimated.json'; 
 import Lottie from 'lottie-react';
 
 const Homepage = () => {
@@ -35,8 +35,7 @@ export default Homepage;
 
 const HomePageParentContainer = styled.div`
   overflow-x: hidden;
-`;
-
+`
 const HomepageCon = styled.div`
   background-color: #13072E;
   color: white;
@@ -45,14 +44,12 @@ const HomepageCon = styled.div`
   justify-content: center;
   align-items: center;
   padding: 25px;
-`;
-
+`
 const HeroHeader = styled.header`
   text-align: center;
   padding: 20px;
   width: 100%; 
-`;
-
+`
 const HeroCon = styled.div`
   border-radius: 15px;
   width: 100%; 
@@ -70,8 +67,7 @@ const HeroCon = styled.div`
   @media (min-width: 768px) {
     flex-direction: row; 
   }
-`;
-
+`
 const Content = styled.div`
   display: flex;
   margin-left: 25px;
@@ -80,8 +76,7 @@ const Content = styled.div`
   @media (min-width: 768px) {
     flex-direction: row; 
   }
-`;
-
+`
 const slideInLeft = keyframes`
   from {
     transform: translateX(-100%);
@@ -91,8 +86,7 @@ const slideInLeft = keyframes`
     transform: translateX(0);
     opacity: 1;
   }
-`;
-
+`
 const slideInRight = keyframes`
   from {
     transform: translateX(100%);
@@ -102,8 +96,7 @@ const slideInRight = keyframes`
     transform: translateX(0);
     opacity: 1;
   }
-`;
-
+`
 const TextContent = styled.div`
   flex: 1;
   text-align: center; 
@@ -149,11 +142,10 @@ const TextContent = styled.div`
     from { width: 0; }
     to { width: 100%; }
   }
-`;
-
+`
 const ImgContent = styled.div`
   flex: 1;
   text-align: center;
   max-width: 100%; 
   animation: ${slideInLeft} 1s forwards;
-`;
+`

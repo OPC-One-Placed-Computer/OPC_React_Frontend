@@ -63,7 +63,7 @@ const ProfileDropdown = () => {
       {isOpen && isLoggedIn && (
         <DropdownMenu>
           <Link to="/placedOrderItems" className="dropdown-item" onClick={toggleDropdown}>My Purchase</Link>
-          <Link to="/profile" className="dropdown-item" onClick={toggleDropdown}>Profile</Link>
+          <Link to="/profile" className="dropdown-item" onClick={toggleDropdown}>My Account</Link>
           <Link className="dropdown-item" onClick={handleLogout}>Logout</Link>
         </DropdownMenu>
       )}

@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ClipLoader from 'react-spinners/ClipLoader';
-import { CgDetailsMore } from "react-icons/cg";
-import { IoIosInformationCircle } from "react-icons/io";
+import Footer from './footer';
 import axios from 'axios';
+import Breadcrumb from './breadcrumb';
+import { MdAccountCircle } from "react-icons/md";
+import { FaAddressBook } from "react-icons/fa6";
+
 
 const PlaceOrder = () => {
   const location = useLocation();
@@ -13,6 +16,7 @@ const PlaceOrder = () => {
   const [lastName, setLastName] = useState('');
   const [fullName, setFullName] = useState('');
   const [address, setAddress] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [loading, setLoading] = useState(false);
   const products = location.state ? location.state.products : [];
 
@@ -25,9 +29,9 @@ const PlaceOrder = () => {
             Authorization: `Bearer ${token}`,
           }
         });
-        setFirstName(response.data.first_name);
-        setLastName(response.data.last_name);
-        setAddress(response.data.address);
+        setFirstName(response.data.first_name || '');
+        setLastName(response.data.last_name || '');
+        setAddress(response.data.address || '');
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -43,19 +47,26 @@ const PlaceOrder = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     const totalPayment = products.reduce((acc, product) => acc + Number(product.subtotal), 0);
-
+  
+    const cartItems = products.map(product => ({
+      id: product.cart_id,
+      quantity: product.quantity
+    }));
+  
     const orderData = {
       full_name: fullName,
       shipping_address: address,
       total: totalPayment,
-      cart_items: products.map(product => ({
-        id: product.cart_id, // Updated this line to use id instead of cart_id
-        quantity: product.quantity
-      }))
+      payment_method: paymentMethod,
+      cart_items: {
+        id: cartItems.map(item => item.id)
+      },
+      success_url: 'http://localhost:3000/viewOrder',
+      cancel_url: 'http://localhost:3000/cancelOrder'
     };
-
+  
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post('https://onepc.online/api/v1/orders', orderData, {
@@ -63,68 +74,128 @@ const PlaceOrder = () => {
           Authorization: `Bearer ${token}`,
         }
       });
-      console.log('Order placed successfully:', response.data);
-      setLoading(false);
-      navigate('/placedOrderItems');
+  
+      if (paymentMethod === 'stripe' && response.data.status && response.data.data.url) {
+        window.location.href = response.data.data.url;
+      } else { 
+        console.log('Order placed successfully:', response.data);
+        setLoading(false);
+        navigate('/placedOrderItems');
+      }
     } catch (error) {
-      console.error('Error placing order:', error.response.data); // Log the response data for more details
+      console.error('Error placing order:', error.response.data);
       setLoading(false);
     }
   };
-
+  
   const handleCancelOrder = async () => {
-      navigate('/cartPage'); // Navigate to the homepage or any other page after cancellation
+    navigate('/cartPage'); 
   };
 
   const totalPayment = products.reduce((acc, product) => acc + Number(product.subtotal), 0);
 
   return (
+    <>
     <OrderContainer>
       <Form onSubmit={handleSubmit}>
-        <Section>
-          <SectionTitle><IoIosInformationCircle />Customer Information</SectionTitle>
-          <FormRow>
-            <FormLabel>Full Name:</FormLabel>
-            <FullNameDisplay>{fullName}</FullNameDisplay>
-          </FormRow>
-          <FormRow>
-            <FormLabel>Address:</FormLabel>
-            <FormInput
-              type="text" value={address} onChange={(e) => setAddress(e.target.value)} required />
-          </FormRow>
-        </Section>
-
-        <Section>
-          <SectionTitle><CgDetailsMore />Order Summary</SectionTitle>
-          {products.map((product, index) => (
-            <ProductDetail key={index}>
-              <ProductImage src={product.productImage} alt={product.productName} />
-              <ProductInfo>
-                <ProductName>{product.productName}</ProductName>
-                <ProductPrice>₱{Number(product.price)}</ProductPrice>
-                <ProductQuantity>Quantity: {product.quantity}</ProductQuantity>
-                <ProductSubtotal>Subtotal: ₱{Number(product.subtotal)}</ProductSubtotal>
-              </ProductInfo>
-            </ProductDetail>
-          ))}
-        </Section>
-
-        <TotalSection>
-          <TotalLabel>Total Payment:</TotalLabel>
-          <TotalAmount>₱{totalPayment.toFixed(2)}</TotalAmount>
-        </TotalSection>
-
-        <ButtonContainer>
+      <Breadcrumb items={[{ label: 'Home', path: '/HomePage' }, { label: 'Shopping Cart', path: '/cartPage' },
+       { label: 'Checkout' }]} />
+        <FormContent>
+        <BillingContainer>
+        <SectionTitle>Billing Details</SectionTitle>
+          <BillingSection>
+            <FormRow>
+            <IconContainer>
+                <MdAccountCircle />
+              </IconContainer>
+              <FullNameDisplay>{fullName}</FullNameDisplay>
+            </FormRow>
+            <FormRow>
+            <IconContainer>
+                <FaAddressBook />
+              </IconContainer>
+              <FormInput
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+              />
+            </FormRow>
+            <FormRow>
+              <FormLabel>Payment</FormLabel>
+            </FormRow>
+            <RadioContainer>
+              <PaymentOption>
+                <input
+                  type="radio"
+                  id="cod"
+                  name="paymentMethod"
+                  value="cod"
+                  checked={paymentMethod === 'cod'}
+                  onChange={() => setPaymentMethod('cod')}
+                />
+                <label htmlFor="cod">Cash on Delivery</label>
+              </PaymentOption>
+              <PaymentOption>
+                <input
+                  type="radio"
+                  id="stripe"
+                  name="paymentMethod"
+                  value="stripe"
+                  checked={paymentMethod === 'stripe'}
+                  onChange={() => setPaymentMethod('stripe')}
+                />
+                <label htmlFor="stripe">Credit Card</label>
+              </PaymentOption>
+            </RadioContainer>
+            <ButtonContainer>
+            <SubmitButton type="submit">Place Order</SubmitButton>
           <CancelButton type="button" onClick={handleCancelOrder}>Cancel Order</CancelButton>
-          <SubmitButton type="submit">Place Order</SubmitButton>
         </ButtonContainer>
+          </BillingSection>
+          </BillingContainer>
+
+          <OrderSummarySection>
+            <SectionTitle>Order Summary</SectionTitle>
+            <Table>
+              <thead>
+                <tr>
+                  <TableHeader>Image</TableHeader>
+                  <TableHeader>Product Name</TableHeader>
+                  <TableHeader>Price</TableHeader>
+                  <TableHeader>Quantity</TableHeader>
+                  <TableHeader>Subtotal</TableHeader>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product, index) => (
+                  <tr key={index}>
+                    <TableCell><ProductImage src={product.productImage} alt={product.productName} /></TableCell>
+                    <TableCell>{product.productName}</TableCell>
+                    <TableCell>₱{Number(product.price).toFixed(2)}</TableCell>
+                    <TableCell>{product.quantity}</TableCell>
+                    <TableCell>₱{Number(product.subtotal).toFixed(2)}</TableCell>
+                  </tr>
+                ))}
+                <tr>
+                  <TableCell colSpan="4">Total Payment:</TableCell>
+                  <TableCell>₱{totalPayment.toFixed(2)}</TableCell>
+                </tr>
+              </tbody>
+            </Table>
+            
+          </OrderSummarySection>
+        </FormContent>
       </Form>
+
       {loading && (
         <LoaderContainer>
           <ClipLoader color="#007bff" loading={loading} size={35} />
         </LoaderContainer>
       )}
     </OrderContainer>
+    <Footer />
+    </>
   );
 };
 
@@ -135,57 +206,103 @@ const OrderContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
 `;
 
 const Form = styled.form`
-  background-color: #fff;
+  display: flex;
+  flex-direction: column;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
   width: 100%;
-  max-width: 600px;
+  background-color: #ffffff;
 
   @media (max-width: 768px) {
     padding: 10px;
   }
 `;
+const FormContent = styled.div`
+margin: 0 auto;
+  display: flex;
+  gap: 20px;
 
-const Section = styled.div`
-  margin-bottom: 20px;
-  color: black;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const BillingContainer = styled.div`
+flex: 1;
+flex-direction: column;
+width: auto;
+`
+
+const BillingSection = styled.div`
+  background-color: #ffffff;
+  padding: 20px;
+  height: 400px;
+  border: 1px solid #ccc;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+  }
+`;
+
+const OrderSummarySection = styled.div`
+  flex: 2;
+  background-color: #ffffff;
 `;
 
 const SectionTitle = styled.h3`
   font-size: 1.5rem;
   margin-bottom: 10px;
+  color: #343a40;
   display: flex;
   align-items: center;
 
   svg {
-    margin-right: 10px; 
-    font-size: 2.5rem; 
+    margin-right: 10px;
+    font-size: 2.5rem;
   }
 `;
 
 const FormRow = styled.div`
+display: flex;
+justify-content: flex-start;
+align-items: center;
+margin-bottom: 10px;
+`;
+const IconContainer = styled.div`
+  margin-right: 10px;
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+
+  svg {
+    font-size: 1.2rem;
+    color: #343a40;
+  }
 `;
 
 const FormLabel = styled.label`
-  width: 120px;
+  width: 100px;
   font-size: 1rem;
-  color: black;
-`
+  color: #343a40;
+`;
+
 const FormInput = styled.input`
   flex: 1;
   padding: 8px;
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 5px;
-`
+  border-radius: 4px;
+  font-family: 'Poppins', sans-serif;
+
+  &:focus {
+    border-color: #ff6600;
+    outline: none;
+  }
+`;
+
 const FullNameDisplay = styled.span`
   flex: 1;
   padding: 8px;
@@ -193,89 +310,99 @@ const FullNameDisplay = styled.span`
   border-radius: 5px;
   line-height: 1.5;
   display: inline-block;
-`
-const ProductDetail = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-`
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+`;
+
+const TableHeader = styled.th`
+  border-bottom: 1px solid #dee2e6;
+  background-color: #f4f4f4;
+  padding: 10px;
+  text-align: left;
+  font-size: 1.1rem;
+  color: #343a40;
+`;
+
+const TableCell = styled.td`
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+
+  img {
+    max-width: 70px;
+    height: auto;
+  }
+`;
+
 const ProductImage = styled.img`
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 5px;
-  margin-right: 20px;
-`
-const ProductInfo = styled.div`
-  flex: 1;
-  color: black;
-`
-const ProductName = styled.h4`
-  font-size: 1.2rem;
-  margin-bottom: 5px;
-`
-const ProductPrice = styled.p`
-  font-size: 1rem;
-`
-const ProductQuantity = styled.p`
-  font-size: 1rem;
-`
-const ProductSubtotal = styled.p`
-  font-size: 1rem;
-  font-weight: bold;
-`
-const TotalSection = styled.div`
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-`
-const TotalLabel = styled.p`
-  font-size: 1.2rem;
-  margin-right: 20px;
-`
-const TotalAmount = styled.p`
-  color: #B22222;
-  font-size: 1.2rem;
-  font-weight: bold;
-`
+  width: 70px;
+  height: auto;
+`;
+
+const RadioContainer = styled.div`
+  margin-top: 15px;
+`;
+
+const PaymentOption = styled.div`
+  margin-bottom: 10px;
+
+  input[type='radio'] {
+    margin-right: 8px;
+  }
+`;
+
 const ButtonContainer = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 15px;
   justify-content: space-between;
   margin-top: 20px;
-`
-const SubmitButton = styled.button`
-  font-family: 'Poppins', sans-serif;
-  padding: 10px;
-  background-color: #000099;
-  color: #ffffff;
+`;
+
+const CancelButton = styled.button`
+border-radius: 35px;
+font-family: 'Poppins', sans-serif;
+  background-color: #d22630;
+  color: #fff;
+  height: 60px;
   border: none;
-  border-radius: 25px;
-  font-size: 1rem;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #c82333#ff6600;
+  }
+`;
+
+const SubmitButton = styled.button`
+font-family: 'Poppins', sans-serif;
+border-radius: 35px;
+  height: 60px;
+  background-color: #000099;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
 
   &:hover {
     background-color: #0056b3;
   }
-`
-const CancelButton = styled.button`
-  font-family: 'Poppins', sans-serif;
-  padding: 10px;
-  background-color: #ff6347;
-  color: #ffffff;
-  border: none;
-  border-radius: 25px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+`;
 
-  &:hover {
-    background-color: #ff4500;
-  }
-`
 const LoaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-`
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+`;

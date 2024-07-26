@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import styled, { keyframes, css } from 'styled-components';
+import styled from 'styled-components';
 import { FaShoppingCart } from 'react-icons/fa';
 import getImageUrl from '../../tools/media';
 import addToCart from '../Function/addToCart';
@@ -11,8 +11,24 @@ const ProductDetailPage = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
+  const [imageUrl, setImageUrl] = useState('');
   const currentProduct = product || productFromLocation;
+
+  useEffect(() => {
+    if (currentProduct && currentProduct.image_path) {
+      const fetchImage = async () => {
+        try {
+          const url = await getImageUrl(currentProduct.image_path);
+          setImageUrl(url);
+        } catch (error) {
+          console.error('Error fetching image:', error);
+          setErrorMessage('Error fetching image');
+        }
+      };
+
+      fetchImage();
+    }
+  }, [currentProduct]);
 
   if (!currentProduct) {
     return <div className="product-detail">Product not found</div>;
@@ -34,7 +50,11 @@ const ProductDetailPage = ({ product }) => {
     <ProductDetail>
       <ProductContent>
         <ProductImage>
-          <img src={getImageUrl(currentProduct.image_path)} alt={currentProduct.product_name} />
+          {imageUrl ? (
+            <img src={imageUrl} alt={currentProduct.product_name} />
+          ) : (
+            <p>Loading image...</p>
+          )}
         </ProductImage>
         <ProductInfo>
           <h1>{currentProduct.product_name}</h1>
@@ -68,8 +88,7 @@ const ProductDetail = styled.div`
   @media (max-width: 768px) {
     padding: 10px;
   }
-`;
-
+`
 const ProductContent = styled.div`
   display: flex;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -77,8 +96,7 @@ const ProductContent = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
   }
-`;
-
+`
 const ProductImage = styled.div`
   flex: 1;
   max-width: 100%;
@@ -88,16 +106,15 @@ const ProductImage = styled.div`
 
   img {
     width: 100%;
-    height: 400px; /* Explicit height */
-    object-fit: cover; /* Ensures the aspect ratio is maintained */
+    height: 400px; 
+    object-fit: cover;
     max-width: 100%;
   }
 
   @media (max-width: 768px) {
     order: 2;
   }
-`;
-
+`
 const ProductInfo = styled.div`
   flex: 1;
   padding: 20px;
@@ -130,8 +147,7 @@ const ProductInfo = styled.div`
     order: 1;
     text-align: center;
   }
-`;
-
+`
 const QuantitySelector = styled.div`
   display: flex;
   align-items: center;
@@ -143,8 +159,7 @@ const QuantitySelector = styled.div`
   .addition {
     background-color: #000099;
   }
-`;
-
+`
 const QuantityButton = styled.button`
   font-family: 'Poppins', sans-serif;
   width: 30px;
@@ -161,8 +176,7 @@ const QuantityButton = styled.button`
   &:hover {
     background-color: #0056b3;
   }
-`;
-
+`
 const QuantityInput = styled.input`
   font-family: 'Poppins', sans-serif;
   width: 30px;
@@ -171,8 +185,7 @@ const QuantityInput = styled.input`
   justify-content: center;
   text-align: center;
   margin: 0 5px;
-`;
-
+`
 const AddToCartButton = styled.button`
   font-family: 'Poppins', sans-serif;
   margin-top: 10px;
@@ -196,8 +209,7 @@ const AddToCartButton = styled.button`
   &:hover {
     background-color: #0056b3;
   }
-`;
-
+`
 const ErrorMessage = styled.p`
   position: fixed;
   top: 20px;
@@ -209,12 +221,7 @@ const ErrorMessage = styled.p`
   border-radius: 5px;
   font-size: 14px;
   z-index: 1000;
-
-  ${({ errorMessage }) => errorMessage && css`
-    animation: ${shakeAnimation} 0.5s ease-in-out;
-  `}
-`;
-
+`
 const SuccessMessage = styled.p`
   position: fixed;
   top: 20px;
@@ -226,13 +233,4 @@ const SuccessMessage = styled.p`
   border-radius: 5px;
   font-size: 14px;
   z-index: 1000;
-`;
-
-const shakeAnimation = keyframes`
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-10px); }
-  40% { transform: translateX(10px); }
-  60% { transform: translateX(-10px); }
-  80% { transform: translateX(10px); }
-  100% { transform: translateX(0); }
-`;
+`

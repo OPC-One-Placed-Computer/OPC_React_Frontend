@@ -11,6 +11,8 @@ import CartPage from '../user/Pages/cartPage';
 import Profile from '../user/Components/profile';
 import PlaceOrder from '../user/Components/placeOrder';
 import PlacedOrderItems from '../user/Components/placedOrderItems';
+import SingleViewOrder from '../user/Components/viewOrder';
+import OrderCancel from '../user/Components/cancelOrder';
 import styled from 'styled-components';
 
 const UserLayout = () => (
@@ -27,6 +29,8 @@ const UserLayout = () => (
         <Route path="/HomePage" element={<Homepage />} />
         <Route path="/placeOrder" element={<PlaceOrder />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/cancelOrder/:orderId" element={<OrderCancel />} />
+        <Route path="/viewOrder/:orderId" element={<SingleViewOrder />} />
         <Route path="/placedOrderItems" element={<PlacedOrderItems />} />
       </Routes>
     </Content>

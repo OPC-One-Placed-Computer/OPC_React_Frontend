@@ -5,21 +5,20 @@ import styled from 'styled-components';
 import { IoSearchOutline } from "react-icons/io5";
 import Axios from 'axios';
 import ReactPaginate from 'react-paginate';
+import Slider from 'react-slider';
 
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(100000);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     fetchProducts(currentPage);
@@ -31,7 +30,6 @@ const ProductsPage = () => {
       console.log("Fetch Products Response:", response.data); // Log response data
       if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
         const { data, meta } = response.data.data;
-        setProducts(data);
         setFilteredProducts(data);
         const uniqueCategories = [...new Set(data.map(product => product.category))];
         const uniqueBrands = [...new Set(data.map(product => product.brand))];
@@ -43,18 +41,12 @@ const ProductsPage = () => {
         } else {
           setTotalPages(1);
         }
-
-        if (meta && meta.per_page) {
-          setItemsPerPage(meta.per_page);
-        }
       } else {
-        setProducts([]);
         setFilteredProducts([]);
         setTotalPages(1);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
-      setProducts([]);
       setFilteredProducts([]);
       setTotalPages(1);
     }
@@ -73,7 +65,7 @@ const ProductsPage = () => {
         const query = `https://onepc.online/api/v1/products?${params.toString()}`;
 
         const response = await Axios.get(query);
-        console.log("Filtered Products Response:", response.data); // Log filtered products response
+        console.log("Filtered Products Response:", response.data); 
 
         if (response.data && response.data.data) {
           setFilteredProducts(response.data.data.data);
@@ -117,6 +109,11 @@ const ProductsPage = () => {
     setMaxPrice(event.target.value);
   };
 
+  const handleSliderChange = (values) => {
+    setMinPrice(values[0]);
+    setMaxPrice(values[1]);
+  };
+
   const handleProductClick = (product) => {
     navigate(`/product/${product.product_id}`, { state: { product } });
   };
@@ -125,17 +122,7 @@ const ProductsPage = () => {
     const nextPage = selected + 1;
     setCurrentPage(nextPage);
   };
-
-  const offset = (currentPage - 1) * itemsPerPage;
-  const currentPageData = filteredProducts.slice(offset, offset + itemsPerPage);
-
-
-  // Debugging logs
-  console.log("Current Page:", currentPage);
-  console.log("Filtered Products:", filteredProducts);
-  console.log("Current Page Data:", currentPageData);
-  console.log("Offset:", offset);
-  console.log("Items Per Page:", itemsPerPage);
+  
   return (
     <PageContainer>
       <Sidebar>
@@ -164,23 +151,36 @@ const ProductsPage = () => {
               <option key={brand} value={brand}>{brand}</option>
             ))}
           </Select>
-          <Input 
-            type="number" 
-            placeholder="Min Price" 
-            value={minPrice} 
-            onChange={handleMinPriceChange} 
-          />
-          <Input 
-            type="number" 
-            placeholder="Max Price" 
-            value={maxPrice} 
-            onChange={handleMaxPriceChange} 
-          />
+          <PriceInputsContainer>
+            <Input 
+              type="number" 
+              placeholder="Min Price" 
+              value={minPrice} 
+              onChange={handleMinPriceChange} 
+            />
+            <Input 
+              type="number" 
+              placeholder="Max Price" 
+              value={maxPrice} 
+              onChange={handleMaxPriceChange} 
+            />
+          </PriceInputsContainer>
+          <SliderContainer>
+            <Slider
+              value={[minPrice, maxPrice]}
+              min={0}
+              max={100000}
+              step={10}
+              onChange={handleSliderChange}
+              renderTrack={(props, state) => <div {...props} />}
+              renderThumb={(props, state) => <div {...props} />}
+            />
+          </SliderContainer>
         </Filters>
       </Sidebar>
       <Content>
         <ProductList>
-          {currentPageData.map(product => (
+          {filteredProducts.map(product => (
             <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
               <Product
                 image={product.image_path}
@@ -213,7 +213,6 @@ const ProductsPage = () => {
 
 export default ProductsPage;
 
-
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -223,8 +222,7 @@ const PageContainer = styled.div`
   @media (min-width: 768px) {
     flex-direction: row;
   }
-`;
-
+`
 const Sidebar = styled.div`
   width: 100%;
   padding: 20px;
@@ -237,8 +235,7 @@ const Sidebar = styled.div`
     width: 250px;
     height: 100vh;
   }
-`;
-
+`
 const Content = styled.div`
   margin-left: 0;
   padding: 1.5rem;
@@ -248,12 +245,10 @@ const Content = styled.div`
     margin-left: 270px;
     padding: 3rem;
   }
-`;
-
+`
 const Search = styled.div`
   margin-bottom: 2rem;
-`;
-
+`
 const SearchContainer = styled.div`
   position: relative;
   width: 100%;
@@ -281,8 +276,7 @@ const SearchContainer = styled.div`
       font-size: 0.875rem;
     }
   }
-`;
-
+`
 const Filters = styled.div`
   display: flex;
   flex-direction: column;
@@ -293,21 +287,32 @@ const Filters = styled.div`
     width: calc(100% - 2.75rem);
     gap: 0.625rem;
   }
-`;
+`
+const PriceInputsContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%; /* Ensure container takes full width */
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+`
 const Input = styled.input`
   font-family: 'Poppins', sans-serif;
-  padding: 1rem;
-  font-size: 1rem;
+  padding: 0.5rem 1rem; 
+  font-size: 0.8rem;
   border: 1px solid #ccc;
   border-radius: 2rem;
   box-sizing: border-box;
+  width: calc(50% - 0.5rem); 
 
   @media (max-width: 768px) {
-    padding: 0.75rem; 
+    padding: 0.75rem;
     font-size: 0.875rem;
+    width: 100%; 
   }
-`;
-
+`
 const Select = styled.select`
   font-family: 'Poppins', sans-serif;
   width: 100%;
@@ -332,9 +337,7 @@ const Select = styled.select`
       padding: 0.5rem 0.75rem; 
     }
   }
-`;
-
-
+`
 const ProductList = styled.div`
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); 
@@ -348,8 +351,7 @@ gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(9.375rem, 1fr)); 
     margin-top: 200px;
   }
-`;
-
+`
 const ProductCard = styled.div`
   border: 1px solid #ccc;
   border-radius: 0.5rem;
@@ -360,8 +362,7 @@ const ProductCard = styled.div`
   &:hover {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
   }
-`;
-
+`
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -392,4 +393,55 @@ const PaginationContainer = styled.div`
     color: #fff;
     border-color: #007bff;
   }
-`;
+`
+const SliderContainer = styled.div`
+  .track {
+    height: 1px; 
+    background: black; 
+    border-radius: 3px; 
+    border: 1px solid black; 
+  }
+
+  .thumb {
+    height: 20px; 
+    width: 20px; 
+    background: #fff; 
+    border: 2px solid #000; 
+    border-radius: 50%; 
+    cursor: grab; 
+    transition: 
+
+    &:hover {
+      background: #000; 
+      border-color: #fff; 
+    }
+  }
+
+  .thumb.active {
+    background: #000; 
+    border-color: #fff; 
+  }
+
+  .slider {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .value-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .value {
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-family: 'Poppins', sans-serif;
+    color: #000;
+    font-size: 14px;
+  }
+`

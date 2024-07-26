@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import getImageUrl from '../../tools/media';
 import styled, { keyframes, css } from 'styled-components';
 import addToCart from '../Function/addToCart';
@@ -8,10 +8,25 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 
 const Product = ({ image, brand, product_name, price, product_id }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isButtonHovered, setIsButtonHovered] = useState(false); // New state for button hover
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const quantity = 1;
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const url = await getImageUrl(image);
+        setImageUrl(url);
+      } catch (error) {
+        console.error('Error fetching product image:', error);
+        setErrorMessage('Failed to load product image.');
+      }
+    };
+
+    fetchImage();
+  }, [image]);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -45,7 +60,7 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
             style={{ width: 300, height: 300 }}
           />
         </LottieAnimationContainer>
-        <img src={getImageUrl(image)} alt={product_name} />
+        <img src={imageUrl} alt={product_name} />
         <Overlay $isHovered={isHovered} />
         {isHovered && (
           <AddCartButton
@@ -214,5 +229,5 @@ const AddCartButton = styled.button`
 `;
 
 const StyledCartIcon = styled(MdOutlineShoppingCart)`
-  font-size: 24px; // Adjust the size of the icon here
+  font-size: 24px; 
 `;

@@ -7,29 +7,36 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { BsBookmarkStarFill } from "react-icons/bs";
 import addToCart from '../Function/addToCart';
+import getImageUrl from '../../tools/media';
 
 const FeaturedProducts = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const fetchFeaturedProducts = async (page) => {
       try {
-        const response = await axios.get('https://onepc.online/api/v1/products/featured');
-        if (response.data.status) {
-          setFeaturedProducts(response.data.data);
+        const response = await axios.get('https://onepc.online/api/v1/products', {
+          params: { page, featured: true }
+        });
+        if (response.data.status && response.data.data && Array.isArray(response.data.data.data)) {
+          setFeaturedProducts(response.data.data.data);
+        } else {
+          console.error("Unexpected data format:", response.data);
+          setErrorMessage("Failed to fetch featured products");
         }
       } catch (error) {
         console.error("Error fetching the featured products", error);
+        setErrorMessage("Error fetching the featured products");
       }
     };
-
-    fetchFeaturedProducts();
-
-    // Scroll event listener to track scroll position
+  
+    fetchFeaturedProducts(currentPage);
+  
     const handleScroll = () => {
       if (window.scrollY > 0) {
         setScrolled(true);
@@ -37,14 +44,34 @@ const FeaturedProducts = () => {
         setScrolled(false);
       }
     };
-
+  
     window.addEventListener('scroll', handleScroll);
-
-    // Clean up the scroll event listener
+  
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [currentPage, setCurrentPage]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const updatedProducts = await Promise.all(
+          featuredProducts.map(async (product) => {
+            const imageUrl = await getImageUrl(product.image_path);
+            return { ...product, imageUrl };
+          })
+        );
+        setFeaturedProducts(updatedProducts);
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      }
+    };
+
+    if (featuredProducts.length > 0) {
+      fetchImages();
+    }
+  }, [featuredProducts]);
+  
 
   const settings = {
     dots: true,
@@ -58,7 +85,7 @@ const FeaturedProducts = () => {
   };
 
   const handleAddToCart = (product_id, product_name) => {
-    const quantity = 1; // Default quantity to 1
+    const quantity = 1; 
     addToCart(product_id, product_name, quantity, setErrorMessage, setSuccessMessage);
   };
 
@@ -75,7 +102,7 @@ const FeaturedProducts = () => {
             <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
               {product.featured && <FireBadge />}
               <ProductImage 
-                src={`https://onepc.online${product.image_path}`} 
+                src={product.imageUrl} 
                 alt={product.product_name} 
               />
               <BrandName>{product.brand}</BrandName>
@@ -83,7 +110,7 @@ const FeaturedProducts = () => {
               <ProductPrice>
                 ${parseFloat(product.price).toFixed(2)}
               </ProductPrice>
-              <AddToCartButton onClick={() => handleAddToCart(product.product_id, product.product_name)}>ADD TO CART</AddToCartButton>
+              <AddToCartButton onClick={(e) => { e.stopPropagation(); handleAddToCart(product.product_id, product.product_name); }}>ADD TO CART</AddToCartButton>
             </ProductCard>
           ))}
         </Slider>
@@ -94,7 +121,7 @@ const FeaturedProducts = () => {
             <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
               {product.featured && <FireBadge />}
               <ProductImage 
-                src={`https://onepc.online${product.image_path}`} 
+                src={product.imageUrl} 
                 alt={product.product_name} 
               />
               <BrandName>{product.brand}</BrandName>
@@ -102,34 +129,35 @@ const FeaturedProducts = () => {
               <ProductPrice>
                 ${parseFloat(product.price).toFixed(2)}
               </ProductPrice>
-              <AddToCartButton onClick={() => handleAddToCart(product.product_id, product.product_name)}>ADD TO CART</AddToCartButton>
+              <AddToCartButton onClick={(e) => { e.stopPropagation(); handleAddToCart(product.product_id, product.product_name); }}>ADD TO CART</AddToCartButton>
             </ProductCard>
           ))}
         </ProductGrid>
       </DesktopView>
+     
       {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
     </Section>
   );
 };
 
- const NextArrow = (props) => {
-    const { onClick } = props;
-    return (
-      <Arrow className="next" onClick={onClick}>
-        &gt;
-      </Arrow>
-    );
-  };
-  
-  const PrevArrow = (props) => {
-    const { onClick } = props;
-    return (
-      <Arrow className="prev" onClick={onClick}>
-        &lt;
-      </Arrow>
-    );
-  };
+const NextArrow = (props) => {
+  const { onClick } = props;
+  return (
+    <Arrow className="next" onClick={onClick}>
+      &gt;
+    </Arrow>
+  );
+};
+
+const PrevArrow = (props) => {
+  const { onClick } = props;
+  return (
+    <Arrow className="prev" onClick={onClick}>
+      &lt;
+    </Arrow>
+  );
+};
 
 export default FeaturedProducts;
 
@@ -305,4 +333,3 @@ const SuccessMessage = styled.p`
   font-size: 14px;
   z-index: 1000;
 `;
-

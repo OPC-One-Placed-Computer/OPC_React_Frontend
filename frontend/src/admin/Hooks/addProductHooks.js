@@ -1,6 +1,6 @@
-// addProductHooks.js
 import { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const AddProductHooks = () => {
   const [newProductData, setNewProductData] = useState({
@@ -10,7 +10,7 @@ const AddProductHooks = () => {
     price: 0,
     quantity: 0,
     description: '',
-    featured: 0, // Default to not featured
+    featured: 0, 
     image: null,
   });
 
@@ -26,7 +26,7 @@ const AddProductHooks = () => {
     const { checked } = e.target;
     setNewProductData((prevData) => ({
       ...prevData,
-      featured: checked ? 1 : 0, // 1 for featured, 0 for not featured
+      featured: checked ? 1 : 0, 
     }));
   };
 
@@ -41,18 +41,38 @@ const AddProductHooks = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     
-    const formData = new FormData();
-    Object.keys(newProductData).forEach((key) => {
-      formData.append(key, newProductData[key]);
-    });
-
     try {
-      const response = await axios.post('https://onepc.online/api/v1/products', formData);
+      const formData = new FormData();
+      Object.keys(newProductData).forEach((key) => {
+        formData.append(key, newProductData[key]);
+      });
+
+      const token = localStorage.getItem('token');
+      const response = await axios.post('https://onepc.online/api/v1/products', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data', 
+        },
+      });
+      toast.success('Product added successfully!'); 
       console.log('Product added successfully:', response.data);
-      // Reset form or handle success
+
+  
+      setNewProductData({
+        product_name: '',
+        category: '',
+        brand: '',
+        price: 0,
+        quantity: 0,
+        description: '',
+        featured: 0, 
+        image: null,
+      });
+      document.querySelector('input[type="file"]').value = null;
+
     } catch (error) {
+      toast.error('Error adding product. Please try again.');
       console.error('Error adding product:', error);
-      // Handle error
     }
   };
 

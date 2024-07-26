@@ -17,7 +17,11 @@ const Sidebar = () => {
           <IconWrapper><FaClipboardList /></IconWrapper>
           Manage Orders
         </SidebarLink>
-        <LogoutLink to="/loginForm"> {/* Updated to navigate to loginForm */}
+        <SidebarLink to="/admin/salesAnalytics">
+          <IconWrapper><FaClipboardList /></IconWrapper>
+          Sales Report
+        </SidebarLink>
+        <LogoutLink to="/loginForm"> 
           Logout
         </LogoutLink>
       </SidebarNav>

@@ -1,13 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import getImageUrl from '../../tools/media';
 import styled  from 'styled-components';
 
 const AdminProduct = ({ image, brand, product_name, price, product_id }) => {
 
+  const [imageUrl, setImageUrl] = useState('');
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const url = await getImageUrl(image);
+        setImageUrl(url);
+      } catch (error) {
+        console.error('Error fetching product image:', error);
+
+      }
+    };
+
+    fetchImage();
+  }, [image]);
+
   return (
     <ProdCon>
       <ProdImg >
-        <img src={getImageUrl(image)} alt={product_name} />
+        <img src={imageUrl} alt={product_name} />
       </ProdImg>
       <ProdDetails>
         <h3>{brand}</h3>
