@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Product from '../Components/product';
 import styled from 'styled-components';
-import { IoSearchOutline } from "react-icons/io5";
+import { IoSearchOutline, IoFilterOutline } from "react-icons/io5";
 import Axios from 'axios';
 import ReactPaginate from 'react-paginate';
 import Slider from 'react-slider';
@@ -19,6 +19,10 @@ const ProductsPage = () => {
   const [brands, setBrands] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const sidebarRef = useRef(null);
+  const contentRef = useRef(null);
 
   useEffect(() => {
     fetchProducts(currentPage);
@@ -89,6 +93,25 @@ const ProductsPage = () => {
     fetchFilteredProducts();
   }, [searchTerm, selectedBrand, selectedCategory, minPrice, maxPrice]);
 
+  
+  useEffect(() => {
+    const adjustMarginTop = () => {
+      if (window.innerWidth <= 768 && sidebarRef.current && contentRef.current) {
+        const sidebarHeight = sidebarRef.current.offsetHeight;
+        contentRef.current.style.marginTop = `${sidebarHeight}px`;
+      } else {
+        contentRef.current.style.marginTop = '0px';
+      }
+    };
+    adjustMarginTop();
+    window.addEventListener('resize', adjustMarginTop);
+
+    return () => {
+      window.removeEventListener('resize', adjustMarginTop);
+    };
+  }, [sidebarRef.current?.offsetHeight]);
+  
+
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
   };
@@ -122,10 +145,14 @@ const ProductsPage = () => {
     const nextPage = selected + 1;
     setCurrentPage(nextPage);
   };
-  
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
   return (
     <PageContainer>
-      <Sidebar>
+      <Sidebar ref={sidebarRef}>
         <Search>
           <SearchContainer>
             <IoSearchOutline className="search-icon" />
@@ -137,21 +164,24 @@ const ProductsPage = () => {
               className="search-input" 
             />
           </SearchContainer>
+          <FilterContainer onClick={toggleFilters}>
+            <IoFilterOutline className="filter-icon"  />
+            </FilterContainer>
         </Search>
-        <Filters>
+        <Filters show={showFilters}>
           <div className='categoryCon'>
-          <Select value={selectedCategory} onChange={handleCategoryChange}>
-            <option value="">All Categories</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </Select>
-          <Select value={selectedBrand} onChange={handleBrandChange}>
-            <option value="">All Brands</option>
-            {brands.map(brand => (
-              <option key={brand} value={brand}>{brand}</option>
-            ))}
-          </Select>
+            <Select value={selectedCategory} onChange={handleCategoryChange}>
+              <option value="">All Categories</option>
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </Select>
+            <Select value={selectedBrand} onChange={handleBrandChange}>
+              <option value="">All Brands</option>
+              {brands.map(brand => (
+                <option key={brand} value={brand}>{brand}</option>
+              ))}
+            </Select>
           </div>
           <PriceInputsContainer>
             <Input 
@@ -180,7 +210,7 @@ const ProductsPage = () => {
           </SliderContainer>
         </Filters>
       </Sidebar>
-      <Content>
+      <Content ref={contentRef}>
         <ProductList>
           {filteredProducts.map(product => (
             <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
@@ -262,11 +292,14 @@ const Content = styled.div`
 
 const Search = styled.div`
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 const SearchContainer = styled.div`
   position: relative;
   margin: 0 auto;
-  width: 90%;
+  width: 80%;
 
   .search-icon {
     position: absolute;
@@ -275,6 +308,10 @@ const SearchContainer = styled.div`
     transform: translateY(-50%);
     font-size: 1.25rem;
     color: #ccc;
+
+    @media (max-width: 768px) {
+      margin-top: 5px;
+    }
   }
 
   .search-input {
@@ -286,6 +323,7 @@ const SearchContainer = styled.div`
     border-radius: 2rem;
     box-sizing: border-box;
 
+
     @media (max-width: 768px) {
       margin-top: 10px;
       width: 100%; 
@@ -294,8 +332,23 @@ const SearchContainer = styled.div`
     }
   }
 `
+const FilterContainer = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    .filter-icon {
+      font-size: 30px;
+    }
+  }
+`;
+
 const Filters = styled.div`
-  display: flex;
+display: flex;
   flex-direction: column;
   gap: 1.25rem;
   width: 100%;
@@ -310,6 +363,7 @@ const Filters = styled.div`
 
   @media (max-width: 768px) {
     gap: 10px;
+    display: ${props => props.show ? 'block' : 'none'};
 
     
     .categoryCon {
@@ -328,6 +382,7 @@ const PriceInputsContainer = styled.div`
   justify-content: center;
 
   @media (max-width: 768px) {
+    margin-top: 10px;
     display: flex;
     justify-content: center;
     flex-direction: row;
@@ -383,11 +438,9 @@ gap: 1rem;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); 
-    margin-top: 230px;
   }
   @media (max-width: 480px) {
     grid-template-columns: repeat(auto-fill, minmax(9.375rem, 1fr)); 
-    margin-top: 230px;
   }
 `
 const ProductCard = styled.div`

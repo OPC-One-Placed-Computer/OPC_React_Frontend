@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineShoppingCart } from 'react-icons/md';
-import logo from '../../assets/logo.png';
+import { ReactComponent as Logo } from '../../assets/1.svg'; 
 import styled from 'styled-components';
 import ProfileDropdown from './profileDropdown';
 import ProductCountHooks from '../Hooks/productCountHooks';
@@ -11,11 +11,11 @@ const NavigationBar = () => {
 
   return (
     <NavBar>
-      <Logo>
-        <Link to="/homepage">
-          <img src={logo} alt="Logo" />
+      <LogoContainer>
+      <Link to="/homepage">
+          <Logo className="logo" />
         </Link>
-      </Logo>
+      </LogoContainer>
       <Content>
         <Link to="/products" className="nav-item">
           Products
@@ -46,28 +46,49 @@ const NavBar = styled.nav`
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  height: 70px; 
 
   @media (max-width: 768px) {
     height: 60px; 
-   padding: 10px;
-
+    padding: 10px;
   }
 `;
 
-const Logo = styled.div`
-  flex: 1; 
+const LogoContainer = styled.div`
+  flex: 1;
   display: flex;
   margin-left: 40px;
-  align-items: center; 
+  align-items: center;
+
+  .logo {
+    margin-top: 10px;
+    width: 100px; 
+    height: 100px; 
+  }
 
   @media (max-width: 768px) {
-    margin-left: 10px;
+    margin-left: 20px;
+    padding-top: 20px;
+
+    .logo {
+      width: 80px; 
+      height: 80px;
+    }
+  }
+
+  @media (max-width: 480px) {
+
+    .logo {
+      width: 80px; 
+      height: 80px; 
+    }
   }
 `;
 
 const Content = styled.div`
   display: flex;
   margin-right: 80px;
+  margin-top: 10px;
   justify-content: flex-end;
   gap: 10px;
 
@@ -82,7 +103,7 @@ const Content = styled.div`
     transition: background-color 0.3s ease, color 0.3s ease;
 
     @media (max-width: 768px) {
-      padding: 0 10px;
+      padding: 0 5px;
     }
     
     &::before,
@@ -116,7 +137,9 @@ const Content = styled.div`
   }
 
   @media (max-width: 768px) {
-    margin-right: 20px;
+    margin-right: 25px;
+    padding-top: 20px;
+    gap: 5px;
   }
 `;
 
