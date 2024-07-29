@@ -139,6 +139,7 @@ const ProductsPage = () => {
           </SearchContainer>
         </Search>
         <Filters>
+          <div className='categoryCon'>
           <Select value={selectedCategory} onChange={handleCategoryChange}>
             <option value="">All Categories</option>
             {categories.map(category => (
@@ -151,6 +152,7 @@ const ProductsPage = () => {
               <option key={brand} value={brand}>{brand}</option>
             ))}
           </Select>
+          </div>
           <PriceInputsContainer>
             <Input 
               type="number" 
@@ -194,8 +196,8 @@ const ProductsPage = () => {
         </ProductList>
         <PaginationContainer>
           <ReactPaginate
-            previousLabel={"Previous"}
-            nextLabel={"Next"}
+            previousLabel={"<"}
+            nextLabel={">"}
             breakLabel={"..."}
             breakClassName={"break-me"}
             pageCount={totalPages}
@@ -215,43 +217,56 @@ export default ProductsPage;
 
 const PageContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row; 
   min-height: 100vh;
   overflow-x: hidden;
 
-  @media (min-width: 768px) {
-    flex-direction: row;
+  @media (max-width: 768px) {
+    flex-direction: column; 
   }
-`
+`;
+
 const Sidebar = styled.div`
-  width: 100%;
-  padding: 20px;
+padding-top: 20px;
   position: fixed;
   background-color: #f8f8f8;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  width: 250px; 
+  height: 100%;
+  amrgin: 10px;
   z-index: 1;
 
-  @media (min-width: 768px) {
-    width: 250px;
-    height: 100vh;
+  
+  @media (max-width: 768px) {
+    width: calc(100% - 30px);  
+    padding: 15px;
+    height: auto;  
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border-bottom-left-radius: 20px;  
+    border-bottom-right-radius: 20px;
   }
-`
+`;
+
 const Content = styled.div`
-  margin-left: 0;
+  margin-left: 250px; 
   padding: 1.5rem;
   flex: 1;
 
-  @media (min-width: 768px) {
-    margin-left: 270px;
-    padding: 3rem;
+
+  @media (max-width: 768px) {
+    margin-left: 0; 
+    padding: 1.5rem;
   }
-`
+`;
+
 const Search = styled.div`
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 `
 const SearchContainer = styled.div`
   position: relative;
-  width: 100%;
+  margin: 0 auto;
+  width: 90%;
 
   .search-icon {
     position: absolute;
@@ -264,13 +279,15 @@ const SearchContainer = styled.div`
 
   .search-input {
     font-family: 'Poppins', sans-serif;
-    padding: 1rem 1rem 1rem 2.75rem; 
-    font-size: 1rem;
+    padding: 0.7rem 0.7rem 0.7rem 2.5rem; 
+    font-size: 12px;
+    width: 100%;
     border: 1px solid #ccc;
     border-radius: 2rem;
     box-sizing: border-box;
 
     @media (max-width: 768px) {
+      margin-top: 10px;
       width: 100%; 
       padding: 0.75rem 1rem 0.75rem 2.75rem; 
       font-size: 0.875rem;
@@ -283,47 +300,68 @@ const Filters = styled.div`
   gap: 1.25rem;
   width: 100%;
 
+  .categoryCon {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+
   @media (max-width: 768px) {
-    width: calc(100% - 2.75rem);
-    gap: 0.625rem;
+    gap: 10px;
+
+    
+    .categoryCon {
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      justify-content: center;
+      gap: 20px;
+    }
   }
 `
 const PriceInputsContainer = styled.div`
   display: flex;
   gap: 1rem;
-  width: 100%; /* Ensure container takes full width */
+  width: 100%;
+  justify-content: center;
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 0.625rem;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 1rem;
   }
 `
 const Input = styled.input`
   font-family: 'Poppins', sans-serif;
-  padding: 0.5rem 1rem; 
-  font-size: 0.8rem;
+  padding: 0.5rem 0.9rem; 
+  font-size: 10px;
   border: 1px solid #ccc;
   border-radius: 2rem;
   box-sizing: border-box;
-  width: calc(50% - 0.5rem); 
+  width: 30%; 
 
   @media (max-width: 768px) {
-    padding: 0.75rem;
-    font-size: 0.875rem;
-    width: 100%; 
+    padding: 0.5rem 0.7rem; 
+    gap: 10px;
+    font-size: 10px;
+    width: 20%; 
   }
 `
 const Select = styled.select`
   font-family: 'Poppins', sans-serif;
-  width: 100%;
-  padding: 0.625rem 0.9375rem;
-  font-size: 1rem;
+  width: 40%;
+  align-self: center;
+  padding: 0.5rem 0.7rem;
+  font-size: 10px;
   border: 1px solid #ccc;
   border-radius: 2rem;
 
   @media (max-width: 768px) {
-    width: calc(100% - 2px);
-    font-size: 0.875rem;
+    width: 130px;
+    font-size: 12px;
     padding: 0.5rem 0.75rem;
   }
 
@@ -345,11 +383,11 @@ gap: 1rem;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); 
-    margin-top: 200px;
+    margin-top: 230px;
   }
   @media (max-width: 480px) {
     grid-template-columns: repeat(auto-fill, minmax(9.375rem, 1fr)); 
-    margin-top: 200px;
+    margin-top: 230px;
   }
 `
 const ProductCard = styled.div`
@@ -366,66 +404,74 @@ const ProductCard = styled.div`
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 20px;
 
   .pagination {
     display: flex;
     list-style: none;
-    gap: 0.625rem;
+    padding: 0;
   }
 
-  @media (max-width: 768px) {
-    gap: 0.3125rem;
+  .pagination li {
+    margin: 0 5px;
+    cursor: pointer;
   }
 
   .pagination li a {
-    padding: 0.625rem 1rem;
+    padding: 8px 12px;
     border: 1px solid #ccc;
-    border-radius: 0.3125rem;
-    cursor: pointer;
+    border-radius: 50%;
     text-decoration: none;
-    color: inherit;
-    font-family: 'Poppins', sans-serif;
+    color: #000099;
   }
 
   .pagination li.active a {
-    background-color: #007bff;
-    color: #fff;
-    border-color: #007bff;
+    background-color: #000099;
+    color: white;
+    border-color: #000099;
   }
-`
+`;
 const SliderContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  width: 80%;
+  margin-top: 15px; 
+
   .track {
-    height: 1px; 
-    background: black; 
-    border-radius: 3px; 
-    border: 1px solid black; 
+    height: 1px;
+    background: black;
+    border-radius: 3px;
+    border: 1px solid black;
   }
 
   .thumb {
-    height: 20px; 
-    width: 20px; 
-    background: #fff; 
-    border: 2px solid #000; 
-    border-radius: 50%; 
-    cursor: grab; 
-    transition: 
+    height: 20px;
+    width: 20px;
+    background: #fff;
+    border: 2px solid #000;
+    border-radius: 50%;
+    cursor: grab;
+    transition: background 0.3s, border-color 0.3s;
 
     &:hover {
-      background: #000; 
-      border-color: #fff; 
+      background: #000;
+      border-color: #fff;
     }
   }
 
   .thumb.active {
-    background: #000; 
-    border-color: #fff; 
+    background: #000;
+    border-color: #fff;
   }
 
   .slider {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
   }
 
   .value-container {
@@ -433,6 +479,7 @@ const SliderContainer = styled.div`
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
+    width: 100%;
   }
 
   .value {
@@ -443,5 +490,49 @@ const SliderContainer = styled.div`
     font-family: 'Poppins', sans-serif;
     color: #000;
     font-size: 14px;
+  }
+
+  @media (max-width: 768px) {
+    .thumb {
+      height: 16px;
+      width: 16px;
+    }
+
+    .value {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+
+    .slider {
+      margin-top: 10px;
+      width: 90%; 
+      margin: 0 auto;
+    }
+
+    .value-container {
+      margin-top: 10px;
+      width: 90%; 
+      margin: 0 auto;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .thumb {
+      height: 12px;
+      width: 12px;
+    }
+
+    .value {
+      font-size: 10px;
+      padding: 3px 6px;
+    }
+
+    .slider {
+      width: 80%; 
+    }
+
+    .value-container {
+      width: 80%; 
+    }
   }
 `

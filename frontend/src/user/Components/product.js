@@ -4,7 +4,7 @@ import styled, { keyframes, css } from 'styled-components';
 import addToCart from '../Function/addToCart';
 import Lottie from 'lottie-react';
 import addCart from '../Animations/addCart.json';
-import { MdOutlineShoppingCart } from "react-icons/md";
+import { MdOutlineShoppingCart, MdAddShoppingCart } from "react-icons/md"; // Import the money icon
 
 const Product = ({ image, brand, product_name, price, product_id }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -75,7 +75,12 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
       <ProdDetails>
         <h3>{brand}</h3>
         <p className="product-name">{product_name}</p>
-        <p className="product-price">₱{price}</p>
+        <p className="product-price">
+          ₱{price}
+          <PriceIcon>
+            <MdAddShoppingCart onClick={handleAddToCart}/>
+          </PriceIcon>
+        </p>
       </ProdDetails>
       {errorMessage && <ErrorMessage errorMessage={errorMessage}>{errorMessage}</ErrorMessage>}
       {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
@@ -148,7 +153,9 @@ const ProdDetails = styled.div`
   .product-price {
     font-weight: bold;
     font-size: 16px;
-    color: #d22630; 
+    color: #d22630;
+    display: flex;
+    align-items: center;
   }
   .product-name {
     font-family: 'Poppins', sans-serif;
@@ -230,4 +237,25 @@ const AddCartButton = styled.button`
 
 const StyledCartIcon = styled(MdOutlineShoppingCart)`
   font-size: 24px; 
+`;
+
+const PriceIcon = styled.span`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    height: 40px;
+    width: 40px;
+    background-color: #ccc;
+    border-radius: 50%;
+
+    svg {
+      color: black;
+      height: 25px;
+      width: 25px;
+    }
+  }
 `;

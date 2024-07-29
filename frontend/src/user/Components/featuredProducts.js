@@ -179,19 +179,25 @@ const Section = styled.section`
   background-color: #ffffff;
   padding: 25px;
   text-align: center;
-  min-height: 800px;
+  min-height: 500px;
   overflow-x: hidden;
 
   &.slide-up {
     animation: ${slideUp} 1s ease forwards;
   }
+
 `;
 
 const Title = styled.h2`
   font-size: 2rem;
   margin-bottom: 20px;
+
   span {
     color: #13072E;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem; 
   }
 `;
 
@@ -230,12 +236,22 @@ const ProductCard = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; 
+  justify-content: space-between;
+  margin: 0 auto; 
+
+  @media (max-width: 767px) {
+    width: 90%; 
+    max-width: 250px; 
+  }
 `;
 
 const BrandName = styled.h3`
   font-size: 1rem;
   font-weight: bold;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem; 
+  }
 `;
 
 const ProductPrice = styled.p`
@@ -243,6 +259,10 @@ const ProductPrice = styled.p`
   font-weight: bold;
   color: #FF4500;
   margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 16px; 
+  }
 `;
 
 const AddToCartButton = styled.button`
@@ -254,9 +274,14 @@ const AddToCartButton = styled.button`
   border-radius: 25px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-top: auto; 
+  margin-top: auto;
+
   &:hover {
     background-color: #ff6600;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 16px; 
   }
 `;
 
@@ -266,70 +291,54 @@ const ProductName = styled.h3`
   font-family: 'Poppins', sans-serif;
   color: #333;
   margin-bottom: 4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    font-size: 16px; 
+  }
+`;
+
+const ProductImage = styled.img`
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+
+  @media (max-width: 480px) {
+    height: 250px; 
+  }
+`;
+
+const ErrorMessage = styled.div`
+  color: red;
+  font-weight: bold;
+`;
+
+const SuccessMessage = styled.div`
+  color: green;
+  font-weight: bold;
 `;
 
 const FireBadge = styled(BsBookmarkStarFill)`
   position: absolute;
   top: 10px;
-  left: 10px;
-  color: #ff6347;
-  font-size: 1.8rem;
-`;
-
-const ProductImage = styled.img`
-  width: 100%;
-  height: 150px;
-  margin-bottom: 15px;
+  right: 10px;
+  font-size: 1.5rem;
+  color: #FF4500;
 `;
 
 const Arrow = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
+  font-size: 2rem;
+  color: #13072E;
   cursor: pointer;
   position: absolute;
   top: 50%;
-  z-index: 1;
+  transform: translateY(-50%);
+  z-index: 1000;
+  
+  &.next {
+    right: 10px;
+  }
 
   &.prev {
     left: 10px;
   }
-
-  &.next {
-    right: 10px;
-  }
-`;
-
-const ErrorMessage = styled.p`
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 0, 0, 0.8);
-  color: #fff;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  z-index: 1000;
-`;
-
-const SuccessMessage = styled.p`
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 128, 0, 0.8);
-  color: #fff;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  z-index: 1000;
 `;

@@ -119,6 +119,12 @@ const ProfileContainer = styled.div`
   background-color: #fafafa;
   max-width: 500px;
   width: 90%;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    max-width: 300px;
+    margin-top: 20%;
+  }
 `;
 
 const AccountDetailsLabel = styled.h2`
@@ -126,11 +132,24 @@ const AccountDetailsLabel = styled.h2`
   margin-bottom: 20px;
   color: #333;
   font-weight: 700;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
 `;
 
 const ProfileImageContainer = styled.div`
   position: relative;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    margin-bottom: 15px;
+  }
 `;
 
 const ProfileImage = styled.img`
@@ -145,6 +164,11 @@ const ProfileImage = styled.img`
   &:hover {
     transform: scale(1.1);
   }
+
+  @media (max-width: 768px) {
+    width: 120px;
+    height: 120px;
+  }
 `;
 
 const DefaultProfileIcon = styled(FaUserCircle)`
@@ -154,6 +178,11 @@ const DefaultProfileIcon = styled(FaUserCircle)`
   border: 4px solid #fff;
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+
+  @media (max-width: 768px) {
+    width: 120px;
+    height: 120px;
+  }
 `;
 
 const ProfileDetails = styled.div`
@@ -171,12 +200,23 @@ const ProfileDetailItem = styled.div`
   margin-bottom: 15px;
   width: 100%;
   transition: background-color 0.3s ease;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
 `;
 
 const ProfileDetailIcon = styled.div`
   margin-right: 15px;
   color: #555;
   font-size: 1.5rem;
+
+  @media (max-width: 768px) {
+    margin-right: 0;
+  }
 `;
 
 const ProfileDetailValue = styled.div`
@@ -186,6 +226,10 @@ const ProfileDetailValue = styled.div`
   max-width: 200px;
   font-size: 1rem;
   font-weight: 500;
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+  }
 `;
 
 const EditButtonsContainer = styled.div`
@@ -194,6 +238,12 @@ const EditButtonsContainer = styled.div`
   justify-content: center;
   gap: 10px;
   width: 100%;
+
+  @media (max-width: 768px) {
+    margin-top: 20px;
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const EditButton = styled.button`
@@ -221,5 +271,10 @@ const EditButton = styled.button`
   &:focus {
     outline: none;
     box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25);
+  }
+
+  @media (max-width: 768px) {
+    padding: 8px 16px;
+    font-size: 0.875rem;
   }
 `;

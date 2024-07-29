@@ -235,14 +235,29 @@ const ModalContent = styled.div`
   background-color: #ffffff;
   padding: 30px;
   border-radius: 10px;
-  width: 450px;
+  width: 90%; /* Make it responsive */
+  max-width: 450px; /* Maximum width */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: height 1s ease-in-out; 
+  transition: height 1s ease-in-out;
   overflow: hidden;
+
+  /* Responsive styles for mobile devices */
+  @media (max-width: 768px) {
+    padding: 20px;
+    width: 95%;
+    max-width: none; /* Remove max-width constraint */
+  }
+
+  @media (max-width: 480px) {
+    padding: 15px;
+    width: 80%;
+    max-width: none; /* Remove max-width constraint */
+  }
 `;
+
 
 const ModalHeader = styled.div`
   display: flex;

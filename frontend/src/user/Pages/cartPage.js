@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import updateCartItem from '../Function/updateCartItem';
-import ProductDetailPage from './productDetailPage';
+import DetailProduct from '../Components/productDetail';
 import emptyCart from '../Animations/emptyCart.json';
 import Lottie from 'lottie-react';
 import Modal from '../Components/modal';
@@ -55,7 +55,7 @@ const CartPage = () => {
       );
       setProducts(productsWithImageUrls);
     } catch (error) {
-      toast.error('Error fetching cart data.');
+      toast.error('Cart Empty.');
       console.error('Error fetching cart data:', error);
     } finally {
       setIsLoading(false);
@@ -66,6 +66,7 @@ const CartPage = () => {
     if (newQuantity > 0) {
       try {
         await updateCartItem(cart_id, newQuantity, setProducts);
+        fetchCartData();
       } catch (error) {
         console.error('Error updating quantity:', error);
       }
@@ -77,9 +78,7 @@ const CartPage = () => {
   const deleteCartItem = async (cart_id) => {
     const token = localStorage.getItem('token');
     try {
-      await axios.put(`https://onepc.online/api/v1/cart/${cart_id}`, {
-        quantity: 0,
-      }, {
+      await axios.delete(`https://onepc.online/api/v1/cart/${cart_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -87,8 +86,7 @@ const CartPage = () => {
       setProducts(prevProducts => prevProducts.filter(product => product.cart_id !== cart_id));
       toast.success('Item removed from cart.');
     } catch (error) {
-      toast.error('Error removing item from cart.');
-      console.error('Error deleting cart item:', error);
+      toast.error('Error deleting cart item');
     }
   };
 
@@ -201,7 +199,6 @@ const CartPage = () => {
     } else {
       return (
         <>
-         
           <CartLayout>
           <CheckboxContainer>
             <Checkbox
@@ -281,7 +278,7 @@ const CartPage = () => {
             </TableContainer>
           </CartLayout>
           <Modal isOpen={isModalOpen} onClose={handleModalClose}>
-            {selectedProduct && <ProductDetailPage product={selectedProduct} />}
+            {selectedProduct && <DetailProduct product={selectedProduct} />}
           </Modal>
           
         </>
@@ -307,13 +304,23 @@ const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 50px;
-`
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+`;
+
 const CartLayout = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
+
+  @media (max-width: 768px) {
+    margin-top: 10px;
+    flex-direction: column; 
+  }
 `
 const TableContainer = styled.div`
   width: 90%;
@@ -323,7 +330,13 @@ const TableContainer = styled.div`
   justify-content: space-between;
   gap: 20px;
   background-color: #fff;
-`
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+  }
+`;
+
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
@@ -334,14 +347,62 @@ const Table = styled.table`
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
-  td, {
+
+  td {
     height: 70px;
   }
 
   th {
     background-color: #f4f4f4;
   }
-`
+
+  @media (max-width: 768px) {
+
+    td {
+      height: 50px;
+    }
+    th {
+      display: none;
+    }
+
+    tbody tr {
+      display: block;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tbody td {
+      display: block;
+      position: relative;
+      box-sizing: border-box;
+      border: none;
+    }
+
+    tbody td:nth-of-type(2) {
+      display: inline-block;
+      width: calc(50% - 5px); 
+      vertical-align: top;
+    }
+
+    tbody td:nth-of-type(3) {
+      display: inline-block;
+      width: calc(50% - 5px); 
+      vertical-align: top;
+    }
+
+    tbody td:nth-of-type(4) {
+      display: block;
+      width: 100%;
+      margin-top: 50px;
+    }
+
+    tbody td:nth-of-type(6) {
+      display: none;
+    }
+  }
+`;
+
+
+
 const TotalsTable = styled.table`
   width: 50%;
   border-collapse: collapse;
@@ -357,16 +418,34 @@ const TotalsTable = styled.table`
   th {
     background-color: #f4f4f4;
   }
-`
+
+  @media (max-width: 768px) {
+    width: 100%;
+    font-size: 14px;
+  }
+`;
+
 const ProductImage = styled.img`
   width: 50px;
   height: 50px;
   object-fit: cover;
-`
+  margin-right: 15px;
+
+  @media (max-width: 768px) {
+    width: 80px; 
+    height: 80px;
+  }
+`;
+
 const ProductName = styled.span`
   cursor: pointer;
   color: #00008B;
-`
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+`;
+
 const QuantityControls = styled.div`
   display: flex;
   align-items: center;
@@ -376,28 +455,48 @@ const QuantityControls = styled.div`
     border: none;
     padding: 5px 10px;
     cursor: pointer;
+
+    @media (max-width: 768px) {
+      padding: 8px 12px; 
+    }
   }
 
   span {
     margin: 0 10px;
+
+    @media (max-width: 768px) {
+      margin: 0 8px; 
+    }
   }
-`
+`;
+
 const ActionButtons = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
   justify-content: center;
-`
+
+  @media (max-width: 768px) {
+    gap: 10px;
+  }
+`;
+
 const DeleteButton = styled.button`
   font-family: 'Poppins', sans-serif;
-  background-color:  #d22630;
+  background-color: #d22630;
   color: white;
   border: none;
   border-radius: 35px;
   height: 60px;
   padding: 10px 20px;
   cursor: pointer;
-`
+
+  @media (max-width: 768px) {
+    height: 50px;
+    padding: 8px 16px;
+  }
+`;
+
 const CheckoutButton = styled.button`
   font-family: 'Poppins', sans-serif;
   height: 60px;
@@ -407,7 +506,13 @@ const CheckoutButton = styled.button`
   border: none;
   padding: 10px 20px;
   cursor: pointer;
-`
+
+  @media (max-width: 768px) {
+    height: 50px;
+    padding: 8px 16px;
+  }
+`;
+
 const EmptyCartContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -415,11 +520,17 @@ const EmptyCartContainer = styled.div`
   justify-content: center;
   text-align: center;
   height: 100vh;
+
   p {
     font-size: 18px;
     margin-top: 20px;
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
   }
-`
+`;
+
 const ReturnToShopButton = styled.button`
   font-family: 'Poppins', sans-serif;
   background-color: #007bff;
@@ -428,25 +539,44 @@ const ReturnToShopButton = styled.button`
   padding: 10px 20px;
   cursor: pointer;
   margin-top: 10px;
-`
+
+  @media (max-width: 768px) {
+    padding: 8px 16px;
+  }
+`;
+
 const CheckboxContainer = styled.div`
   width: 90%;
   margin-top: 30px;
   display: flex;
   align-items: center;
-`
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
 const Checkbox = styled.input`
   margin-right: 10px;
-`
+
+  @media (max-width: 768px) {
+    margin-right: 5px;
+  }
+`;
+
 const CheckboxLabel = styled.label`
   font-size: 16px;
   color: #333;
-`
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+`;
+
 const LoaderContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-`
-
-
+`;
