@@ -244,17 +244,17 @@ const ModalContent = styled.div`
   transition: height 1s ease-in-out;
   overflow: hidden;
 
-  /* Responsive styles for mobile devices */
+
   @media (max-width: 768px) {
     padding: 20px;
     width: 95%;
-    max-width: none; /* Remove max-width constraint */
+    max-width: none; 
   }
 
   @media (max-width: 480px) {
     padding: 15px;
     width: 80%;
-    max-width: none; /* Remove max-width constraint */
+    max-width: none; 
   }
 `;
 
@@ -290,6 +290,11 @@ const ModalNav = styled.div`
   justify-content: space-between;
   margin-bottom: 20px;
   border-bottom: 1px solid #ddd;
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+  }
 `;
 
 const NavItem = styled.div`
@@ -310,6 +315,7 @@ const NavItem = styled.div`
 const ModalBody = styled.div`
   display: flex;
   flex-direction: column;
+
 `;
 
 const ProfileImageContainer = styled.div`
@@ -349,6 +355,10 @@ const ProfileDetailItem = styled.div`
   display: flex;
   margin-bottom: 15px;
   align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const ProfileDetailLabel = styled.div`
@@ -357,6 +367,13 @@ const ProfileDetailLabel = styled.div`
   width: 100px; 
   font-family: 'Poppins', sans-serif;
   color: #333;
+
+  @media (max-width: 768px) {
+    align-self: flex-start;
+    margin-right: 0; 
+    margin-bottom: 5px; 
+    width: auto; 
+  }
 `;
 
 const ProfileInput = styled.input`
@@ -371,6 +388,10 @@ const ProfileInput = styled.input`
     border-color: #ff6600;
     outline: none;
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const ModalFooter = styled.div`
@@ -378,6 +399,10 @@ const ModalFooter = styled.div`
   justify-content: space-between; 
   margin-top: 20px;
   width: 100%;
+
+  @media (max-width: 768px) {
+    gap: 10px;
+  }
 `;
 
 const SaveButton = styled.button`
@@ -391,6 +416,17 @@ const SaveButton = styled.button`
   margin-left: 10px;
   cursor: pointer;
   transition: background-color 0.3s;
+
+  @media (max-width: 768px) {
+    padding: 12px 15px; 
+    margin-left: 5px; 
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px; 
+    margin-left: 0; 
+    margin-top: 10px;
+    width: 100%; 
 
 `;
 
@@ -406,8 +442,18 @@ const CancelButton = styled.button`
   transition: background-color 0.3s;
   margin-right: 10px;
 
-`;
+  @media (max-width: 768px) {
+    padding: 12px 15px;
+    margin-right: 5px; 
+  }
 
+  @media (max-width: 480px) {
+    padding: 10px; 
+    margin-right: 0; 
+    margin-top: 10px; 
+    width: 100%;
+  }
+`;
 
 const PasswordInput = styled.input`
   font-family: 'Poppins', sans-serif;
