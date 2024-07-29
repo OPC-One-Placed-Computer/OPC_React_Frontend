@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ClipLoader from 'react-spinners/ClipLoader';
+import ScaleLoader from 'react-spinners/ScaleLoader';
 import Footer from './footer';
 import axios from 'axios';
 import Breadcrumb from './breadcrumb';
@@ -9,7 +9,7 @@ import { MdAccountCircle } from "react-icons/md";
 import { FaAddressBook } from "react-icons/fa6";
 
 
-const PlaceOrder = () => {
+const PlaceOrder = ({ successUrl, cancelUrl }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
@@ -63,8 +63,8 @@ const PlaceOrder = () => {
       cart_items: {
         id: cartItems.map(item => item.id)
       },
-      success_url: 'http://localhost:3000/viewOrder',
-      cancel_url: 'http://localhost:3000/cancelOrder'
+      success_url: successUrl || 'http://localhost:3000/viewOrder',
+      cancel_url: cancelUrl || 'http://localhost:3000/cancelOrder'
     };
   
     try {
@@ -190,7 +190,7 @@ const PlaceOrder = () => {
 
       {loading && (
         <LoaderContainer>
-          <ClipLoader color="#007bff" loading={loading} size={35} />
+          <ScaleLoader color="#000099" loading={loading} size={35} />
         </LoaderContainer>
       )}
     </OrderContainer>
@@ -207,6 +207,7 @@ const OrderContainer = styled.div`
   align-items: center;
   padding: 20px;
   background-color: #f8f9fa;
+  }
 `;
 
 const Form = styled.form`
@@ -218,8 +219,10 @@ const Form = styled.form`
 
   @media (max-width: 768px) {
     padding: 10px;
+
   }
 `;
+
 const FormContent = styled.div`
 margin: 0 auto;
   display: flex;
@@ -227,6 +230,7 @@ margin: 0 auto;
 
   @media (max-width: 768px) {
     flex-direction: column;
+    width: 100%;
   }
 `;
 
@@ -234,6 +238,7 @@ const BillingContainer = styled.div`
 flex: 1;
 flex-direction: column;
 width: auto;
+
 `
 
 const BillingSection = styled.div`
@@ -245,6 +250,8 @@ const BillingSection = styled.div`
 
   @media (max-width: 768px) {
     margin-bottom: 20px;
+    height: auto; 
+    padding: 10px; 
   }
 `;
 
@@ -316,6 +323,16 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #ccc;
+
+  @media (max-width: 768px) {
+    display: block;
+
+    tbody tr {
+      border-bottom: 1px solid #ddd;
+    }
+  
+  }
+ 
 `;
 
 const TableHeader = styled.th`
@@ -325,6 +342,12 @@ const TableHeader = styled.th`
   text-align: left;
   font-size: 1.1rem;
   color: #343a40;
+
+ 
+  @media (max-width: 768px) {
+    display: none;
+  }
+  }
 `;
 
 const TableCell = styled.td`
@@ -335,6 +358,46 @@ const TableCell = styled.td`
   img {
     max-width: 70px;
     height: auto;
+  }
+
+  &:nth-of-type(2) {
+    color: #000099;
+  }
+
+  @media (max-width: 768px) {
+      font-size: 0.9rem; 
+      display: block;
+      position: relative;
+      box-sizing: border-box;
+      border: none;
+      height: 50px;
+
+      &:nth-of-type(5) {
+        display: none;
+      }
+
+      &:nth-of-type(1) {
+        display: inline-block;
+        width: calc(40% - 5px); 
+        vertical-align: top;
+        margin-left: 20px;
+      }
+  
+      &:nth-of-type(2) {
+        display: inline-block;
+        width: calc(50% - 5px); 
+        vertical-align: top;
+      }
+      &:nth-of-type(3) {
+        display: block;
+        margin-left: 30px; 
+        margin-top: 10px;  
+      }
+      &:nth-of-type(4) {
+        display: block;
+        margin-left: 30px;   
+      }
+     
   }
 `;
 
@@ -400,9 +463,5 @@ const LoaderContainer = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+
 `;

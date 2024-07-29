@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import ClipLoader from 'react-spinners/ClipLoader';
+import ScaleLoader from 'react-spinners/ScaleLoader';
 import LoginFormHooks from '../Hooks/loginFormHooks';
 import loginAnimated from '../Animations/loginAnimated.json';
 import Lottie from 'lottie-react';
@@ -21,7 +21,7 @@ const LoginForm = () => {
     <LoginPage>
       {isLoading && (
         <LoaderContainer>
-          <ClipLoader color="#007bff" />
+          <ScaleLoader color="#000099" />
         </LoaderContainer>
       )}
       <LoginContainer>
@@ -72,6 +72,7 @@ const LoginPage = styled.div`
   align-items: center;
   min-height: 100vh;
   background-color: #f5f5f5;
+  padding: 20px;
 `;
 
 const LoaderContainer = styled.div`
@@ -88,30 +89,37 @@ const LoaderContainer = styled.div`
 `;
 
 const LoginContainer = styled.div`
-background-color: #ffffff;
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 800px;
   border-radius: 25px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adding shadow border */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 20px;
+  }
 `;
 
 const LottieContainer = styled.div`
   width: 100%;
   max-width: 300px;
-  margin-left: 3rem; 
+  margin-left: 3rem;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    max-width: 150px;
+  }
 `;
 
 const LoginFormContainer = styled.div`
-  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  
-
 
   form {
     width: 100%;
@@ -127,13 +135,18 @@ const LoginFormContainer = styled.div`
     font-weight: bold;
     margin-bottom: 1.5rem;
     text-align: center;
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
   }
 
   button {
     font-family: 'Poppins', sans-serif;
     width: 100%;
     padding: 0.75rem;
-    background-color: #007bff;
+    background-color: #000099;
     color: #ffffff;
     border: none;
     border-radius: 25px;
@@ -141,6 +154,11 @@ const LoginFormContainer = styled.div`
     cursor: pointer;
     transition: background-color 0.3s;
     margin-top: 1rem;
+
+    @media (max-width: 768px) {
+      padding: 0.5rem;
+      font-size: 0.875rem;
+    }
   }
 
   button:hover {
@@ -152,45 +170,58 @@ const FormGroup = styled.div`
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
+  width: 100%;
 
   label {
     margin-bottom: 0.5rem;
     color: #333333;
     text-align: left;
+
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+    }
   }
 
   input {
     font-family: 'Poppins', sans-serif;
     border: none;
-    border-bottom: 1px solid black; /* Add bottom border */
+    border-bottom: 1px solid black;
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s;
-    width: 100%;
+
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+    }
   }
 
   input:focus {
-    border-color: #007bff;
+    border-color: #ff6600;
   }
 `;
-
 
 const SignInButton = styled.button`
   font-family: 'Poppins', sans-serif;
   width: 100%;
   max-width: 200px;
   padding: 0.75rem;
-  background-color: #007bff;
+  background-color: #000099;
   color: #ffffff;
   border: none;
   border-radius: 25px;
-  font-size: 1rem;
+  font-size: 12px;
   cursor: pointer;
   transition: background-color 0.3s;
   margin-top: 1rem;
 
+  @media (max-width: 768px) {
+    max-width: 150px;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+
   &:hover {
-    background-color: #0a1827;
+    background-color: #000099;
   }
 `;
 
@@ -200,7 +231,7 @@ const NewCustomer = styled.p`
   color: #666666;
 
   .link {
-    color: #007bff;
+    color: #000099;
     text-decoration: none;
     transition: color 0.3s;
   }
@@ -209,10 +240,18 @@ const NewCustomer = styled.p`
     color: #0056b3;
     text-decoration: underline;
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+  }
 `;
 
 const ErrorMessage = styled.p`
   color: red;
   text-align: center;
   margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    font-size:10px;
+  }
 `;

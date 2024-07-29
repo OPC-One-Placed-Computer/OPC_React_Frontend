@@ -3,7 +3,7 @@ import axios from 'axios';
 const updateCartItem = async (cart_id, quantity, setProducts) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.put(
+    const response = await axios.post(
       `https://onepc.online/api/v1/cart/${cart_id}`,
       { quantity },
       {

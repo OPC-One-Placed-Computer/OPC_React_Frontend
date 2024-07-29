@@ -4,9 +4,8 @@ import styled from 'styled-components';
 import { FaShoppingCart } from 'react-icons/fa';
 import getImageUrl from '../../tools/media';
 import addToCart from '../Function/addToCart';
-import Breadcrumb from '../Components/breadcrumb';
 
-const ProductDetailPage = ({ product }) => {
+const DetailProduct = ({ product }) => {
   const location = useLocation();
   const productFromLocation = location.state?.product; 
   const [quantity, setQuantity] = useState(1);
@@ -48,8 +47,7 @@ const ProductDetailPage = ({ product }) => {
   };
 
   return (
-    <DetailedContainer>
-    <Breadcrumb items={[{ label: 'Home', path: '/HomePage' }, { label: 'Products', path: '/products' }, { label: 'Detailed Product' }]} />
+
     <ProductDetail>
       <ProductContent>
         <ProductImage>
@@ -79,17 +77,11 @@ const ProductDetailPage = ({ product }) => {
       {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
     </ProductDetail>
-    </DetailedContainer>
   );
 };
 
-export default ProductDetailPage;
+export default DetailProduct;
 
-const DetailedContainer = styled.div `
-display: flex;
-flex-direction: column;
-padding: 50px;
-`
 
 const ProductDetail = styled.div`
   display: flex;

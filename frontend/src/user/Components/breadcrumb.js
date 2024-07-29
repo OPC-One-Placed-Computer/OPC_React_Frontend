@@ -2,9 +2,31 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+const Breadcrumb = ({ items }) => {
+  return (
+    <BreadcrumbContainer>
+      {items.map((item, index) => (
+        <BreadcrumbItem key={index}>
+          {item.path ? (
+            <BreadcrumbLink to={item.path}>{item.label}</BreadcrumbLink>
+          ) : (
+            item.label
+          )}
+        </BreadcrumbItem>
+      ))}
+    </BreadcrumbContainer>
+  );
+};
+
+export default Breadcrumb;
+
 const BreadcrumbContainer = styled.nav`
  margin: 20px 0;
   font-size: 18px;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 `;
 
 const BreadcrumbItem = styled.span`
@@ -26,20 +48,3 @@ const BreadcrumbLink = styled(Link)`
   }
 `;
 
-const Breadcrumb = ({ items }) => {
-  return (
-    <BreadcrumbContainer>
-      {items.map((item, index) => (
-        <BreadcrumbItem key={index}>
-          {item.path ? (
-            <BreadcrumbLink to={item.path}>{item.label}</BreadcrumbLink>
-          ) : (
-            item.label
-          )}
-        </BreadcrumbItem>
-      ))}
-    </BreadcrumbContainer>
-  );
-};
-
-export default Breadcrumb;

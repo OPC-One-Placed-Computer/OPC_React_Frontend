@@ -123,6 +123,10 @@ const DropdownMenu = styled.div`
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
 
+  @media (max-width: 768px) {
+    right: 0;
+  }
+
   .dropdown-item {
     color: white;
     text-decoration: none;

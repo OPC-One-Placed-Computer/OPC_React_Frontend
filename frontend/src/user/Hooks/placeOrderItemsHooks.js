@@ -67,7 +67,7 @@ const useFetchOrders = () => {
         }
       );
       console.log('Order cancelled successfully:', response.data);
-      fetchOrders();
+      // fetchOrders();
     } catch (error) {
       console.error('Error cancelling order:', error.message);
       console.error('Error details:', {

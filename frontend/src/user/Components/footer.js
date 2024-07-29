@@ -12,29 +12,29 @@ const Footer = () => {
         </Column>
         <Column>
           <Title>Company</Title>
-          <Link href="#">About Us</Link>
-          <Link href="#">Services</Link>
-          <Link href="#">Blog</Link>
-          <Link href="#">Contact Us</Link>
+          <StyledLink href="#">About Us</StyledLink>
+          <StyledLink href="#">Services</StyledLink>
+          <StyledLink href="#">Blog</StyledLink>
+          <StyledLink href="#">Contact Us</StyledLink>
         </Column>
         <Column>
           <Title>Support</Title>
-          <Link href="#">Support</Link>
-          <Link href="#">Knowledge Base</Link>
-          <Link href="#">Live Chat</Link>
+          <StyledLink href="#">Support</StyledLink>
+          <StyledLink href="#">Knowledge Base</StyledLink>
+          <StyledLink href="#">Live Chat</StyledLink>
         </Column>
         <Column>
           <Title>Careers</Title>
-          <Link href="#">Jobs</Link>
-          <Link href="#">Our Team</Link>
-          <Link href="#">Leadership</Link>
-          <Link href="#">Privacy Policy</Link>
+          <StyledLink href="#">Jobs</StyledLink>
+          <StyledLink href="#">Our Team</StyledLink>
+          <StyledLink href="#">Leadership</StyledLink>
+          <StyledLink href="#">Privacy Policy</StyledLink>
         </Column>
         <Column>
           <Title>Products</Title>
-          <Link href="#">Laptops</Link>
-          <Link href="#">Desktops</Link>
-          <Link href="#">Accessories</Link>
+          <StyledLink href="#">Laptops</StyledLink>
+          <StyledLink href="#">Desktops</StyledLink>
+          <StyledLink href="#">Accessories</StyledLink>
         </Column>
       </FooterContent>
       <SocialIconsContainer>
@@ -46,8 +46,8 @@ const Footer = () => {
       <FooterBottom>
         <BottomText>&copy; 2024 One Place Computer. All rights reserved.</BottomText>
         <BottomLinks>
-          <Link href="#">Terms & Conditions</Link>
-          <Link href="#">Privacy Policy</Link>
+          <StyledLink href="#">Terms & Conditions</StyledLink>
+          <StyledLink href="#">Privacy Policy</StyledLink>
         </BottomLinks>
       </FooterBottom>
     </FooterContainer>
@@ -59,9 +59,12 @@ export default Footer;
 const FooterContainer = styled.footer`
   background-color: #222;
   color: #fff;
-  width: 100%;
   padding: 60px 20px;
   text-align: center;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
 `;
 
 const FooterContent = styled.div`
@@ -69,14 +72,23 @@ const FooterContent = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   margin: 0 auto;
-  max-width: 1200px;
   text-align: left;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
 `;
 
 const Column = styled.div`
   flex: 1;
   min-width: 200px;
   margin: 20px 0;
+
+  @media (max-width: 768px) {
+    margin: 15px 0;
+  }
 `;
 
 const Title = styled.h4`
@@ -84,15 +96,23 @@ const Title = styled.h4`
   margin-bottom: 20px;
   font-size: 1.2em;
   color: #ff6600;
+
+  @media (max-width: 768px) {
+    margin-bottom: 15px;
+  }
 `;
 
 const Text = styled.p`
   margin: 0;
   margin-bottom: 20px;
   line-height: 1.6;
+
+  @media (max-width: 768px) {
+    margin-bottom: 15px;
+  }
 `;
 
-const Link = styled.a`
+const StyledLink = styled.a`
   display: block;
   color: #fff;
   text-decoration: none;
@@ -102,12 +122,20 @@ const Link = styled.a`
   &:hover {
     color: #ff6600;
   }
+
+  @media (max-width: 768px) {
+    margin-bottom: 8px;
+  }
 `;
 
 const SocialIconsContainer = styled.div`
   display: flex;
   justify-content: center;
   margin: 40px 0;
+
+  @media (max-width: 768px) {
+    margin: 30px 0;
+  }
 `;
 
 const SocialIcon = styled.div`
@@ -123,6 +151,10 @@ const SocialIcon = styled.div`
       color: #ff6600;
     }
   }
+
+  @media (max-width: 768px) {
+    margin: 0 10px;
+  }
 `;
 
 const FooterBottom = styled.div`
@@ -132,6 +164,10 @@ const FooterBottom = styled.div`
   margin-top: 20px;
   border-top: 1px solid #444;
   padding-top: 20px;
+
+  @media (max-width: 768px) {
+    padding-top: 15px;
+  }
 `;
 
 const BottomText = styled.p`
@@ -142,4 +178,10 @@ const BottomLinks = styled.div`
   display: flex;
   gap: 15px;
   margin-top: 10px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
 `;
