@@ -177,7 +177,7 @@ const ErrorMessage = styled.p`
   color: #fff;
   padding: 10px;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 10px;
   z-index: 1000;
 
   ${({ errorMessage }) =>
@@ -195,8 +195,7 @@ const SuccessMessage = styled.p`
   background-color: rgba(0, 128, 0, 0.8);
   color: #fff;
   padding: 10px;
-  border-radius: 5px;
-  font-size: 14px;
+  font-size: 10px;
   z-index: 1000;
 `;
 

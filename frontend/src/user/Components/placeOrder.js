@@ -9,7 +9,7 @@ import { MdAccountCircle } from "react-icons/md";
 import { FaAddressBook } from "react-icons/fa6";
 
 
-const PlaceOrder = ({ successUrl, cancelUrl }) => {
+const PlaceOrder = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
@@ -63,8 +63,8 @@ const PlaceOrder = ({ successUrl, cancelUrl }) => {
       cart_items: {
         id: cartItems.map(item => item.id)
       },
-      success_url: successUrl || 'http://localhost:3000/viewOrder',
-      cancel_url: cancelUrl || 'http://localhost:3000/cancelOrder'
+      success_url: 'https://store.onepc.online/viewOrder' || 'http://localhost:3000/viewOrder',
+      cancel_url:  'https://store.onepc.online/cancelOrder' || 'http://localhost:3000/cancelOrder'
     };
   
     try {

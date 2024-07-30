@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaUserCircle } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -118,7 +118,11 @@ const EditProfileModal = ({
             {currentView === 'editProfile' && (
               <>
                 <ProfileImageContainer>
-                  <ProfileImage src={previewImageUrl || imageUrl} alt="Profile Picture" />
+                  {previewImageUrl || imageUrl ? (
+                    <ProfileImage src={previewImageUrl || imageUrl} alt="Profile Picture" />
+                  ) : (
+                    <DefaultProfileIcon />
+                  )}
                   {isEditing && (
                     <UploadIcon htmlFor="upload-input">
                       <FaPlus />
@@ -240,9 +244,11 @@ const ModalContent = styled.div`
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  max-height: 80vh;
   position: relative;
   transition: height 1s ease-in-out;
-  overflow: hidden;
+  overflow-x: auto;
+  
 
 
   @media (max-width: 768px) {
@@ -270,6 +276,10 @@ const ModalHeader = styled.div`
     margin: 0;
     font-size: 1.5em;
     color: #333;
+
+    @media (max-width: 768px) {
+      font-size: 20px;
+    }
   }
 `;
 
@@ -310,6 +320,10 @@ const NavItem = styled.div`
   &:hover {
     color: #000099;
   }
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
 `;
 
 const ModalBody = styled.div`
@@ -326,7 +340,7 @@ const ProfileImageContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const UploadIcon = styled.label`
+  const UploadIcon = styled.label`
   position: absolute;
   bottom: -10px;
   background-color: #007bff;
@@ -342,13 +356,29 @@ const UploadIcon = styled.label`
   width: 25px;
   height: 25px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+@media (max-width: 1024px) {
+  right: 45%;
+  width: 23px;
+  height: 23px;
+}
+
+@media (max-width: 768px) {
+  right: 40%;
+}
+
+@media (max-width: 480px) {
+  right: 35%;
+}
 `;
+
 
 const ProfileImage = styled.img`
   width: 150px;
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
+
 `;
 
 const ProfileDetailItem = styled.div`
@@ -373,6 +403,7 @@ const ProfileDetailLabel = styled.div`
     margin-right: 0; 
     margin-bottom: 5px; 
     width: auto; 
+    font-size: 14px;
   }
 `;
 
@@ -390,7 +421,8 @@ const ProfileInput = styled.input`
   }
 
   @media (max-width: 768px) {
-    width: 100%;
+    width: 90%;
+    font-size: 12px;
   }
 `;
 
@@ -468,4 +500,9 @@ const PasswordInput = styled.input`
     border-color: #ff6600;
     outline: none;
   }
+`;
+const DefaultProfileIcon = styled(FaUserCircle)`
+  width: 150px;
+  height: 150px;
+  color: #ccc;
 `;

@@ -23,6 +23,8 @@ const ManageOrders = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [dateFilter, setDateFilter] = useState('');
+  const [selectedOrders, setSelectedOrders] = useState([]);
+
 
   useEffect(() => {
     const fetchOrders = async (pageNumber = 1, status = '', start_date = '', end_date = '') => {
@@ -91,7 +93,31 @@ const ManageOrders = () => {
     setPage(1);
     setOrders([]); 
   };
-
+  const deleteOrder = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await Axios.delete(`https://onepc.online/api/v1/orders/delete`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data: { order_ids: selectedOrders },
+      });
+  
+      setOrders(orders.filter(order => !selectedOrders.includes(order.order_id)));
+      setSelectedOrders([]); 
+      toast.success('Selected orders deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting orders:', err.response ? err.response.data : err.message);
+      if (err.response && err.response.status === 401) {
+        setError('Unauthorized. Please log in again.');
+      } else {
+        setError('Error deleting orders.');
+      }
+      toast.error('Failed to delete selected orders.');
+    }
+  };
+  
   const handleDateFilterChange = (filter) => {
     setDateFilter(filter);
     const today = new Date();
@@ -126,6 +152,14 @@ const ManageOrders = () => {
     setUpdatingOrder(order);
     setNewStatus(order.status);
   };
+  const handleCheckboxChange = (orderId) => {
+    setSelectedOrders((prevSelected) =>
+      prevSelected.includes(orderId)
+        ? prevSelected.filter((id) => id !== orderId) // Remove from selection
+        : [...prevSelected, orderId] // Add to selection
+    );
+  };
+  
 
   const closeModal = () => {
     setUpdatingOrder(null);
@@ -214,7 +248,17 @@ const ManageOrders = () => {
           <thead>
             <tr>
               <th>
-                <input type="checkbox" />
+              <input 
+                type="checkbox" 
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedOrders(orders.map(order => order.order_id));
+                  } else {
+                    setSelectedOrders([]);
+                  }
+                }} 
+                checked={selectedOrders.length === orders.length}
+              />
               </th>
               <th>Order ID</th>
               <th>Billing Name</th>
@@ -234,7 +278,11 @@ const ManageOrders = () => {
               orders.map((order, index) => (
                 <tr key={`${order.order_id}-${index}`}>
                   <td>
-                    <input type="checkbox" />
+                  <input 
+                    type="checkbox" 
+                    checked={selectedOrders.includes(order.order_id)}
+                    onChange={() => handleCheckboxChange(order.order_id)}
+                  />
                   </td>
                   <td>{order.order_id}</td>
                   <td>{order.full_name}</td>
@@ -247,7 +295,7 @@ const ManageOrders = () => {
                       <button onClick={() => openModal(order)}>
                         <FaEdit className="edit-icon" />
                       </button>
-                      <button>
+                      <button onClick={() => deleteOrder(order.order_id)}>
                         <FaTrash className="trash-icon" />
                       </button>
                     </ActionButtons>

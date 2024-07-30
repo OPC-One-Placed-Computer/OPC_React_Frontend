@@ -22,7 +22,7 @@ const SalesAnalytics = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const reportResponse = await axios.get(`https://onepc.online/api/v1/sales/report?type=${type}`, {
+        const reportResponse = await axios.get(`https://onepc.online/api/v1/analytics/sales-report?type=${type}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
