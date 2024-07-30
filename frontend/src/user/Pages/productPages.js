@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Product from '../Components/product';
 import styled from 'styled-components';
@@ -94,7 +94,7 @@ const ProductsPage = () => {
   }, [searchTerm, selectedBrand, selectedCategory, minPrice, maxPrice]);
 
   
-  useEffect(() => {
+  useLayoutEffect(() => {
     const adjustMarginTop = () => {
       if (window.innerWidth <= 768 && sidebarRef.current && contentRef.current) {
         const sidebarHeight = sidebarRef.current.offsetHeight;
@@ -103,13 +103,14 @@ const ProductsPage = () => {
         contentRef.current.style.marginTop = '0px';
       }
     };
+
     adjustMarginTop();
     window.addEventListener('resize', adjustMarginTop);
 
     return () => {
       window.removeEventListener('resize', adjustMarginTop);
     };
-  }, [sidebarRef.current?.offsetHeight]);
+  }, [showFilters]);
   
 
   const handleSearchChange = event => {

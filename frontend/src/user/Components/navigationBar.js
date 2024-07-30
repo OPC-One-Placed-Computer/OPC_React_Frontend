@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MdOutlineShoppingCart } from 'react-icons/md';
+import { FaStore } from "react-icons/fa";
 import { ReactComponent as Logo } from '../../assets/1.svg'; 
 import styled from 'styled-components';
 import ProfileDropdown from './profileDropdown';
@@ -12,14 +13,22 @@ const NavigationBar = () => {
   return (
     <NavBar>
       <LogoContainer>
-      <Link to="/homepage">
+        <Link to="/homepage">
           <Logo className="logo" />
         </Link>
       </LogoContainer>
       <Content>
-        <Link to="/products" className="nav-item">
-          Products
         </Link>
+        <NavItem>
+          <Link to="/products" className="nav-item desktop-only">
+            Products
+          </Link>
+          <IconContainer className="mobile-only">
+            <Link to="/products" className='nav-item'>
+              <FaStore size={24} color="white" />
+            </Link>
+          </IconContainer>
+        </NavItem>
         <Link to="/cartPage" className="nav-item">
           <CartIconContainer>
             <MdOutlineShoppingCart size={24} />
@@ -67,7 +76,7 @@ const LogoContainer = styled.div`
   }
 
   @media (max-width: 768px) {
-    margin-left: 20px;
+    margin-left: 0;
     padding-top: 20px;
 
     .logo {
@@ -77,7 +86,6 @@ const LogoContainer = styled.div`
   }
 
   @media (max-width: 480px) {
-
     .logo {
       width: 80px; 
       height: 80px; 
@@ -139,8 +147,35 @@ const Content = styled.div`
   @media (max-width: 768px) {
     margin-right: 25px;
     padding-top: 20px;
-    gap: 5px;
+    gap: 20px;
   }
+`;
+
+const NavItem = styled.div`
+  display: flex;
+  align-items: center;
+  
+  .desktop-only {
+    display: block;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  .mobile-only {
+    display: none;
+
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-rigth: 25px;
 `;
 
 const CartIconContainer = styled.div`
