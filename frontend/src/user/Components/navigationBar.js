@@ -18,7 +18,6 @@ const NavigationBar = () => {
         </Link>
       </LogoContainer>
       <Content>
-        </Link>
         <NavItem>
           <Link to="/products" className="nav-item desktop-only">
             Products
