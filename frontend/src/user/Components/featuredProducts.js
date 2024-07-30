@@ -308,14 +308,30 @@ const ProductImage = styled.img`
 `;
 
 const ErrorMessage = styled.div`
-  color: red;
-  font-weight: bold;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 0, 0, 0.8);
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 10px;
+  z-index: 1000;
 `;
 
-const SuccessMessage = styled.div`
-  color: green;
-  font-weight: bold;
+const SuccessMessage = styled.p`
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 128, 0, 0.8);
+  color: #fff;
+  padding: 10px;
+  font-size: 10px;
+  z-index: 1000;
 `;
+
 
 const FireBadge = styled(BsBookmarkStarFill)`
   position: absolute;

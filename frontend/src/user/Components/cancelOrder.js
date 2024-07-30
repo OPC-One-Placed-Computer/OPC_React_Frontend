@@ -11,25 +11,29 @@ const OrderCancel = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchOrderDetails = async () => {
+    const cancelOrder = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`https://onepc.online/api/v1/orders/${orderId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response.data.data);
+        const response = await axios.post(
+          `https://onepc.online/api/v1/orders/cancel`, 
+          { order_id: orderId }, 
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response.data);
       } catch (err) {
-        console.log('Error fetching order details.');
+        console.error('Error cancelling order:', err);
       }
     };
 
-    fetchOrderDetails();
+    cancelOrder();
   }, [orderId]);
 
   const handleBackToProducts = () => {
-    navigate('/products'); // Adjust the path if needed
+    navigate('/products'); 
   };
 
   return (
@@ -81,7 +85,7 @@ const LottieContainer = styled.div`
 `;
 
 const BackButton = styled.button`
-font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin-top: 20px;
   padding: 12px 25px;
   font-size: 1.1rem;

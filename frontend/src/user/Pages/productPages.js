@@ -31,7 +31,7 @@ const ProductsPage = () => {
   const fetchProducts = async (page) => {
     try {
       const response = await Axios.get(`https://onepc.online/api/v1/products?page=${page}`);
-      console.log("Fetch Products Response:", response.data); // Log response data
+      console.log("Fetch Products Response:", response.data); 
       if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
         const { data, meta } = response.data.data;
         setFilteredProducts(data);

@@ -59,9 +59,13 @@ const ProfileHooks = () => {
 
   const fetchImageUrl = async (imagePath, token) => {
     try {
-      const response = await axios.get(`https://onepc.online/api/v1/download/file?path=${imagePath}`, {
+      const imageName = imagePath.split('/').pop();
+      const response = await axios.get(`https://onepc.online/api/v1/download/user-image`, {
         headers: {
           Authorization: `Bearer ${token}`,
+        },
+        params: {
+          image_name: imageName, 
         },
         responseType: 'blob', 
       });
