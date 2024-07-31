@@ -177,7 +177,7 @@ const EditProfileModal = ({
 
                 <ModalFooter>
                   <CancelButton onClick={handleCancel}>Cancel</CancelButton>
-                  <SaveButton onClick={handleSaveClick}>Save Changes</SaveButton>
+                  <SaveButton onClick={handleSaveClick}>Save</SaveButton>
                 </ModalFooter>
               </>
             )}
@@ -209,7 +209,7 @@ const EditProfileModal = ({
                 </ModalBody>
                 <ModalFooter>
                   <CancelButton onClick={handleCancel}>Cancel</CancelButton>
-                  <SaveButton onClick={handlePasswordChange}>Change Password</SaveButton>
+                  <SaveButton onClick={handlePasswordChange}>Save</SaveButton>
                 </ModalFooter>
               </>
             )}

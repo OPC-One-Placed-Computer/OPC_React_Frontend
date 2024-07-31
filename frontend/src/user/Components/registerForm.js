@@ -68,9 +68,9 @@ const RegisterPage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f5f5f5;
-  padding: 20px;
+  padding: 1rem;
 `;
 
 const RegisterContainer = styled.div`

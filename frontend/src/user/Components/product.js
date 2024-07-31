@@ -4,7 +4,9 @@ import styled, { keyframes, css } from 'styled-components';
 import addToCart from '../Function/addToCart';
 import Lottie from 'lottie-react';
 import addCart from '../Animations/addCart.json';
-import { MdOutlineShoppingCart, MdAddShoppingCart } from "react-icons/md"; // Import the money icon
+import { MdOutlineShoppingCart, MdAddShoppingCart } from "react-icons/md";
+import CartModal from './cartModal';
+import axios from 'axios';
 
 const Product = ({ image, brand, product_name, price, product_id }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -12,6 +14,9 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
   const [imageUrl, setImageUrl] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const quantity = 1;
 
   useEffect(() => {
@@ -27,6 +32,35 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
 
     fetchImage();
   }, [image]);
+
+  const fetchCartData = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('https://onepc.online/api/v1/cart', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const productsWithImageUrls = await Promise.all(
+        response.data.data.map(async (product) => {
+          const imageUrl = await getImageUrl(product.product.image_path);
+          return { ...product, imageUrl };
+        })
+      );
+      setCartItems(productsWithImageUrls);
+    } catch (error) {
+      console.error('Error fetching cart data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isModalOpen) {
+      fetchCartData(); // Fetch cart data when the modal is opened
+    }
+  }, [isModalOpen]);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -44,9 +78,16 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
     setIsButtonHovered(false);
   };
 
-  const handleAddToCart = (event) => {
+  const handleAddToCart = async (event) => {
     event.stopPropagation();
-    addToCart(product_id, product_name, quantity, setErrorMessage, setSuccessMessage);
+    await addToCart(product_id, product_name, quantity, setErrorMessage, setSuccessMessage);
+    await fetchCartData(); // Fetch updated cart data immediately after adding item
+    setIsModalOpen(true);
+  };
+
+  const closeModal = (event) => {
+    event.stopPropagation();
+    setIsModalOpen(false);
   };
 
   return (
@@ -78,17 +119,19 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
         <p className="product-price">
           ₱{price}
           <PriceIcon>
-            <MdAddShoppingCart onClick={handleAddToCart}/>
+            <MdAddShoppingCart onClick={handleAddToCart} />
           </PriceIcon>
         </p>
       </ProdDetails>
-      {errorMessage && <ErrorMessage errorMessage={errorMessage}>{errorMessage}</ErrorMessage>}
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+      <CartModal isModalOpen={isModalOpen} closeModal={closeModal} cartItems={cartItems} isLoading={isLoading} />
     </ProdCon>
   );
 };
 
 export default Product;
+
 
 const ProdCon = styled.div`
   display: flex;
@@ -250,6 +293,9 @@ const PriceIcon = styled.span`
     width: 40px;
     background-color: #ccc;
     border-radius: 50%;
+    border: 1px solid #aaa; /* Add a border to make it look like a button */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transition: background-color 0.3s ease;
 
     svg {
       color: black;

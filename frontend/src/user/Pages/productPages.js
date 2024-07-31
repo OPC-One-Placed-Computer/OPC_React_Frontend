@@ -111,6 +111,26 @@ const ProductsPage = () => {
       window.removeEventListener('resize', adjustMarginTop);
     };
   }, [showFilters]);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY; 
+    let hasScrolledDown = false; 
+  
+    const handleScroll = () => {
+      if (window.innerWidth <= 768) { 
+        if (window.scrollY > lastScrollY) {
+          hasScrolledDown = true; 
+          setShowFilters(false);
+        }
+        lastScrollY = window.scrollY; 
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+  
   
 
   const handleSearchChange = event => {
@@ -269,13 +289,16 @@ padding-top: 20px;
 
   
   @media (max-width: 768px) {
-    width: calc(100% - 30px);  
+    width: calc(100% - 30px); 
     padding: 15px;
     height: auto;  
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
     border-bottom-left-radius: 20px;  
     border-bottom-right-radius: 20px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+    transform: translateY(0);
   }
 `;
 
@@ -365,8 +388,8 @@ display: flex;
   @media (max-width: 768px) {
     gap: 10px;
     display: ${props => props.show ? 'block' : 'none'};
-
-    
+    transform: ${props => (props.show ? 'translateX(0)' : 'translateX(-100%)')};
+     
     .categoryCon {
       display: flex;
       width: 100%;

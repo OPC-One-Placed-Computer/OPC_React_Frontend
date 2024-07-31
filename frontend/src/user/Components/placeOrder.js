@@ -6,7 +6,7 @@ import Footer from './footer';
 import axios from 'axios';
 import Breadcrumb from './breadcrumb';
 import { MdAccountCircle } from "react-icons/md";
-import { FaAddressBook } from "react-icons/fa6";
+import { MdLocationPin } from "react-icons/md";
 
 
 const PlaceOrder = () => {
@@ -55,6 +55,9 @@ const PlaceOrder = () => {
       quantity: product.quantity
     }));
   
+    // Store cartItems in local storage
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  
     const orderData = {
       full_name: fullName,
       shipping_address: address,
@@ -64,7 +67,7 @@ const PlaceOrder = () => {
         id: cartItems.map(item => item.id)
       },
       success_url: 'https://store.onepc.online/viewOrder' || 'http://localhost:3000/viewOrder',
-      cancel_url:  'https://store.onepc.online/cancelOrder' || 'http://localhost:3000/cancelOrder'
+      cancel_url:  'http://localhost:3000/placeOrder'
     };
   
     try {
@@ -73,6 +76,7 @@ const PlaceOrder = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         }
+        
       });
   
       if (paymentMethod === 'stripe' && response.data.status && response.data.data.url) {
@@ -87,6 +91,7 @@ const PlaceOrder = () => {
       setLoading(false);
     }
   };
+  
   
   const handleCancelOrder = async () => {
     navigate('/cartPage'); 
@@ -112,11 +117,12 @@ const PlaceOrder = () => {
             </FormRow>
             <FormRow>
             <IconContainer>
-                <FaAddressBook />
+                <MdLocationPin />
               </IconContainer>
               <FormInput
                 type="text"
                 value={address}
+                placeholder='Enter your address'
                 onChange={(e) => setAddress(e.target.value)}
                 required
               />
@@ -207,6 +213,11 @@ const OrderContainer = styled.div`
   align-items: center;
   padding: 20px;
   background-color: #f8f9fa;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    background-color: #ffffff;
+    }
   }
 `;
 
@@ -432,6 +443,7 @@ font-family: 'Poppins', sans-serif;
   background-color: #d22630;
   color: #fff;
   height: 60px;
+  font-size: 2re
   border: none;
   padding: 10px 20px;
   cursor: pointer;

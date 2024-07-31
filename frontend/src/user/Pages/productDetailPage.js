@@ -63,7 +63,7 @@ const ProductDetailPage = ({ product }) => {
           <h1>{currentProduct.product_name}</h1>
           <h2>{currentProduct.brand}</h2>
           <p className="product-description">{currentProduct.description}</p>
-          <p className="product-price">Price: ${currentProduct.price}</p>
+          <p className="product-price">Price: ₱{Number(currentProduct.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           <p className="product-quantity">Available Quantity: {currentProduct.quantity}</p>
           <QuantitySelector>
             <QuantityButton className='subtraction' onClick={handleDecreaseQuantity}>-</QuantityButton>
@@ -89,6 +89,10 @@ const DetailedContainer = styled.div `
 display: flex;
 flex-direction: column;
 padding: 50px;
+
+@media (max-width: 768px) {
+  padding: 1rem;
+}
 `
 
 const ProductDetail = styled.div`
@@ -96,7 +100,7 @@ const ProductDetail = styled.div`
   justify-content: center;
   padding: 20px;
   @media (max-width: 768px) {
-    padding: 10px;
+    padding: 5px;
   }
 `
 const ProductContent = styled.div`

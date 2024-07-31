@@ -88,7 +88,7 @@ const ProductDetail = styled.div`
   justify-content: center;
   padding: 20px;
   @media (max-width: 768px) {
-    padding: 10px;
+    padding: 0.5rem;
   }
 `
 const ProductContent = styled.div`

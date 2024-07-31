@@ -209,6 +209,7 @@ const CartPage = () => {
             <CheckboxLabel>Select All</CheckboxLabel>
           </CheckboxContainer>
             <TableContainer>
+              <ProductContainer>
               <Table>
                 <thead>
                   <tr>
@@ -236,7 +237,7 @@ const CartPage = () => {
                       <td>
                         <ProductName onClick={() => handleProductClick(product.product_id)}>{product.product.product_name}</ProductName>
                       </td>
-                      <td>₱{Number(product.product.price).toFixed(2)}</td>
+                      <td>₱{Number(product.product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       <td onClick={(e) => e.stopPropagation()}>
                         <QuantityControls>
                           <button className='subtract' onClick={() => handleQuantityChange(product.cart_id, product.quantity - 1)}>-</button>
@@ -244,11 +245,13 @@ const CartPage = () => {
                           <button className='addition' onClick={() => handleQuantityChange(product.cart_id, product.quantity + 1)}>+</button>
                         </QuantityControls>
                       </td>
-                      <td>₱{Number(product.subtotal).toFixed(2)}</td>
+                      <td>₱{Number(product.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+
                     </tr>
                   ))}
                 </tbody>
               </Table>
+              </ProductContainer>
               <TotalsTable>
                 <thead>
                   <tr>
@@ -300,13 +303,19 @@ const CartPage = () => {
 
 export default CartPage;
 
+const ProductContainer = styled.div`
+display: flex;
+justify-content: center;
+align-items: flex-start;
+`
+
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 50px;
 
   @media (max-width: 768px) {
-    padding: 20px;
+    padding: 1rem;
   }
 `;
 
@@ -341,19 +350,17 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #ddd;
-
+ 
   th, td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
-
-  td {
-    height: 70px;
-  }
-
   th {
     background-color: #f4f4f4;
+  }
+  td {
+    height: 70px;
   }
 
   @media (max-width: 768px) {
@@ -407,7 +414,8 @@ const TotalsTable = styled.table`
   width: 50%;
   border-collapse: collapse;
   border: 1px solid #ddd;
-  height: 400px;
+  max-height: 150px; /* Adjust this value as needed */
+  overflow-y: auto;
 
   th, td {
     padding: 12px;
