@@ -88,10 +88,10 @@ const PlaceOrder = () => {
       payment_method: paymentMethod,
       cart_items: {
         id: cartItems.map(item => item.id)
-      },
-      // 'https://store.onepc.online/viewOrder'
-      success_url: 'http://localhost:3000/viewOrder',
-      cancel_url:  'http://localhost:3000/placeOrder'
+      }, 
+
+      success_url: 'https://store.onepc.online/viewOrder' || 'http://localhost:3000/viewOrder',
+      cancel_url:  'https://store.onepc.online/placeOrder' || 'http://localhost:3000/placeOrder'
     };
   
     try {
