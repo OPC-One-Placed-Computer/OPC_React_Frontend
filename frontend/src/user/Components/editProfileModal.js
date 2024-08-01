@@ -177,7 +177,7 @@ const EditProfileModal = ({
 
                 <ModalFooter>
                   <CancelButton onClick={handleCancel}>Cancel</CancelButton>
-                  <SaveButton onClick={handleSaveClick}>Save Changes</SaveButton>
+                  <SaveButton onClick={handleSaveClick}>Save</SaveButton>
                 </ModalFooter>
               </>
             )}
@@ -209,7 +209,7 @@ const EditProfileModal = ({
                 </ModalBody>
                 <ModalFooter>
                   <CancelButton onClick={handleCancel}>Cancel</CancelButton>
-                  <SaveButton onClick={handlePasswordChange}>Change Password</SaveButton>
+                  <SaveButton onClick={handlePasswordChange}>Save</SaveButton>
                 </ModalFooter>
               </>
             )}
@@ -236,6 +236,9 @@ const ModalBackdrop = styled.div`
 `;
 
 const ModalContent = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   background-color: #ffffff;
   padding: 30px;
   border-radius: 10px;

@@ -251,7 +251,7 @@ fetchProducts();
                         <td>{product.brand}</td>
                         <td>{product.product_name}</td>
                         <td>{product.quantity}</td>
-                        <td>${product.price}</td>
+                        <td>₱{Number(product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td>
                         <ActionsContainer>
                             <FaEdit className="icon edit" onClick={() => handleEdit(product)} />

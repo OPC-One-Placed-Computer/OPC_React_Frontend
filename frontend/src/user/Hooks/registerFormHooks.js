@@ -53,9 +53,7 @@ const RegisterFormHooks = () => {
       }, 2000); 
 
     } catch (error) {
-      const errorResponse = error.response ? error.response.data : error.message;
-      const errorMessage = typeof errorResponse === 'object' ? JSON.stringify(errorResponse) : errorResponse;
-      setErrorMessage(errorMessage);
+      setErrorMessage('The password field must be at least 8 characters.');
       setSuccessMessage('');
     }
   };

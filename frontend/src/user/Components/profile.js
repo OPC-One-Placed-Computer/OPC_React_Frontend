@@ -108,6 +108,9 @@ const Profile = () => {
 export default Profile;
 
 const ProfileContainer = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   flex-direction: column;
   align-items: center;

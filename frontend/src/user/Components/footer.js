@@ -57,6 +57,9 @@ const Footer = () => {
 export default Footer;
 
 const FooterContainer = styled.footer`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   background-color: #222;
   color: #fff;
   padding: 60px 20px;
