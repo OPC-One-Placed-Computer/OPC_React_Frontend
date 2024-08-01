@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import useFetchOrders from '../Hooks/placeOrderItemsHooks';
 import emptyOrder from '../Animations/emptyOrder.json';
 import Lottie from 'lottie-react';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { MdAccountCircle } from "react-icons/md";
-import { FaAddressBook, FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
+import { FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
+import { MdLocationPin } from "react-icons/md";
 import { FaCalendarAlt } from "react-icons/fa";
 import Footer from './footer';
 import ReactPaginate from 'react-paginate';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const PlacedOrderItems = () => {
   const { orders, loading, cancelOrder, lastPage, setCurrentPage, imageUrls } = useFetchOrders();
   
   const [activeTab, setActiveTab] = useState('To Pay');
+  const [sessionId, setSessionId] = useState(null);
   
   const handleCancelOrder = async (order_id) => {
     try {
@@ -50,7 +53,55 @@ const PlacedOrderItems = () => {
         return orders;
     }
   };
+  useEffect(() => {
+    const fetchSessionId = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get('https://onepc.online/api/v1/orders', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
+        if (response.data && response.data.orders && response.data.orders.length > 0) {
+          setSessionId(response.data.orders[0].stripe_session_id);
+        }
+      } catch (error) {
+        console.error('Error fetching session ID:', error);
+        toast.error('Failed to fetch session ID. Please try again.');
+      }
+    };
+
+    fetchSessionId();
+  }, []);
+  
+  const handlePay = async (orderSessionId) => {
+    if (!orderSessionId) {
+      toast.error('Session ID is missing.');
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem('token');      
+      const response = await axios.get(`https://onepc.online/api/v1/stripe/checkout-url?session_id=${orderSessionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      const checkoutUrl = response.data.data.checkout_url;
+      if (checkoutUrl) {
+        const decodedUrl = decodeURIComponent(checkoutUrl);
+        window.location.href = decodedUrl;
+      } else {
+        toast.error('Failed to get the checkout URL. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during payment process:', error); // Log the error details
+      toast.error('Failed to get the checkout URL. Please try again.');
+    }
+  };
+  
   if (loading) {
     return (
       <LoadingContainer>
@@ -58,14 +109,15 @@ const PlacedOrderItems = () => {
       </LoadingContainer>
     );
   }
-
   const filteredOrders = filterOrders(activeTab);
-
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-
+  const paymentMethodLabels = {
+    stripe: 'Credit Card',
+    cod: 'Cash on Delivery'
+  };
   const getPaymentIcon = (paymentMethod) => {
     switch (paymentMethod) {
       case 'stripe':
@@ -111,7 +163,7 @@ const PlacedOrderItems = () => {
                   </OrderDetail>
                   <OrderDetail>
                     <IconContainer>
-                      <FaAddressBook />
+                      <MdLocationPin />
                     </IconContainer>
                     <OrderField>{order.shipping_address}</OrderField>
                   </OrderDetail>
@@ -125,7 +177,7 @@ const PlacedOrderItems = () => {
                     <IconContainer>
                       {getPaymentIcon(order.payment_method)}
                     </IconContainer>
-                    <OrderField>{order.payment_method}</OrderField>
+                    <OrderField>{paymentMethodLabels[order.payment_method]}</OrderField>
                   </OrderDetail>
                 </OrderInfo>
                 <OrderItems>
@@ -133,7 +185,7 @@ const PlacedOrderItems = () => {
                   <OrderItemsTable>
                     <thead>
                       <TableRow>
-                        <TableHeader>Product Image</TableHeader>
+                        <TableHeader></TableHeader>
                         <TableHeader>Product Name</TableHeader>
                         <TableHeader>Quantity</TableHeader>
                         <TableHeader>Price</TableHeader>
@@ -147,20 +199,20 @@ const PlacedOrderItems = () => {
                             <ProductImage src={imageUrls[item.product.image_path] || ''} alt={item.product.product_name} />
                           </TableCell>
                           <TableCell>{item.product.product_name}</TableCell>
-                          <TableCell>₱{item.product.price}</TableCell>
                           <TableCell>{item.quantity}</TableCell>
-                          <TableCell>₱{item.subtotal}</TableCell>
+                          <TableCell>{Number(item.product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                          <TableCell>{Number(item.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                         </TableRow>
                       ))}
                     </tbody>
                   </OrderItemsTable>
-                  <TotalAmount><strong>Total Amount:</strong> ₱{order.total}</TotalAmount>
+                  <TotalAmount><strong>Total Amount:</strong> ₱{Number(order.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TotalAmount>
                   <TotalWrapper>
                     <OrderStatus><strong>Status:</strong> {order.status}</OrderStatus>
                     {activeTab === 'To Pay' && order.status === 'awaiting payment' ? (
-                      <PayButton >
-                        Pay
-                      </PayButton>
+                      <PayButton onClick={() => handlePay(order.stripe_session_id)}>
+                      Pay
+                    </PayButton>
                     ) : activeTab === 'To Pay' && (
                       <CancelButton onClick={() => handleCancelOrder(order.order_id)} disabled={order.status === 'cancelled'}>
                         Cancel Order
@@ -330,6 +382,7 @@ const TableHeader = styled.th`
   padding: 10px;
   font-size: 1rem;
   color: #333;
+  background-color: #f4f4f4
   text-align: left;
 
   @media (max-width: 768px) {
@@ -354,6 +407,9 @@ const TableCell = styled.td`
 
   &:nth-of-type(2) {
     color: #000099;
+  }
+  &:nth-of-type(3) {
+    text-align: center;
   }
 
   @media (max-width: 768px) {
@@ -433,10 +489,19 @@ const CancelButton = styled.button`
 `;
 
 const LoadingContainer = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
 `;
 
 const NoOrdersMessage = styled.p`

@@ -266,7 +266,11 @@ const ProductsPage = () => {
 
 export default ProductsPage;
 
+
 const PageContainer = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   flex-direction: row; 
   min-height: 100vh;

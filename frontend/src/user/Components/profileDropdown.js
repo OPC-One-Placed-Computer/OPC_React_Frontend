@@ -74,6 +74,9 @@ const ProfileDropdown = () => {
 export default ProfileDropdown;
 
 const ProfileContainer = styled.div`
+* {
+  -webkit-tap-highlight-color: transparent;
+}
   position: relative;
   display: flex;
   align-items: center;
@@ -82,6 +85,11 @@ const ProfileContainer = styled.div`
 const ProfileIcon = styled.div`
   cursor: pointer;
   color: white;
+
+  a {
+    -webkit-tap-highlight-color: transparent;
+    outline: none; 
+  }
 
   &::before,
   &::after {

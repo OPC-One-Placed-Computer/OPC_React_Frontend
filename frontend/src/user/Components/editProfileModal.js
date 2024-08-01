@@ -236,6 +236,9 @@ const ModalBackdrop = styled.div`
 `;
 
 const ModalContent = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   background-color: #ffffff;
   padding: 30px;
   border-radius: 10px;

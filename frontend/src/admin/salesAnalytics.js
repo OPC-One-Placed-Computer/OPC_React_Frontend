@@ -98,7 +98,7 @@ const SalesAnalytics = () => {
         font: {
           size: 20,
           weight: 'bold',
-          family: 'Poppins, sans-serif', // Apply Poppins font to title
+          family: 'Poppins, sans-serif', 
         },
       },
       tooltip: {
@@ -117,7 +117,7 @@ const SalesAnalytics = () => {
         labels: {
           color: '#333',
           font: {
-            family: 'Poppins, sans-serif', // Apply Poppins font to legend labels
+            family: 'Poppins, sans-serif', 
           },
         },
       },
@@ -127,7 +127,7 @@ const SalesAnalytics = () => {
         ticks: {
           color: '#333',
           font: {
-            family: 'Poppins, sans-serif', // Apply Poppins font to X axis labels
+            family: 'Poppins, sans-serif', 
           },
         },
         grid: {
@@ -138,7 +138,7 @@ const SalesAnalytics = () => {
         ticks: {
           color: '#333',
           font: {
-            family: 'Poppins, sans-serif', // Apply Poppins font to Y axis labels
+            family: 'Poppins, sans-serif',
           },
         },
         grid: {

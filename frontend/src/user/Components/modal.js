@@ -30,6 +30,9 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContent = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   background: white;
   padding: 20px;
   width: 90%; 

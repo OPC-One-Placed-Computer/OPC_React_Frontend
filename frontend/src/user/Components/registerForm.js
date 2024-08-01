@@ -65,6 +65,9 @@ const RegisterForm = () => {
 export default RegisterForm;
 
 const RegisterPage = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   justify-content: center;
   align-items: center;
@@ -209,6 +212,7 @@ const Account = styled.p`
 const ErrorMessage = styled.div`
   color: red;
   margin-bottom: 1rem;
+  font-size: 12px;
 
   @media (max-width: 768px) {
     font-size: 10px;
@@ -216,6 +220,7 @@ const ErrorMessage = styled.div`
 `;
 
 const SuccessMessage = styled.div`
+ font-size: 12px;
   color: green;
   margin-bottom: 1rem;
 

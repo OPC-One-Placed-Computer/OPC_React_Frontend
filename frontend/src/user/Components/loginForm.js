@@ -67,6 +67,9 @@ const LoginForm = () => {
 export default LoginForm;
 
 const LoginPage = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   justify-content: center;
   align-items: center;
@@ -249,6 +252,7 @@ const NewCustomer = styled.p`
 const ErrorMessage = styled.p`
   color: red;
   text-align: center;
+  font-size: 12px;
   margin-bottom: 1rem;
 
   @media (max-width: 768px) {

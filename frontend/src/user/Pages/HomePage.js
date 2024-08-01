@@ -34,6 +34,9 @@ const Homepage = () => {
 export default Homepage;
 
 const HomePageParentContainer = styled.div`
+* {
+  -webkit-tap-highlight-color: transparent;
+}
   overflow-x: hidden;
 `
 const HomepageCon = styled.div`

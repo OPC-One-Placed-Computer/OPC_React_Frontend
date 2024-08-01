@@ -21,6 +21,9 @@ const Breadcrumb = ({ items }) => {
 export default Breadcrumb;
 
 const BreadcrumbContainer = styled.nav`
+* {
+  -webkit-tap-highlight-color: transparent;
+}
  margin: 20px 0;
   font-size: 18px;
 

@@ -22,11 +22,24 @@ const CartPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [selectedTotal, setSelectedTotal] = useState(0);
+  const [totalCartAmount, setTotalCartAmount] = useState(0);
   const navigate = useNavigate();
   
   useEffect(() => {
     fetchCartData();
   }, []);
+
+  useEffect(() => {
+    if (selectedItems.length === 0) {
+      setSelectedTotal(totalCartAmount);
+    } else {
+      const total = products
+        .filter(product => selectedItems.includes(product.product_id))
+        .reduce((sum, product) => sum + parseFloat(product.subtotal), 0);
+      setSelectedTotal(total.toFixed(2));
+    }
+  }, [selectedItems, products, totalCartAmount]);
 
   useEffect(() => {
     if (alertMessage) {
@@ -54,6 +67,10 @@ const CartPage = () => {
         })
       );
       setProducts(productsWithImageUrls);
+
+      const total = productsWithImageUrls.reduce((sum, product) => sum + parseFloat(product.subtotal), 0);
+      setTotalCartAmount(total.toFixed(2));
+      setSelectedTotal(total.toFixed(2));
     } catch (error) {
       toast.error('Cart Empty.');
       console.error('Error fetching cart data:', error);
@@ -139,14 +156,16 @@ const CartPage = () => {
     if (selectedItems.length === 0) {
       toast.info('Please select a product to checkout.');
     } else {
+     
       const selectedProducts = products.filter(product => selectedItems.includes(product.product_id));
+      
       navigate('/placeOrder', {
         state: {
           products: selectedProducts.map(product => ({
             productName: product.product.product_name,
             price: product.product.price,
             quantity: product.quantity,
-            productImage: product.imageUrl,
+            imageName: product.product.image_name, 
             subtotal: product.subtotal,
             cart_id: product.cart_id
           })),
@@ -154,7 +173,7 @@ const CartPage = () => {
       });
     }
   };
-
+  
   const handleProductClick = async (product_id) => {
     setIsLoading(true);
     try {
@@ -262,11 +281,11 @@ const CartPage = () => {
                 <tbody>
                   <tr>
                     <td>Subtotal</td>
-                    <td>₱{products.reduce((total, product) => total + parseFloat(product.subtotal), 0).toFixed(2)}</td>
+                    <td>₱{Number(selectedTotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   </tr>
                   <tr>
                     <td>Total</td>
-                    <td>₱{products.reduce((total, product) => total + parseFloat(product.subtotal), 0).toFixed(2)}</td>
+                    <td>₱{Number(selectedTotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   </tr>
                   <tr>
                 <td colSpan="5">
@@ -292,7 +311,7 @@ const CartPage = () => {
   return (
     <>
     <PageContainer>
-    <Breadcrumb items={[{ label: 'Home', path: '/HomePage' }, { label: 'Shopping Cart' }]} />
+    <Breadcrumb items={[{ label: 'Home', path: '/HomePage' }, { label: 'Products', path: '/products' }, { label: 'Shopping Cart' }]} />
     <ToastContainer />
       {renderCartContent()}
     </PageContainer>
@@ -304,15 +323,18 @@ const CartPage = () => {
 export default CartPage;
 
 const ProductContainer = styled.div`
-display: flex;
-justify-content: center;
-align-items: flex-start;
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 `
-
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 50px;
+  height: auto;
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -408,13 +430,11 @@ const Table = styled.table`
   }
 `;
 
-
-
 const TotalsTable = styled.table`
   width: 50%;
   border-collapse: collapse;
   border: 1px solid #ddd;
-  max-height: 150px; /* Adjust this value as needed */
+  max-height: 150px; 
   overflow-y: auto;
 
   th, td {
@@ -458,9 +478,23 @@ const QuantityControls = styled.div`
   display: flex;
   align-items: center;
 
+  .subtract {
+    background-color: #dc3545;
+  }
+  .addition {
+    background-color: #000099;
+  }
+
+
   button {
-    background: #ddd;
+    display: flex;
+    justify-content: center;
+    width:25px;
+    height: 25px;
+    align-items: center;
+    color: #ffffff;
     border: none;
+    border-radius: 50%;
     padding: 5px 10px;
     cursor: pointer;
 
@@ -480,6 +514,7 @@ const QuantityControls = styled.div`
 
 const ActionButtons = styled.div`
   display: flex;
+  align-items: center;
   flex-direction: column;
   gap: 20px;
   justify-content: center;
@@ -492,10 +527,12 @@ const ActionButtons = styled.div`
 const DeleteButton = styled.button`
   font-family: 'Poppins', sans-serif;
   background-color: #d22630;
+  width: 300px;
   color: white;
+  font-size: 0.9rem;
   border: none;
   border-radius: 35px;
-  height: 60px;
+  height: 50px;
   padding: 10px 20px;
   cursor: pointer;
 
@@ -507,9 +544,11 @@ const DeleteButton = styled.button`
 
 const CheckoutButton = styled.button`
   font-family: 'Poppins', sans-serif;
-  height: 60px;
+  height: 50px;
+  width: 300px;
   background-color: #000099;
   border-radius: 35px;
+  font-size: 0.9rem;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -541,9 +580,10 @@ const EmptyCartContainer = styled.div`
 
 const ReturnToShopButton = styled.button`
   font-family: 'Poppins', sans-serif;
-  background-color: #007bff;
+  background-color: #000099;
   color: white;
   border: none;
+  border-radius: 25px;
   padding: 10px 20px;
   cursor: pointer;
   margin-top: 10px;
@@ -586,5 +626,11 @@ const LoaderContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
 `;
