@@ -250,6 +250,12 @@ const PriceIcon = styled.span`
     width: 40px;
     background-color: #ccc;
     border-radius: 50%;
+<<<<<<< Updated upstream
+=======
+    border: 1px solid #aaa;
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+>>>>>>> Stashed changes
 
     svg {
       color: black;

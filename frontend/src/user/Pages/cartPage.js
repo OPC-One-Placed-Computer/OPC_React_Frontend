@@ -55,7 +55,6 @@ const CartPage = () => {
       );
       setProducts(productsWithImageUrls);
     } catch (error) {
-      toast.error('Cart Empty.');
       console.error('Error fetching cart data:', error);
     } finally {
       setIsLoading(false);
@@ -300,10 +299,27 @@ const CartPage = () => {
 
 export default CartPage;
 
+<<<<<<< Updated upstream
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 50px;
+=======
+const ProductContainer = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  flex: 3;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+`
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  height: auto;
+>>>>>>> Stashed changes
 
   @media (max-width: 768px) {
     padding: 20px;
@@ -315,7 +331,7 @@ const CartLayout = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 10px;
 
   @media (max-width: 768px) {
     margin-top: 10px;
@@ -359,7 +375,7 @@ const Table = styled.table`
   @media (max-width: 768px) {
 
     td {
-      height: 50px;
+      height: auto;
     }
     th {
       display: none;
@@ -379,20 +395,18 @@ const Table = styled.table`
 
     tbody td:nth-of-type(2) {
       display: inline-block;
-      width: calc(50% - 5px); 
       vertical-align: top;
     }
 
     tbody td:nth-of-type(3) {
       display: inline-block;
-      width: calc(50% - 5px); 
       vertical-align: top;
     }
 
     tbody td:nth-of-type(4) {
       display: block;
       width: 100%;
-      margin-top: 50px;
+      
     }
 
     tbody td:nth-of-type(6) {
@@ -404,7 +418,7 @@ const Table = styled.table`
 
 
 const TotalsTable = styled.table`
-  width: 50%;
+  flex: 1;
   border-collapse: collapse;
   border: 1px solid #ddd;
   height: 400px;
@@ -484,6 +498,12 @@ const ActionButtons = styled.div`
 const DeleteButton = styled.button`
   font-family: 'Poppins', sans-serif;
   background-color: #d22630;
+<<<<<<< Updated upstream
+=======
+  width: 80%;
+  max-width: 300px;
+  min-width: 200px;
+>>>>>>> Stashed changes
   color: white;
   border: none;
   border-radius: 35px;
@@ -499,7 +519,14 @@ const DeleteButton = styled.button`
 
 const CheckoutButton = styled.button`
   font-family: 'Poppins', sans-serif;
+<<<<<<< Updated upstream
   height: 60px;
+=======
+  height: 50px;
+  width: 80%;
+  max-width: 300px; 
+  min-width: 200px;
+>>>>>>> Stashed changes
   background-color: #000099;
   border-radius: 35px;
   color: white;
