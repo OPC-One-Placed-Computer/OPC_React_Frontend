@@ -63,11 +63,7 @@ const ProductDetailPage = ({ product }) => {
           <h1>{currentProduct.product_name}</h1>
           <h2>{currentProduct.brand}</h2>
           <p className="product-description">{currentProduct.description}</p>
-<<<<<<< Updated upstream
-          <p className="product-price">Price: ${currentProduct.price}</p>
-=======
           <p className="product-price">₱{Number(currentProduct.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
->>>>>>> Stashed changes
           <p className="product-quantity">Available Quantity: {currentProduct.quantity}</p>
           <QuantitySelector>
             <QuantityButton className='subtraction' onClick={handleDecreaseQuantity}>-</QuantityButton>

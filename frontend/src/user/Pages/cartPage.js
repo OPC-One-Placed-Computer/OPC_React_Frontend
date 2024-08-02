@@ -299,12 +299,6 @@ const CartPage = () => {
 
 export default CartPage;
 
-<<<<<<< Updated upstream
-const PageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 50px;
-=======
 const ProductContainer = styled.div`
   * {
     -webkit-tap-highlight-color: transparent;
@@ -319,7 +313,6 @@ const PageContainer = styled.div`
   flex-direction: column;
   padding: 30px;
   height: auto;
->>>>>>> Stashed changes
 
   @media (max-width: 768px) {
     padding: 20px;

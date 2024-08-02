@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import useFetchOrders from '../Hooks/placeOrderItemsHooks';
 import emptyOrder from '../Animations/emptyOrder.json';
@@ -11,22 +11,16 @@ import Footer from './footer';
 import ReactPaginate from 'react-paginate';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-<<<<<<< Updated upstream
-=======
 import ConfirmationModal from './confirmationModal';
 import axios from 'axios';
->>>>>>> Stashed changes
 
 const PlacedOrderItems = () => {
   const { orders, setOrders, loading, cancelOrder, lastPage, setCurrentPage, imageUrls, fetchOrders } = useFetchOrders();
   
   const [activeTab, setActiveTab] = useState('To Pay');
-<<<<<<< Updated upstream
-=======
   const [sessionId, setSessionId] = useState(null);
   const [showModal, setShowModal] = useState(false); 
   const [orderToCancel, setOrderToCancel] = useState(null);
->>>>>>> Stashed changes
   
   const handleCancelOrder = async () => {
     try {
@@ -70,7 +64,54 @@ const PlacedOrderItems = () => {
         return orders;
     }
   };
+  useEffect(() => {
+    const fetchSessionId = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get('https://onepc.online/api/v1/orders', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
+        if (response.data && response.data.orders && response.data.orders.length > 0) {
+          setSessionId(response.data.orders[0].stripe_session_id);
+        }
+      } catch (error) {
+        console.error('Error fetching session ID:', error);
+        toast.error('Failed to fetch session ID. Please try again.');
+      }
+    };
+
+    fetchSessionId();
+  }, []);
+  
+  const handlePay = async (orderSessionId) => {
+    if (!orderSessionId) {
+      toast.error('Session ID is missing.');
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem('token');      
+      const response = await axios.get(`https://onepc.online/api/v1/stripe/checkout-url?session_id=${orderSessionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      const checkoutUrl = response.data.data.checkout_url;
+      if (checkoutUrl) {
+        const decodedUrl = decodeURIComponent(checkoutUrl);
+        window.location.href = decodedUrl;
+      } else {
+        toast.error('Failed to get the checkout URL. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during payment process:', error); // Log the error details
+      toast.error('Failed to get the checkout URL. Please try again.');
+    }
+  };
   if (loading) {
     return (
       <LoadingContainer>
@@ -174,30 +215,14 @@ const PlacedOrderItems = () => {
                           <TableCell>{item.product.product_name}</TableCell>
                           <TableCell>₱{item.product.price}</TableCell>
                           <TableCell>{item.quantity}</TableCell>
-<<<<<<< Updated upstream
-                          <TableCell>₱{item.subtotal}</TableCell>
-=======
                           <TableCell>₱{Number(item.product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                           <TableCell>₱{Number(item.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
->>>>>>> Stashed changes
                         </TableRow>
                       ))}
                     </tbody>
                   </OrderItemsTable>
                   <TotalAmount><strong>Total Amount:</strong> ₱{order.total}</TotalAmount>
                   <TotalWrapper>
-<<<<<<< Updated upstream
-                    <OrderStatus><strong>Status:</strong> {order.status}</OrderStatus>
-                    {activeTab === 'To Pay' && order.status === 'awaiting payment' ? (
-                      <PayButton >
-                        Pay
-                      </PayButton>
-                    ) : activeTab === 'To Pay' && (
-                      <CancelButton onClick={() => handleCancelOrder(order.order_id)} disabled={order.status === 'cancelled'}>
-                        Cancel Order
-                      </CancelButton>
-                    )}
-=======
                       <OrderStatus><strong>Status:</strong> {order.status}</OrderStatus>
                       <Buttons>
                         {activeTab === 'To Pay' && (
@@ -227,7 +252,6 @@ const PlacedOrderItems = () => {
                           )
                         )}
                       </Buttons>
->>>>>>> Stashed changes
                   </TotalWrapper>
                 </OrderItems>
               </OrderDetailsContainer>

@@ -43,11 +43,7 @@ const DetailProduct = ({ product }) => {
           <h1>{currentProduct.product_name}</h1>
           <h2>{currentProduct.brand}</h2>
           <p className="product-description">{currentProduct.description}</p>
-<<<<<<< Updated upstream
-          <p className="product-price">Price: ${currentProduct.price}</p>
-=======
           <p className="product-price"> ₱{Number(currentProduct.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
->>>>>>> Stashed changes
           <p className="product-quantity">Available Quantity: {currentProduct.quantity}</p>
         </ProductInfo>
       </ProductContent>
@@ -62,12 +58,6 @@ const ProductDetail = styled.div`
   display: flex;
   justify-content: center;
   padding: 20px;
-<<<<<<< Updated upstream
-  @media (max-width: 768px) {
-    padding: 10px;
-  }
-=======
->>>>>>> Stashed changes
 `
 const ProductContent = styled.div`
   display: flex;
