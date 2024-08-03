@@ -24,13 +24,6 @@ const Footer = () => {
           <StyledLink href="#">Live Chat</StyledLink>
         </Column>
         <Column>
-          <Title>Careers</Title>
-          <StyledLink href="#">Jobs</StyledLink>
-          <StyledLink href="#">Our Team</StyledLink>
-          <StyledLink href="#">Leadership</StyledLink>
-          <StyledLink href="#">Privacy Policy</StyledLink>
-        </Column>
-        <Column>
           <Title>Products</Title>
           <StyledLink href="#">Laptops</StyledLink>
           <StyledLink href="#">Desktops</StyledLink>
@@ -75,7 +68,6 @@ const FooterContent = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   margin: 0 auto;
-  text-align: left;
 
   @media (max-width: 768px) {
     flex-direction: column;

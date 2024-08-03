@@ -67,7 +67,6 @@ const useFetchOrders = () => {
         }
       );
       console.log('Order cancelled successfully:', response.data);
-      // fetchOrders();
     } catch (error) {
       console.error('Error cancelling order:', error.message);
       console.error('Error details:', {
@@ -83,7 +82,7 @@ const useFetchOrders = () => {
     fetchOrders();
   }, [currentPage]);
 
-  return { orders, loading, cancelOrder, currentPage, lastPage, setCurrentPage, imageUrls }; // Return imageUrls
+  return { orders, loading, cancelOrder, currentPage, lastPage, setCurrentPage, imageUrls, fetchOrders}; // Return imageUrls
 };
 
 export default useFetchOrders;

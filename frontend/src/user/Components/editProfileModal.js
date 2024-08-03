@@ -162,7 +162,7 @@ const EditProfileModal = ({
                     <ProfileInput
                       type="email"
                       value={editedEmail}
-                      onChange={(e) => setEditedEmail(e.target.value)}
+                      onChange={(e) => setEditedEmail(e.target.value)} disabled
                     />
                   </ProfileDetailItem>
                   <ProfileDetailItem>

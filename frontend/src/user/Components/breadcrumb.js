@@ -24,7 +24,7 @@ const BreadcrumbContainer = styled.nav`
 * {
   -webkit-tap-highlight-color: transparent;
 }
- margin: 20px 0;
+ margin: 10px 0;
   font-size: 18px;
 
   @media (max-width: 768px) {
