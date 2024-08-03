@@ -86,17 +86,23 @@ const ProductDetailPage = ({ product }) => {
 export default ProductDetailPage;
 
 const DetailedContainer = styled.div `
-display: flex;
-flex-direction: column;
-padding: 50px;
-`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  display: flex;
+  flex-direction: column;
+  padding: 50px;
 
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`
 const ProductDetail = styled.div`
   display: flex;
   justify-content: center;
   padding: 20px;
   @media (max-width: 768px) {
-    padding: 10px;
+    padding: 5px;
   }
 `
 const ProductContent = styled.div`

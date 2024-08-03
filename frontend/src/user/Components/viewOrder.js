@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
-import ClipLoader from 'react-spinners/ClipLoader';
+import ScaleLoader from 'react-spinners/ScaleLoader';
 import { MdAccountCircle } from "react-icons/md";
-import { FaAddressBook, FaCalendarAlt, FaCreditCard } from "react-icons/fa";
+import { FaCalendarAlt, FaCreditCard } from "react-icons/fa";
 import Footer from './footer';
+import { MdLocationPin } from "react-icons/md";
+import Breadcrumb from './breadcrumb';
 import useFetchOrders from '../Hooks/placeOrderItemsHooks';
 
 const SingleViewOrder = () => {
@@ -44,10 +46,15 @@ const SingleViewOrder = () => {
   if (loading) {
     return (
       <LoadingContainer>
-        <ClipLoader color="#333" size={50} />
+        <ScaleLoader color="#000099" size={50} />
       </LoadingContainer>
     );
   }
+
+  const stripeLabel = {
+    stripe: 'Credit Card',
+  };
+  
 
   if (error) {
     return <ErrorMessage>{error}</ErrorMessage>;
@@ -56,6 +63,7 @@ const SingleViewOrder = () => {
   return (
     <>
       <Container>
+      <Breadcrumb items={[{ label: 'Home', path: '/HomePage' }, { label: 'Products', path: '/products' }, { label: 'My Purchase' }]} />
         <OrderContainer>
           <OrderDetailsContainer>
             <OrderInfo>
@@ -68,7 +76,7 @@ const SingleViewOrder = () => {
               </OrderDetail>
               <OrderDetail>
                 <IconContainer>
-                  <FaAddressBook />
+                  <MdLocationPin  />
                 </IconContainer>
                 <OrderField>{order.shipping_address}</OrderField>
               </OrderDetail>
@@ -82,7 +90,7 @@ const SingleViewOrder = () => {
                 <IconContainer>
                  <FaCreditCard />
                 </IconContainer>
-                <OrderField>{order.payment_method}</OrderField>
+                <OrderField>{stripeLabel[order.payment_method]}</OrderField>
               </OrderDetail>
             </OrderInfo>
             <OrderItems>
@@ -90,7 +98,7 @@ const SingleViewOrder = () => {
               <OrderItemsTable>
                 <thead>
                   <TableRow>
-                    <TableHeader>Product Image</TableHeader>
+                    <TableHeader></TableHeader>
                     <TableHeader>Product Name</TableHeader>
                     <TableHeader>Quantity</TableHeader>
                     <TableHeader>Price</TableHeader>
@@ -104,9 +112,9 @@ const SingleViewOrder = () => {
                       <ProductImage src={imageUrls[item.product.image_path] || ''} alt={item.product.product_name} />
                       </TableCell>
                       <TableCell>{item.product.product_name}</TableCell>
-                      <TableCell>₱{item.product.price}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
-                      <TableCell>₱{item.subtotal}</TableCell>
+                      <TableCell>₱{Number(item.product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                      <TableCell>₱{Number(item.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     </TableRow>
                   ))}
                 </tbody>
@@ -127,7 +135,10 @@ const SingleViewOrder = () => {
 export default SingleViewOrder;
 
 const Container = styled.div`
-  padding: 20px;
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  padding: 30px;
   background-color: #f5f5f5;
 `;
 
@@ -198,6 +209,7 @@ const TableRow = styled.tr`
 const TableHeader = styled.th`
   padding: 10px;
   font-size: 1rem;
+  background-color: #f4f4f4;
   color: #333;
   text-align: left;
 
@@ -220,6 +232,13 @@ const TableCell = styled.td`
   padding: 10px;
   font-size: 1rem;
   color: #333;
+
+  &:nth-of-type(3) {
+    text-align: center;
+  }
+  &:nth-of-type(2) {
+    color: #000099;
+  }
 
   @media (max-width: 768px) {
       font-size: 0.9rem; 
@@ -244,11 +263,13 @@ const TableCell = styled.td`
         display: inline-block;
         width: calc(50% - 5px); 
         vertical-align: top;
+        color: #000099;
       }
       &:nth-of-type(3) {
         display: block;
         margin-left: 20px; 
-        margin-top: 10px;  
+        margin-top: 10px; 
+        text-align: left; 
       }
       &:nth-of-type(4) {
         display: block;
@@ -293,7 +314,13 @@ const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
 `;
 
 const ErrorMessage = styled.p`

@@ -4,7 +4,7 @@ import styled, { keyframes, css } from 'styled-components';
 import addToCart from '../Function/addToCart';
 import Lottie from 'lottie-react';
 import addCart from '../Animations/addCart.json';
-import { MdOutlineShoppingCart, MdAddShoppingCart } from "react-icons/md"; // Import the money icon
+import { MdOutlineShoppingCart, MdAddShoppingCart } from "react-icons/md";
 
 const Product = ({ image, brand, product_name, price, product_id }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -48,7 +48,6 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
     event.stopPropagation();
     addToCart(product_id, product_name, quantity, setErrorMessage, setSuccessMessage);
   };
-
   return (
     <ProdCon>
       <ProdImg onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
@@ -76,13 +75,13 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
         <h3>{brand}</h3>
         <p className="product-name">{product_name}</p>
         <p className="product-price">
-          ₱{price}
+          ₱{Number(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           <PriceIcon>
-            <MdAddShoppingCart onClick={handleAddToCart}/>
+            <MdAddShoppingCart onClick={handleAddToCart} />
           </PriceIcon>
         </p>
       </ProdDetails>
-      {errorMessage && <ErrorMessage errorMessage={errorMessage}>{errorMessage}</ErrorMessage>}
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
     </ProdCon>
   );
@@ -91,6 +90,9 @@ const Product = ({ image, brand, product_name, price, product_id }) => {
 export default Product;
 
 const ProdCon = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -250,12 +252,9 @@ const PriceIcon = styled.span`
     width: 40px;
     background-color: #ccc;
     border-radius: 50%;
-<<<<<<< Updated upstream
-=======
     border: 1px solid #aaa;
     cursor: pointer; 
     transition: background-color 0.3s ease;
->>>>>>> Stashed changes
 
     svg {
       color: black;

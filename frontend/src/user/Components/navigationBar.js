@@ -43,6 +43,10 @@ const NavigationBar = () => {
 export default NavigationBar;
 
 const NavBar = styled.nav`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   width: 100%;
   position: fixed;
   top: 0;
@@ -72,6 +76,7 @@ const LogoContainer = styled.div`
     margin-top: 10px;
     width: 100px; 
     height: 100px; 
+    
   }
 
   @media (max-width: 768px) {
@@ -82,13 +87,16 @@ const LogoContainer = styled.div`
       width: 80px; 
       height: 80px;
     }
+    
   }
 
   @media (max-width: 480px) {
-    .logo {
+    .logo{
       width: 80px; 
       height: 80px; 
+      outline: none;
     }
+
   }
 `;
 

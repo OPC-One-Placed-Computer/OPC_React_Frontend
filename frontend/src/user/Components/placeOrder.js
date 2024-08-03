@@ -6,8 +6,9 @@ import Footer from './footer';
 import axios from 'axios';
 import Breadcrumb from './breadcrumb';
 import { MdAccountCircle } from "react-icons/md";
-import { FaAddressBook } from "react-icons/fa6";
-
+import { MdLocationPin } from "react-icons/md";
+import logo from '../../assets/logo.png'; 
+import getImageUrl from '../../tools/media';
 
 const PlaceOrder = () => {
   const location = useLocation();
@@ -18,7 +19,33 @@ const PlaceOrder = () => {
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [loading, setLoading] = useState(false);
-  const products = location.state ? location.state.products : [];
+  const [products, setProducts] = useState(location.state ? location.state.products : []);
+  const [imageUrls, setImageUrls] = useState({});
+
+  useEffect(() => {
+    const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+    if (location.state && location.state.products) {
+      setProducts(location.state.products);
+      localStorage.setItem('products', JSON.stringify(location.state.products));
+    } else if (storedProducts.length > 0) {
+      setProducts(storedProducts);
+    }
+
+    console.log('Products data passed to PlaceOrder:', products);
+  }, [location.state]);
+
+  useEffect(() => {
+    const fetchImageUrls = async () => {
+      const urls = {};
+      for (const product of products) {
+        const url = await getImageUrl(product.imageName);
+        urls[product.cart_id] = url;
+      }
+      setImageUrls(urls);
+    };
+
+    fetchImageUrls();
+  }, [products]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -52,9 +79,8 @@ const PlaceOrder = () => {
   
     const cartItems = products.map(product => ({
       id: product.cart_id,
-      quantity: product.quantity
+      quantity: product.quantity,
     }));
-  
     const orderData = {
       full_name: fullName,
       shipping_address: address,
@@ -62,9 +88,10 @@ const PlaceOrder = () => {
       payment_method: paymentMethod,
       cart_items: {
         id: cartItems.map(item => item.id)
-      },
-      success_url: 'https://store.onepc.online/viewOrder' || 'http://localhost:3000/viewOrder',
-      cancel_url:  'https://store.onepc.online/cancelOrder' || 'http://localhost:3000/cancelOrder'
+      }, 
+
+      success_url:  'http://localhost:3000/viewOrder',
+      cancel_url:  'http://localhost:3000/placeOrder'
     };
   
     try {
@@ -73,6 +100,7 @@ const PlaceOrder = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         }
+
       });
   
       if (paymentMethod === 'stripe' && response.data.status && response.data.data.url) {
@@ -87,7 +115,6 @@ const PlaceOrder = () => {
       setLoading(false);
     }
   };
-  
   const handleCancelOrder = async () => {
     navigate('/cartPage'); 
   };
@@ -112,11 +139,12 @@ const PlaceOrder = () => {
             </FormRow>
             <FormRow>
             <IconContainer>
-                <FaAddressBook />
+                <MdLocationPin />
               </IconContainer>
               <FormInput
                 type="text"
                 value={address}
+                placeholder='Enter your address'
                 onChange={(e) => setAddress(e.target.value)}
                 required
               />
@@ -160,7 +188,7 @@ const PlaceOrder = () => {
             <Table>
               <thead>
                 <tr>
-                  <TableHeader>Image</TableHeader>
+                  <TableHeader></TableHeader>
                   <TableHeader>Product Name</TableHeader>
                   <TableHeader>Price</TableHeader>
                   <TableHeader>Quantity</TableHeader>
@@ -170,16 +198,22 @@ const PlaceOrder = () => {
               <tbody>
                 {products.map((product, index) => (
                   <tr key={index}>
-                    <TableCell><ProductImage src={product.productImage} alt={product.productName} /></TableCell>
+                     <TableCell>
+                      <ProductImage
+                        src={imageUrls[product.cart_id] || logo}
+                        alt={product.productName || 'Product Image'}
+                        onError={(e) => e.target.src = logo} 
+                      />
+                    </TableCell>
                     <TableCell>{product.productName}</TableCell>
-                    <TableCell>₱{Number(product.price).toFixed(2)}</TableCell>
+                    <TableCell>₱{Number(product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell>{product.quantity}</TableCell>
-                    <TableCell>₱{Number(product.subtotal).toFixed(2)}</TableCell>
+                    <TableCell>₱{Number(product.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                   </tr>
                 ))}
                 <tr>
                   <TableCell colSpan="4">Total Payment:</TableCell>
-                  <TableCell>₱{totalPayment.toFixed(2)}</TableCell>
+                  <TableCell>₱{totalPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                 </tr>
               </tbody>
             </Table>
@@ -202,20 +236,19 @@ const PlaceOrder = () => {
 export default PlaceOrder;
 
 const OrderContainer = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
-<<<<<<< Updated upstream
-  background-color: #f8f9fa;
-=======
   background-color: #ffffff;
 
   @media (max-width: 768px) {
     padding: 1rem;
     background-color: #ffffff;
     }
->>>>>>> Stashed changes
   }
 `;
 
@@ -389,6 +422,9 @@ const TableCell = styled.td`
   &:nth-of-type(2) {
     color: #000099;
   }
+  &:nth-of-type(4) {
+    text-align: center;
+  }
 
   @media (max-width: 768px) {
       font-size: 0.9rem; 
@@ -416,11 +452,7 @@ const TableCell = styled.td`
       }
       &:nth-of-type(4) {
         display: block;
-<<<<<<< Updated upstream
-        margin-left: 30px;   
-=======
         text-align: left; 
->>>>>>> Stashed changes
       }
      
   }
@@ -433,14 +465,11 @@ const ProductImage = styled.img`
 
 const RadioContainer = styled.div`
   margin-top: 15px;
-<<<<<<< Updated upstream
-=======
   border-bottom: 1px solid #ccc;
 
   @media (max-width: 768px) {
     font-size: 0.8rem;
   }
->>>>>>> Stashed changes
 `;
 
 const PaymentOption = styled.div`
@@ -458,9 +487,10 @@ const PaymentOption = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 15px;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 30px;
 `;
 
 const CancelButton = styled.button`
@@ -468,15 +498,11 @@ border-radius: 35px;
 font-family: 'Poppins', sans-serif;
   background-color: #d22630;
   color: #fff;
-<<<<<<< Updated upstream
-  height: 60px;
-=======
   height: 50px;
   width: 80%;
   max-width: 300px;
   min-width: 200px;
   font-size: 0.9rem;
->>>>>>> Stashed changes
   border: none;
   padding: 10px 20px;
   cursor: pointer;
@@ -489,17 +515,14 @@ font-family: 'Poppins', sans-serif;
 const SubmitButton = styled.button`
 font-family: 'Poppins', sans-serif;
 border-radius: 35px;
-<<<<<<< Updated upstream
-  height: 60px;
-=======
   height: 50px;
   width: 80%;
   max-width: 300px; 
   min-width: 200px;
->>>>>>> Stashed changes
   background-color: #000099;
   color: #fff;
   border: none;
+  font-size: 0.9rem;
   padding: 10px 20px;
   cursor: pointer;
 
@@ -513,7 +536,11 @@ const LoaderContainer = styled.div`
   justify-content: center;
   align-items: center;
   position: fixed;
-  top: 50%;
-  left: 50%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
 
 `;

@@ -18,7 +18,7 @@ const useFetchOrders = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response);
+      console.log('Fetched Orders:', response.data.data); // Log order data
       if (response.data.status) {
         setOrders(response.data.data.data);
         setLastPage(response.data.data.meta.last_page);

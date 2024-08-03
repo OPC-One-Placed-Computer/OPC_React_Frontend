@@ -5,7 +5,8 @@ import emptyOrder from '../Animations/emptyOrder.json';
 import Lottie from 'lottie-react';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { MdAccountCircle } from "react-icons/md";
-import { FaAddressBook, FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
+import { FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
+import { MdLocationPin } from "react-icons/md";
 import { FaCalendarAlt } from "react-icons/fa";
 import Footer from './footer';
 import ReactPaginate from 'react-paginate';
@@ -119,14 +120,15 @@ const PlacedOrderItems = () => {
       </LoadingContainer>
     );
   }
-
   const filteredOrders = filterOrders(activeTab);
-
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-
+  const paymentMethodLabels = {
+    stripe: 'Credit Card',
+    cod: 'Cash on Delivery'
+  };
   const getPaymentIcon = (paymentMethod) => {
     switch (paymentMethod) {
       case 'stripe':
@@ -177,7 +179,7 @@ const PlacedOrderItems = () => {
                   </OrderDetail>
                   <OrderDetail>
                     <IconContainer>
-                      <FaAddressBook />
+                      <MdLocationPin />
                     </IconContainer>
                     <OrderField>{order.shipping_address}</OrderField>
                   </OrderDetail>
@@ -191,7 +193,7 @@ const PlacedOrderItems = () => {
                     <IconContainer>
                       {getPaymentIcon(order.payment_method)}
                     </IconContainer>
-                    <OrderField>{order.payment_method}</OrderField>
+                    <OrderField>{paymentMethodLabels[order.payment_method]}</OrderField>
                   </OrderDetail>
                 </OrderInfo>
                 <OrderItems>
@@ -199,7 +201,7 @@ const PlacedOrderItems = () => {
                   <OrderItemsTable>
                     <thead>
                       <TableRow>
-                        <TableHeader>Product Image</TableHeader>
+                        <TableHeader></TableHeader>
                         <TableHeader>Product Name</TableHeader>
                         <TableHeader>Quantity</TableHeader>
                         <TableHeader>Price</TableHeader>
@@ -213,7 +215,6 @@ const PlacedOrderItems = () => {
                             <ProductImage src={imageUrls[item.product.image_path] || ''} alt={item.product.product_name} />
                           </TableCell>
                           <TableCell>{item.product.product_name}</TableCell>
-                          <TableCell>₱{item.product.price}</TableCell>
                           <TableCell>{item.quantity}</TableCell>
                           <TableCell>₱{Number(item.product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                           <TableCell>₱{Number(item.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
@@ -221,7 +222,7 @@ const PlacedOrderItems = () => {
                       ))}
                     </tbody>
                   </OrderItemsTable>
-                  <TotalAmount><strong>Total Amount:</strong> ₱{order.total}</TotalAmount>
+                  <TotalAmount><strong>Total Amount:</strong> ₱{Number(order.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TotalAmount>
                   <TotalWrapper>
                       <OrderStatus><strong>Status:</strong> {order.status}</OrderStatus>
                       <Buttons>
@@ -445,6 +446,7 @@ const TableHeader = styled.th`
   padding: 10px;
   font-size: 1rem;
   color: #333;
+  background-color: #f4f4f4
   text-align: left;
 
   &:nth-of-type(2) {
@@ -473,6 +475,9 @@ const TableCell = styled.td`
 
   &:nth-of-type(2) {
     color: #000099;
+  }
+  &:nth-of-type(3) {
+    text-align: center;
   }
 
   @media (max-width: 768px) {
@@ -560,10 +565,19 @@ const CancelButton = styled.button`
 `;
 
 const LoadingContainer = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
 `;
 
 const NoOrdersMessage = styled.p`

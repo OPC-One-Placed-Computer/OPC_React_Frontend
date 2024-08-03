@@ -10,6 +10,7 @@ import ScaleLoader from 'react-spinners/ScaleLoader';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactPaginate from 'react-paginate';
+import ConfirmationModal from './Components/confirmationModal';
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -24,6 +25,7 @@ const ManageOrders = () => {
   const [endDate, setEndDate] = useState(null);
   const [dateFilter, setDateFilter] = useState('');
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
 
   useEffect(() => {
@@ -159,6 +161,20 @@ const ManageOrders = () => {
         : [...prevSelected, orderId] // Add to selection
     );
   };
+
+
+const openConfirmationModal = () => {
+  setIsConfirmationModalOpen(true);
+};
+
+const closeConfirmationModal = () => {
+  setIsConfirmationModalOpen(false);
+};
+
+const handleDeleteConfirmation = () => {
+  deleteOrder();
+  closeConfirmationModal();
+};
   
 
   const closeModal = () => {
@@ -220,7 +236,9 @@ const ManageOrders = () => {
             <option value="year">This Year</option>
           </select>
         </div>
-        <DatePickerContainer>
+      </FilterContainer>
+      <ButtonContainer>
+      <DatePickerContainer>
           <DatePicker 
             selected={startDate}
             onChange={(date) => setStartDate(date)}
@@ -242,7 +260,8 @@ const ManageOrders = () => {
             className="date-picker"
           />
         </DatePickerContainer>
-      </FilterContainer>
+        <Button  onClick={openConfirmationModal}>Delete</Button>
+        </ButtonContainer>
       <TableWrapper>
         <OrderTable>
           <thead>
@@ -287,16 +306,13 @@ const ManageOrders = () => {
                   <td>{order.order_id}</td>
                   <td>{order.full_name}</td>
                   <td>{new Date(order.created_at).toLocaleDateString()}</td>
-                  <td>${order.total}</td>
+                  <td>₱{Number(order.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td>{order.status}</td>
                   <td>{getPaymentMethodIcon(order.payment_method)}</td>
                   <td>
                   <ActionButtons>
                       <button onClick={() => openModal(order)}>
                         <FaEdit className="edit-icon" />
-                      </button>
-                      <button onClick={() => deleteOrder(order.order_id)}>
-                        <FaTrash className="trash-icon" />
                       </button>
                     </ActionButtons>
                   </td>
@@ -327,6 +343,12 @@ const ManageOrders = () => {
         setNewStatus={setNewStatus}
         handleStatusChange={handleStatusChange}
       />
+      <ConfirmationModal
+      isOpen={isConfirmationModalOpen}
+      onRequestClose={closeConfirmationModal}
+      onConfirm={handleDeleteConfirmation}
+      message="Are you sure you want to delete the selected orders?"
+    />
        <ToastContainer />
     </PageContainer>
   );
@@ -355,7 +377,7 @@ const Error = styled.div`
 const FilterContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+
 
   .filter-group {
     display: flex;
@@ -374,21 +396,38 @@ const FilterContainer = styled.div`
       border: 1px solid #ccc;
       border-radius: 4px;
 
-      
-    &:focus {
-    border-color: #ff6600;
-    outline: none;
-  }
+      &:focus {
+        border-color: #ff6600;
+        outline: none;
+      }
     }
-
   }
 `;
+const ButtonContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+    justify-content: space-between;
+`
+
+const Button = styled.button`
+  font-family: 'Poppins', sans-serif;
+  padding: 10px;
+  width: 100px;
+  background-color:  #dc3545;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+`;
+
 
 const DatePickerContainer = styled.div`
+margin-top: 10px;
+gap: 20px;
   display: flex;
 
   .date-picker {
-    margin-left: 10px;
     font-family: 'Poppins', sans-serif;
      border: 1px solid #ccc;
 

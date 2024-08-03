@@ -22,11 +22,24 @@ const CartPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [selectedTotal, setSelectedTotal] = useState(0);
+  const [totalCartAmount, setTotalCartAmount] = useState(0);
   const navigate = useNavigate();
   
   useEffect(() => {
     fetchCartData();
   }, []);
+
+  useEffect(() => {
+    if (selectedItems.length === 0) {
+      setSelectedTotal(totalCartAmount);
+    } else {
+      const total = products
+        .filter(product => selectedItems.includes(product.product_id))
+        .reduce((sum, product) => sum + parseFloat(product.subtotal), 0);
+      setSelectedTotal(total.toFixed(2));
+    }
+  }, [selectedItems, products, totalCartAmount]);
 
   useEffect(() => {
     if (alertMessage) {
@@ -54,6 +67,10 @@ const CartPage = () => {
         })
       );
       setProducts(productsWithImageUrls);
+
+      const total = productsWithImageUrls.reduce((sum, product) => sum + parseFloat(product.subtotal), 0);
+      setTotalCartAmount(total.toFixed(2));
+      setSelectedTotal(total.toFixed(2));
     } catch (error) {
       console.error('Error fetching cart data:', error);
     } finally {
@@ -138,14 +155,16 @@ const CartPage = () => {
     if (selectedItems.length === 0) {
       toast.info('Please select a product to checkout.');
     } else {
+     
       const selectedProducts = products.filter(product => selectedItems.includes(product.product_id));
+      
       navigate('/placeOrder', {
         state: {
           products: selectedProducts.map(product => ({
             productName: product.product.product_name,
             price: product.product.price,
             quantity: product.quantity,
-            productImage: product.imageUrl,
+            imageName: product.product.image_name, 
             subtotal: product.subtotal,
             cart_id: product.cart_id
           })),
@@ -153,7 +172,7 @@ const CartPage = () => {
       });
     }
   };
-
+  
   const handleProductClick = async (product_id) => {
     setIsLoading(true);
     try {
@@ -208,6 +227,7 @@ const CartPage = () => {
             <CheckboxLabel>Select All</CheckboxLabel>
           </CheckboxContainer>
             <TableContainer>
+              <ProductContainer>
               <Table>
                 <thead>
                   <tr>
@@ -235,7 +255,7 @@ const CartPage = () => {
                       <td>
                         <ProductName onClick={() => handleProductClick(product.product_id)}>{product.product.product_name}</ProductName>
                       </td>
-                      <td>₱{Number(product.product.price).toFixed(2)}</td>
+                      <td>₱{Number(product.product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       <td onClick={(e) => e.stopPropagation()}>
                         <QuantityControls>
                           <button className='subtract' onClick={() => handleQuantityChange(product.cart_id, product.quantity - 1)}>-</button>
@@ -243,11 +263,13 @@ const CartPage = () => {
                           <button className='addition' onClick={() => handleQuantityChange(product.cart_id, product.quantity + 1)}>+</button>
                         </QuantityControls>
                       </td>
-                      <td>₱{Number(product.subtotal).toFixed(2)}</td>
+                      <td>₱{Number(product.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+
                     </tr>
                   ))}
                 </tbody>
               </Table>
+              </ProductContainer>
               <TotalsTable>
                 <thead>
                   <tr>
@@ -258,11 +280,11 @@ const CartPage = () => {
                 <tbody>
                   <tr>
                     <td>Subtotal</td>
-                    <td>₱{products.reduce((total, product) => total + parseFloat(product.subtotal), 0).toFixed(2)}</td>
+                    <td>₱{Number(selectedTotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   </tr>
                   <tr>
                     <td>Total</td>
-                    <td>₱{products.reduce((total, product) => total + parseFloat(product.subtotal), 0).toFixed(2)}</td>
+                    <td>₱{Number(selectedTotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   </tr>
                   <tr>
                 <td colSpan="5">
@@ -288,7 +310,7 @@ const CartPage = () => {
   return (
     <>
     <PageContainer>
-    <Breadcrumb items={[{ label: 'Home', path: '/HomePage' }, { label: 'Shopping Cart' }]} />
+    <Breadcrumb items={[{ label: 'Home', path: '/HomePage' }, { label: 'Products', path: '/products' }, { label: 'Shopping Cart' }]} />
     <ToastContainer />
       {renderCartContent()}
     </PageContainer>
@@ -315,7 +337,7 @@ const PageContainer = styled.div`
   height: auto;
 
   @media (max-width: 768px) {
-    padding: 20px;
+    padding: 1rem;
   }
 `;
 
@@ -350,19 +372,17 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #ddd;
-
+ 
   th, td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
-
-  td {
-    height: 70px;
-  }
-
   th {
     background-color: #f4f4f4;
+  }
+  td {
+    height: 70px;
   }
 
   @media (max-width: 768px) {
@@ -408,13 +428,12 @@ const Table = styled.table`
   }
 `;
 
-
-
 const TotalsTable = styled.table`
   flex: 1;
   border-collapse: collapse;
   border: 1px solid #ddd;
-  height: 400px;
+  max-height: 150px; 
+  overflow-y: auto;
 
   th, td {
     padding: 12px;
@@ -457,9 +476,23 @@ const QuantityControls = styled.div`
   display: flex;
   align-items: center;
 
+  .subtract {
+    background-color: #dc3545;
+  }
+  .addition {
+    background-color: #000099;
+  }
+
+
   button {
-    background: #ddd;
+    display: flex;
+    justify-content: center;
+    width:25px;
+    height: 25px;
+    align-items: center;
+    color: #ffffff;
     border: none;
+    border-radius: 50%;
     padding: 5px 10px;
     cursor: pointer;
 
@@ -479,6 +512,7 @@ const QuantityControls = styled.div`
 
 const ActionButtons = styled.div`
   display: flex;
+  align-items: center;
   flex-direction: column;
   gap: 20px;
   justify-content: center;
@@ -491,16 +525,14 @@ const ActionButtons = styled.div`
 const DeleteButton = styled.button`
   font-family: 'Poppins', sans-serif;
   background-color: #d22630;
-<<<<<<< Updated upstream
-=======
   width: 80%;
   max-width: 300px;
   min-width: 200px;
->>>>>>> Stashed changes
   color: white;
+  font-size: 0.9rem;
   border: none;
   border-radius: 35px;
-  height: 60px;
+  height: 50px;
   padding: 10px 20px;
   cursor: pointer;
 
@@ -512,16 +544,13 @@ const DeleteButton = styled.button`
 
 const CheckoutButton = styled.button`
   font-family: 'Poppins', sans-serif;
-<<<<<<< Updated upstream
-  height: 60px;
-=======
   height: 50px;
   width: 80%;
   max-width: 300px; 
   min-width: 200px;
->>>>>>> Stashed changes
   background-color: #000099;
   border-radius: 35px;
+  font-size: 0.9rem;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -553,9 +582,10 @@ const EmptyCartContainer = styled.div`
 
 const ReturnToShopButton = styled.button`
   font-family: 'Poppins', sans-serif;
-  background-color: #007bff;
+  background-color: #000099;
   color: white;
   border: none;
+  border-radius: 25px;
   padding: 10px 20px;
   cursor: pointer;
   margin-top: 10px;
@@ -598,5 +628,11 @@ const LoaderContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
 `;

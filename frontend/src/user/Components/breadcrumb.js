@@ -21,14 +21,10 @@ const Breadcrumb = ({ items }) => {
 export default Breadcrumb;
 
 const BreadcrumbContainer = styled.nav`
-<<<<<<< Updated upstream
- margin: 20px 0;
-=======
 * {
   -webkit-tap-highlight-color: transparent;
 }
  margin: 10px 0;
->>>>>>> Stashed changes
   font-size: 18px;
 
   @media (max-width: 768px) {

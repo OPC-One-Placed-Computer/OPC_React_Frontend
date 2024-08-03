@@ -43,6 +43,10 @@ const OrderStatusModal = ({ isOpen, onRequestClose, order, newStatus, setNewStat
                   </Label>
                   <Label>
                     Payment Status:
+                    <Input type="text" value={order.status} readOnly />
+                  </Label>
+                  <Label>
+                    Update Status:
                     <Select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
                       <option value="">Select status</option>
                       {getStatusOptions(order.status, order.payment_method).map(status => (
@@ -108,9 +112,12 @@ const CloseButton = styled.button`
 `;
 
 const Form = styled.div`
-font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
   display: flex;
   flex-direction: column;
+  height: 500px; 
+  overflow-y: auto;
+  overflow-x: hidden; 
 `;
 
 const Label = styled.label`

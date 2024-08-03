@@ -55,6 +55,9 @@ export default DetailProduct;
 
 
 const ProductDetail = styled.div`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   justify-content: center;
   padding: 20px;

@@ -127,7 +127,7 @@ const FeaturedProducts = () => {
               <BrandName>{product.brand}</BrandName>
               <ProductName>{product.product_name}</ProductName>
               <ProductPrice>
-                ${parseFloat(product.price).toFixed(2)}
+              ₱{Number(product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </ProductPrice>
               <AddToCartButton onClick={(e) => { e.stopPropagation(); handleAddToCart(product.product_id, product.product_name); }}>ADD TO CART</AddToCartButton>
             </ProductCard>
@@ -173,6 +173,9 @@ const slideUp = keyframes`
 `;
 
 const Section = styled.section`
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   display: flex;
   flex-direction: column;
   align-items: center;
