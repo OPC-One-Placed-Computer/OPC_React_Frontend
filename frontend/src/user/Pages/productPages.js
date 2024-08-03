@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { IoSearchOutline, IoFilterOutline } from "react-icons/io5";
 import Axios from 'axios';
 import ReactPaginate from 'react-paginate';
+import emptyOrder from '../Animations/emptyOrder.json';
+import Lottie from 'lottie-react';
 import Slider from 'react-slider';
 
 const ProductsPage = () => {
@@ -171,6 +173,7 @@ const ProductsPage = () => {
     setShowFilters(!showFilters);
   };
 
+ 
   return (
     <PageContainer>
       <Sidebar ref={sidebarRef}>
@@ -204,6 +207,10 @@ const ProductsPage = () => {
               ))}
             </Select>
           </div>
+          <InputContainer>
+          <label>Min</label>
+          <label>Max</label>
+          </InputContainer>
           <PriceInputsContainer>
             <Input 
               type="number" 
@@ -218,6 +225,7 @@ const ProductsPage = () => {
               onChange={handleMaxPriceChange} 
             />
           </PriceInputsContainer>
+          
           <SliderContainer>
             <Slider
               value={[minPrice, maxPrice]}
@@ -233,32 +241,41 @@ const ProductsPage = () => {
       </Sidebar>
       <Content ref={contentRef}>
         <ProductList>
-          {filteredProducts.map(product => (
-            <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
-              <Product
-                image={product.image_path}
-                brand={product.brand}
-                product_name={product.product_name}
-                price={product.price}
-                product_id={product.product_id}
-              />
-            </ProductCard>
-          ))}
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map(product => (
+              <ProductCard key={product.product_id} onClick={() => handleProductClick(product)}>
+                <Product
+                  image={product.image_path}
+                  brand={product.brand}
+                  product_name={product.product_name}
+                  price={product.price}
+                  product_id={product.product_id}
+                />
+              </ProductCard>
+            ))
+          ) : (
+            <NoProductsContainer>
+              <Lottie animationData={emptyOrder} autoplay loop style={{ width: 200, height: 200 }} />
+      <p>Your Product is empty.</p>
+            </NoProductsContainer>
+          )}
         </ProductList>
-        <PaginationContainer>
-          <ReactPaginate
-            previousLabel={"<"}
-            nextLabel={">"}
-            breakLabel={"..."}
-            breakClassName={"break-me"}
-            pageCount={totalPages}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
-          />
-        </PaginationContainer>
+        {filteredProducts.length > 0 && (
+          <PaginationContainer>
+            <ReactPaginate
+              previousLabel={"<"}
+              nextLabel={">"}
+              breakLabel={"..."}
+              breakClassName={"break-me"}
+              pageCount={totalPages}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={handlePageClick}
+              containerClassName={"pagination"}
+              activeClassName={"active"}
+            />
+          </PaginationContainer>
+        )}
       </Content>
     </PageContainer>
   );
@@ -280,7 +297,27 @@ const PageContainer = styled.div`
     flex-direction: column; 
   }
 `;
+const NoProductsContainer = styled.div`
+  position: absolute; 
+  top: 50%;
+  left: 60%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 
+  p {
+    font-size: 18px;
+    margin-top: 20px;
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+      top: 50%;
+      left: 50%;
+    }
+  }
+`;
 const Sidebar = styled.div`
 padding-top: 20px;
   position: fixed;
@@ -376,9 +413,8 @@ const FilterContainer = styled.div`
 `;
 
 const Filters = styled.div`
-display: flex;
+  display: flex;
   flex-direction: column;
-  gap: 1.25rem;
   width: 100%;
 
   .categoryCon {
@@ -402,6 +438,24 @@ display: flex;
       gap: 20px;
     }
   }
+`
+const InputContainer = styled.div`
+margin-top: 10px;
+display: flex;
+gap: 4rem;
+width: 100%;
+justify-content: center;
+
+ label {
+  font-size: 0.7rem;
+ }
+
+@media (max-width: 768px) {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
 `
 const PriceInputsContainer = styled.div`
   display: flex;
@@ -463,6 +517,7 @@ const ProductList = styled.div`
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); 
 gap: 1rem;
+
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); 

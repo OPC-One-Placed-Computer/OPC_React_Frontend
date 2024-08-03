@@ -3,12 +3,12 @@
   "name": "One Place Computer",
   "icons": [
     {
-      "src": "1.svg",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/svg"
+      "src": "favicon.ico",
+      "sizes": "150x400 32x32 24x24 16x16",
+      "type": "image/ico"
     },
     {
-      "src": "logo.png",
+      "src": "../../../assests/logo.png",
       "type": "image/png",
       "sizes": "192x192"
     },

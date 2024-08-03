@@ -12,22 +12,34 @@ import Footer from './footer';
 import ReactPaginate from 'react-paginate';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ConfirmationModal from './confirmationModal';
 import axios from 'axios';
 
 const PlacedOrderItems = () => {
-  const { orders, loading, cancelOrder, lastPage, setCurrentPage, imageUrls } = useFetchOrders();
+  const { orders, setOrders, loading, cancelOrder, lastPage, setCurrentPage, imageUrls, fetchOrders } = useFetchOrders();
   
   const [activeTab, setActiveTab] = useState('To Pay');
   const [sessionId, setSessionId] = useState(null);
+  const [showModal, setShowModal] = useState(false); 
+  const [orderToCancel, setOrderToCancel] = useState(null);
   
-  const handleCancelOrder = async (order_id) => {
+  const handleCancelOrder = async () => {
     try {
-      await cancelOrder(order_id);
-      toast.success('Order cancelled successfully.');
+      if (orderToCancel) {
+        await cancelOrder(orderToCancel);
+        toast.success('Order cancelled successfully.');
+        setShowModal(false);
+        setOrderToCancel(null);
+        setTimeout(() => {
+          fetchOrders();
+        }, 3000);
+      }
     } catch (error) {
       toast.error('Failed to cancel order. Please try again.');
     }
   };
+
+  
 
   const handlePageClick = (data) => {
     setCurrentPage(data.selected + 1);
@@ -101,7 +113,6 @@ const PlacedOrderItems = () => {
       toast.error('Failed to get the checkout URL. Please try again.');
     }
   };
-  
   if (loading) {
     return (
       <LoadingContainer>
@@ -128,29 +139,34 @@ const PlacedOrderItems = () => {
         return null;
     }
   };
+  const showConfirmationModal = (order_id) => {
+    setOrderToCancel(order_id);
+    setShowModal(true);
+  };
 
   return (
     <div>
-      <ToastContainer />
-      <Tabs>
-        {['To Pay', 'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Refunded'].map((tab) => (
-          <Tab
-            key={tab}
-            active={activeTab === tab}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </Tab>
-        ))}
-      </Tabs>
-      <OrdersContainer>
-        {filteredOrders.length === 0 ? (
-          <EmptyOrdersContainer>
-            <Lottie animationData={emptyOrder} style={{ width: 200, height: 200 }} />
-            <NoOrdersMessage>No orders found.</NoOrdersMessage>
-          </EmptyOrdersContainer>
-        ) : (
-          filteredOrders.map((order, index) => (
+    <ToastContainer />
+    <Tabs>
+      {['To Pay', 'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Refunded'].map((tab) => (
+        <Tab
+          key={tab}
+          active={activeTab === tab}
+          onClick={() => setActiveTab(tab)}
+        >
+          {tab}
+        </Tab>
+      ))}
+    </Tabs>
+    <OrdersContainer>
+      {filteredOrders.length === 0 ? (
+        <EmptyOrdersContainer>
+          <Lottie animationData={emptyOrder} style={{ width: 200, height: 200 }} />
+          <NoOrdersMessage>No orders found.</NoOrdersMessage>
+        </EmptyOrdersContainer>
+      ) : (
+        <>
+          {filteredOrders.map((order, index) => (
             <OrderContainer key={index}>
               <OrderDetailsContainer>
                 <OrderInfo>
@@ -200,46 +216,73 @@ const PlacedOrderItems = () => {
                           </TableCell>
                           <TableCell>{item.product.product_name}</TableCell>
                           <TableCell>{item.quantity}</TableCell>
-                          <TableCell>{Number(item.product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
-                          <TableCell>{Number(item.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                          <TableCell>₱{Number(item.product.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                          <TableCell>₱{Number(item.subtotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                         </TableRow>
                       ))}
                     </tbody>
                   </OrderItemsTable>
                   <TotalAmount><strong>Total Amount:</strong> ₱{Number(order.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TotalAmount>
                   <TotalWrapper>
-                    <OrderStatus><strong>Status:</strong> {order.status}</OrderStatus>
-                    {activeTab === 'To Pay' && order.status === 'awaiting payment' ? (
-                      <PayButton onClick={() => handlePay(order.stripe_session_id)}>
-                      Pay
-                    </PayButton>
-                    ) : activeTab === 'To Pay' && (
-                      <CancelButton onClick={() => handleCancelOrder(order.order_id)} disabled={order.status === 'cancelled'}>
-                        Cancel Order
-                      </CancelButton>
-                    )}
+                      <OrderStatus><strong>Status:</strong> {order.status}</OrderStatus>
+                      <Buttons>
+                        {activeTab === 'To Pay' && (
+                          <>
+                            {order.status === 'awaiting payment' && (
+                              <>
+                                <PayButton onClick={() => handlePay(order.stripe_session_id)}>
+                                  Pay
+                                </PayButton>
+                                <CancelButton onClick={() => showConfirmationModal(order.order_id)} disabled={order.status === 'cancelled'}>
+                                  Cancel
+                                </CancelButton>
+                              </>
+                            )}
+                            {order.payment_method === 'cod' && order.status === 'pending' && (
+                              <CancelButton onClick={() => showConfirmationModal(order.order_id)} disabled={order.status === 'cancelled'}>
+                                Cancel
+                              </CancelButton>
+                            )}
+                          </>
+                        )}
+                        {activeTab === 'To Ship' && (
+                          order.payment_method === 'stripe' && order.status === 'paid' && (
+                            <CancelButton onClick={() => showConfirmationModal(order.order_id)} disabled={order.status === 'cancelled'}>
+                              Cancel
+                            </CancelButton>
+                          )
+                        )}
+                      </Buttons>
                   </TotalWrapper>
                 </OrderItems>
               </OrderDetailsContainer>
             </OrderContainer>
-          ))
-        )}
-        <PaginationContainer>
-          <ReactPaginate
-            previousLabel={"<"}
-            nextLabel={">"}
-            breakLabel={"..."}
-            pageCount={lastPage}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
-          />
-        </PaginationContainer>
-      </OrdersContainer>
-      <Footer/>
-    </div>
+          ))}
+          {filteredOrders.length > 0 && (
+            <PaginationContainer>
+              <ReactPaginate
+                previousLabel={'<'}
+                nextLabel={'>'}
+                breakLabel={'...'}
+                pageCount={lastPage}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageClick}
+                containerClassName={'pagination'}
+                activeClassName={'active'}
+              />
+            </PaginationContainer>
+          )}
+        </>
+      )}
+    </OrdersContainer>
+    <Footer />
+    <ConfirmationModal
+        isVisible={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleCancelOrder}
+      />
+  </div>
   );
 };
 
@@ -249,6 +292,9 @@ const PayButton = styled.button`
   font-family: 'Poppins', sans-serif;
   background-color: #28a745;
   color: #fff;
+  width: 100%;
+  max-width: 130px;
+  font-size: 0.9rem;
   border: none;
   padding: 8px 16px;
   border-radius: 25px;
@@ -258,7 +304,25 @@ const PayButton = styled.button`
   &:hover {
     background-color: #218838;
   }
+
+
+  @media (max-width: 768px) {
+    max-width: 120px;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
+    max-width: 120px;
+  }
 `;
+const Buttons = styled.div`
+display: flex;
+flex-direction: column;
+gap: 20px;
+justify-content: space-between;
+`
+
 const Tabs = styled.div`
   display: flex;
   justify-content: center;
@@ -385,6 +449,10 @@ const TableHeader = styled.th`
   background-color: #f4f4f4
   text-align: left;
 
+  &:nth-of-type(2) {
+    text-align: left;
+  }
+
   @media (max-width: 768px) {
     font-size: 0.9rem;
     padding: 8px;
@@ -418,7 +486,7 @@ const TableCell = styled.td`
       position: relative;
       box-sizing: border-box;
       border: none;
-      height: 50px;
+      height: auto;
 
       &:nth-of-type(5) {
         display: none;
@@ -426,24 +494,19 @@ const TableCell = styled.td`
 
       &:nth-of-type(1) {
         display: inline-block;
-        width: calc(40% - 5px); 
         vertical-align: top;
-        margin-left: 20px;
       }
   
       &:nth-of-type(2) {
         display: inline-block;
-        width: calc(50% - 5px); 
         vertical-align: top;
       }
       &:nth-of-type(3) {
         display: block;
-        margin-left: 20px; 
-        margin-top: 10px;  
+        text-align: left;
       }
       &:nth-of-type(4) {
-        display: block;
-        margin-left: 20px;   
+        display: block; 
       }
   }
 `;
@@ -477,6 +540,9 @@ const CancelButton = styled.button`
   background-color: #dc3545;
   color: #fff;
   border: none;
+  font-size: 0.9rem;
+  width: 100%;
+  max-width: 130px;
   padding: 8px 16px;
   border-radius: 25px;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
@@ -485,6 +551,16 @@ const CancelButton = styled.button`
 
   &:hover {
     background-color: ${props => !props.disabled && '#c82333'};
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    max-width: 120px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+    max-width: 120px;
   }
 `;
 

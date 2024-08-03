@@ -252,8 +252,8 @@ const PriceIcon = styled.span`
     width: 40px;
     background-color: #ccc;
     border-radius: 50%;
-    border: 1px solid #aaa; /* Add a border to make it look like a button */
-    cursor: pointer; /* Change cursor to pointer on hover */
+    border: 1px solid #aaa;
+    cursor: pointer; 
     transition: background-color 0.3s ease;
 
     svg {

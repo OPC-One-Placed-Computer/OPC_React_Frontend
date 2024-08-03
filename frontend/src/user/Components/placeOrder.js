@@ -90,8 +90,8 @@ const PlaceOrder = () => {
         id: cartItems.map(item => item.id)
       }, 
 
-      success_url: 'https://store.onepc.online/viewOrder' || 'http://localhost:3000/viewOrder',
-      cancel_url:  'https://store.onepc.online/placeOrder' || 'http://localhost:3000/placeOrder'
+      success_url:  'http://localhost:3000/viewOrder',
+      cancel_url:  'http://localhost:3000/placeOrder'
     };
   
     try {
@@ -243,7 +243,7 @@ const OrderContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -266,7 +266,7 @@ const Form = styled.form`
 `;
 
 const FormContent = styled.div`
-margin: 0 auto;
+  margin: 30px;
   display: flex;
   gap: 20px;
 
@@ -275,14 +275,11 @@ margin: 0 auto;
     width: 100%;
   }
 `;
-
 const BillingContainer = styled.div`
-flex: 1;
-flex-direction: column;
-width: auto;
-
+  flex: 1;
+  flex-direction: column;
+  width: auto;
 `
-
 const BillingSection = styled.div`
   background-color: #ffffff;
   padding: 20px;
@@ -296,9 +293,8 @@ const BillingSection = styled.div`
     padding: 10px; 
   }
 `;
-
 const OrderSummarySection = styled.div`
-  flex: 2;
+  flex: 3;
   background-color: #ffffff;
 `;
 
@@ -350,7 +346,22 @@ const FormInput = styled.input`
     border-color: #ff6600;
     outline: none;
   }
+
+  @media (max-width: 768px) {
+    width: 100%; 
+    max-width: 400px; 
+    padding: 6px;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%; 
+    max-width: 300px; /
+    padding: 4px;
+    font-size: 0.8rem;
+  }
 `;
+
 
 const FullNameDisplay = styled.span`
   flex: 1;
@@ -359,6 +370,12 @@ const FullNameDisplay = styled.span`
   border-radius: 5px;
   line-height: 1.5;
   display: inline-block;
+
+  @media (max-width: 768px) {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
+
 `;
 
 const Table = styled.table`
@@ -415,7 +432,7 @@ const TableCell = styled.td`
       position: relative;
       box-sizing: border-box;
       border: none;
-      height: 50px;
+      height: auto;
 
       &:nth-of-type(5) {
         display: none;
@@ -423,24 +440,18 @@ const TableCell = styled.td`
 
       &:nth-of-type(1) {
         display: inline-block;
-        width: calc(40% - 5px); 
         vertical-align: top;
-        margin-left: 20px;
       }
   
       &:nth-of-type(2) {
         display: inline-block;
-        width: calc(50% - 5px); 
         vertical-align: top;
       }
       &:nth-of-type(3) {
         display: block;
-        margin-left: 30px; 
-        margin-top: 10px;  
       }
       &:nth-of-type(4) {
         display: block;
-        margin-left: 30px;   
         text-align: left; 
       }
      
@@ -455,6 +466,10 @@ const ProductImage = styled.img`
 const RadioContainer = styled.div`
   margin-top: 15px;
   border-bottom: 1px solid #ccc;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const PaymentOption = styled.div`
@@ -462,6 +477,10 @@ const PaymentOption = styled.div`
 
   input[type='radio'] {
     margin-right: 8px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
   }
 `;
 
@@ -480,7 +499,9 @@ font-family: 'Poppins', sans-serif;
   background-color: #d22630;
   color: #fff;
   height: 50px;
-  width: 300px;
+  width: 80%;
+  max-width: 300px;
+  min-width: 200px;
   font-size: 0.9rem;
   border: none;
   padding: 10px 20px;
@@ -495,7 +516,9 @@ const SubmitButton = styled.button`
 font-family: 'Poppins', sans-serif;
 border-radius: 35px;
   height: 50px;
-  width: 300px;
+  width: 80%;
+  max-width: 300px; 
+  min-width: 200px;
   background-color: #000099;
   color: #fff;
   border: none;
