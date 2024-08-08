@@ -90,8 +90,8 @@ const PlaceOrder = () => {
         id: cartItems.map(item => item.id)
       }, 
 
-      success_url:  'http://localhost:3000/viewOrder',
-      cancel_url:  'http://localhost:3000/placeOrder'
+      success_url:  'http://localhost:3000/viewOrder' || 'https://onepc.online/api/v1/viewOrder',
+      cancel_url:  'http://localhost:3000/placeOrder'  || 'https://onepc.online/api/v1/placeOrder'
     };
   
     try {
