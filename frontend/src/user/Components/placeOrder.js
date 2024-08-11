@@ -273,6 +273,7 @@ const FormContent = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     width: 100%;
+    margin: 0 auto;
   }
 `;
 const BillingContainer = styled.div`
@@ -356,7 +357,7 @@ const FormInput = styled.input`
 
   @media (max-width: 480px) {
     width: 100%; 
-    max-width: 300px; /
+    max-width: 300px; 
     padding: 4px;
     font-size: 0.8rem;
   }
